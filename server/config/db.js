@@ -13,7 +13,7 @@ class DatabaseConnection {
                 logger.info("Database already connected");
                 return;
             }
-
+ 
             const options = {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
