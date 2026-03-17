@@ -50,8 +50,20 @@ const setupMiddleware = (app) => {
         });
     });
 };
- 
+
+const createAuthLimiter =()=>{
+    return rateLimit({
+        windowMs:config.RATE_LIMIT.WINDOW_MS,
+        max:config.RATE_LIMIT.AUTH_MAX_REQUESTS,
+         message: {
+      success: false,
+      message: 'Too many authentication attempts, please try again later.'
+    },
+    standardHeaders:true,
+    legacyHeaders:false
+    });
+}
 
 module.exports={
-    setupMiddleware
+    setupMiddleware,createAuthLimiter
 }
