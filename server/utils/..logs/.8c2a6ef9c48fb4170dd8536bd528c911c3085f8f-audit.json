@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\vyasa\\OneDrive\\Desktop\\ShopEase Ecomm\\server\\utils\\..logs\\.8c2a6ef9c48fb4170dd8536bd528c911c3085f8f-audit.json",
+    "files": [
+        {
+            "date": 1773936170936,
+            "name": "C:\\Users\\vyasa\\OneDrive\\Desktop\\ShopEase Ecomm\\server\\utils\\..logs\\error-262026-03-19.log",
+            "hash": "10685799911bc2587cd9b95a402f1b2ab83f724d100f247f549af55df191446a"
+        }
+    ],
+    "hashType": "sha256"
+}
