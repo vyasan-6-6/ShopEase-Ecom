@@ -8,7 +8,7 @@ const logFormat = winston.format.combine(
 );
 
 const infoTransport = new winston.transports.DailyRotateFile({
-    filename:path.join(__dirname,"..logs/info-%DATE%.log"),
+    filename:path.join(__dirname,"../logs/info-%DATE%.log"),
     datePattern:'YYY-MM-DD',
     zippedArchive:true,
     maxSize:"20m",
@@ -18,7 +18,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 });
 
 const errorTranspot  = new winston.transports.DailyRotateFile({
-    filename:path.join(__dirname,"..logs/error-%DATE%.log"),
+    filename:path.join(__dirname,"../logs/error-%DATE%.log"),
     datePattern:'YYY-MM-DD',
     zippedArchive:true,
     maxSize:"20m",
