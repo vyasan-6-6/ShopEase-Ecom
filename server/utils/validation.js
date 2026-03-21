@@ -36,12 +36,7 @@ const registerValidation = Joi.object({
   email: commonPatterns.email.messages(customMessages),
   password: commonPatterns.password.messages(customMessages)
 });
-
-const loginValidation = Joi.object({
-    email:commonPatterns.email.messages(customMessages),
-    password:Joi.string().label("Password").trim().required().messages(customMessages),
-});
-
+ 
 //
 //
 //
@@ -51,5 +46,5 @@ const loginValidation = Joi.object({
 
 module.exports={
     registerValidation,
-    loginValidation
+    
 }
