@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["active", "banned","inactive"],
+            enum: ["active", "banned", "inactive"],
             default: "active",
         },
         banReason: {
@@ -72,18 +72,30 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-userSchema.methods.getPublicProfile = function(){
-    const userObject = this.toObject();//this.toObject() creates a plain JavaScript copy of the Mongoose document.
-    delete userObject.password;//removes the password only from that copy.
+userSchema.methods.getPublicProfile = function () {
+    const userObject = this.toObject(); //this.toObject() creates a plain JavaScript copy of the Mongoose document.
+    delete userObject.password; //removes the password only from that copy.
     return userObject;
 };
 
-userSchema.statics.findActiveUsers = function(){
-    return this.find({status:"active"});
+userSchema.statics.findActiveUsers = function () {
+    return this.find({ status: "active" });
 };
 
-userSchema.statics.findbyEmail = function(email){
-    return this.findOne({email:email.toLowerCase()})
+userSchema.statics.findbyEmail = function (email) {
+    return this.findOne({ email: email.toLowerCase() });
 };
 
-module.exports=mongoose.model("User",userSchema);
+userSchema.set("toJSON", {
+    transform: (doc, ret) => {
+        delete ret.password;
+        delete ret.__v;
+
+        ret.id = ret._id; //rename for frondend
+
+        delete ret._id;
+        return ret;
+    },
+});
+
+module.exports = mongoose.model("User", userSchema);
