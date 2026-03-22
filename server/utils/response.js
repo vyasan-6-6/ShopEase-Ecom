@@ -18,16 +18,15 @@ class ResponseFormatter {
         return res.status(statusCode).json(response);
     }
 
-    static error(res, error, statusCode = null) {
+    static error(res, error) {
         const formattedError = ErrorUtils.formatError(error);
-        const finalStatusCode = statusCode || formattedError.error.statusCode;
 
         const response = {
             ...formattedError,
             timestamp: new Date().toISOString(),
             requestId: res.locals.requestId || null,
         };
-        return res.status(finalStatusCode).json(response);
+        return res.status(formattedError.error.statusCode).json(response);
     }
 
     
@@ -38,23 +37,14 @@ class ResponseFormatter {
       value: detail.context?.value
     }));
 
-    const response = {
-      success: false,
-      error: {
-        message: 'Validation failed',
-        code: 'VALIDATION_ERROR',
-        statusCode: 400,
-        details: errors
-      },
-      timestamp: new Date().toISOString(),
-      requestId: res.locals.requestId || null
-    };
-
-    return res.status(400).json(response);
+  const error = {
+    name:"ValidationError",
+    details:errors
   }
 
-//
-//
+   return this.error(res,error)
+  }
+
 //
 //
 //
