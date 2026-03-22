@@ -1,15 +1,23 @@
+const { ErrorFactory } = require("../utils/errors");
 const logger = require("../utils/logger");
 const { sendError, sendSuccess } = require("../utils/response");
 
 class BaseController {
     static asyncHandler(fn) {
-        return (req, res, next) => { 
+        return (req, res, next) => {
             Promise.resolve(fn(req, res, next)).catch(next); //.catch(next) = “Forward this error to the global error handler”
         };
     }
 
-    //
-    //
+    static validateRequest(schema, data) {
+        const { error, value } = schema.validate(data, { abortEarly: false });
+        if (error) {
+            throw ErrorFactory.validation("Validation fails.", error.details);
+        }
+        return value;
+    }
+
+
     static sendSuccess(res, message, data = null, statusCode = 200) {
         return sendSuccess(res, message, data, statusCode);
     }
@@ -35,8 +43,8 @@ class BaseController {
         logger.info(`Controller Action: ${action}`, logData);
     }
 
-    static sanitizeUser(user){
-        const sanitize = user.toObject ? user.toObject() : {...user};
+    static sanitizeUser(user) {
+        const sanitize = user.toObject ? user.toObject() : { ...user };
         delete sanitize.password;
         delete sanitize._v;
 
@@ -44,4 +52,4 @@ class BaseController {
     }
 }
 
-module.exports=BaseController;
+module.exports = BaseController;
