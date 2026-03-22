@@ -59,10 +59,14 @@ const sendError = (res,message,statusCode=500,details=null)=>{
     return ResponseFormatter.error(res,error,statusCode);
 }
 
-//
+
+const sendValidationError = (res, validationResult) => {
+  return ResponseFormatter.validationError(res, validationResult);
+};
 
 module.exports={
     ResponseFormatter,
     sendSuccess,
-    sendError
+    sendError,
+    sendValidationError
 }

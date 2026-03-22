@@ -1,6 +1,6 @@
 const { ErrorFactory } = require("../utils/errors");
 const logger = require("../utils/logger");
-const { sendError, sendSuccess } = require("../utils/response");
+const { sendError, sendSuccess,sendValidationError } = require("../utils/response");
 
 class BaseController {
     static asyncHandler(fn) {
@@ -17,6 +17,9 @@ class BaseController {
         return value;
     }
 
+    static handleValidationError (res,error){
+return sendValidationError(res, { error });
+    }
 
     static sendSuccess(res, message, data = null, statusCode = 200) {
         return sendSuccess(res, message, data, statusCode);
