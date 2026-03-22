@@ -3,7 +3,7 @@ const { sendError, sendSuccess } = require("../utils/response");
 
 class BaseController {
     static asyncHandler(fn) {
-        return (req, res, next) => {
+        return (req, res, next) => { 
             Promise.resolve(fn(req, res, next)).catch(next); //.catch(next) = “Forward this error to the global error handler”
         };
     }
