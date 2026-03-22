@@ -20,7 +20,7 @@ class ResponseFormatter {
 
     static error(res, error, statusCode = null) {
         const formattedError = ErrorUtils.formatError(error);
-        const finalStatusCode = statusCode || formattedError.error.Date;
+        const finalStatusCode = statusCode || formattedError.error.statusCode;
 
         const response = {
             ...formattedError,
@@ -31,8 +31,28 @@ class ResponseFormatter {
     }
 
     
+  static validationError(res, validationResult) {
+    const errors = validationResult.error.details.map(detail => ({
+      field: detail.path[0],
+      message: detail.message,
+      value: detail.context?.value
+    }));
 
-//
+    const response = {
+      success: false,
+      error: {
+        message: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        statusCode: 400,
+        details: errors
+      },
+      timestamp: new Date().toISOString(),
+      requestId: res.locals.requestId || null
+    };
+
+    return res.status(400).json(response);
+  }
+
 //
 //
 //
