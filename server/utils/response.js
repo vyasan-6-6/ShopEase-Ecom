@@ -45,6 +45,13 @@ class ResponseFormatter {
    return this.error(res,error)
   }
 
+static created(res,message,data=null){
+    return this.success(res,message,data,201);
+}
+
+static noContent(res){
+    return res.status(204).send();
+}
 //
 //
 //
@@ -63,7 +70,6 @@ const sendSuccess = (res,message,data=null,statusCode=200)=>{
 }
 
 const sendError = (res,error)=>{
-   
     return ResponseFormatter.error(res,error);
 }
 
