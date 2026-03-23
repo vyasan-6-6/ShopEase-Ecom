@@ -21,3 +21,19 @@ const authHeader = req.headers.authorization;
     next(ErrorFactory.authentication("Invalid or expired token"));
   }
 }
+
+const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return next(ErrorFactory.authentication('Not authenticated'));
+  }
+
+  if (req.user.role !== 'admin') {
+    return next(ErrorFactory.authorization('Admin privileges required'));
+  }
+
+  next();
+};
+module.exports = {
+    authenticateUser,
+    requireAdmin
+}
