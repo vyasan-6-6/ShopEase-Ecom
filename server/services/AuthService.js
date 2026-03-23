@@ -5,31 +5,28 @@ const logger = require("../utils/logger");
 
 class AuthService {
     static async register(userData) {
-        try {
+  
             const existingUser = await User.findByEmail(userData.email);
             if (existingUser) {
                 throw ErrorFactory.conflict("User with this email already exists");
             }
 
-            const user = new User(userData);
+            const user = await User.create(userData);
             await user.save();
             logger.info(`New user registered: ${userData.email}`);
 
             return {
                 user: user.getPublicProfile(),
             };
-        } catch (error) {
-            logger.error("Registration error:", error);
-            throw error;
-        }
+  
     }
 
     static async login(credentials) {
-        try {
+       
             const { email, password } = credentials;
             const user = await User.findByEmail(email);
             if (!user) {
-                throw ErrorFactory.validation("Invalid email or password");
+                throw ErrorFactory.authentication("Invalid email or password");
             }
 
             if (user.status === "banned") {
@@ -53,10 +50,7 @@ class AuthService {
                 user: user.getPublicProfile(),
                 token,
             };
-        } catch (error) {
-            logger.error("Login error:", error);
-            throw error;
-        }
+      
     }
 }
 
