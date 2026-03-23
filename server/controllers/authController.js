@@ -14,6 +14,7 @@ static login = BaseController.asyncHandler(async (req,res)=>{
     const validationData = BaseController.validateRequest(loginValidation,req.body);
     const result = await AuthService.login(validationData);
     BaseController.logAction("USER_LOGIN",result.user);
-    BaseController.sendError(res,"Login Successfull.",result);
+    BaseController.sendSuccess(res,"Login Successfull.",result);
 })
 }
+module.exports=AuthController;

@@ -1,17 +1,11 @@
 const express = require("express");
+const AuthController = require("../controllers/AuthController");
 
 const router = express.Router();
 
-router.get("/u",async (req,res)=>{
-res.json("hi vyasan")
-});
+router.post("/register",AuthController.register);
+router.post("/login",AuthController.login);
 
-// router.post("/register");
-// router.post("/login");
 
-// router.get("/me");
-// router.put("/profile");
-// router.put("/change-password");
-// router.post("/logout");
 
 module.exports=router;
