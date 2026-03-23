@@ -3,7 +3,7 @@ const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 const helmet = require("helmet");
 const config = require("../config/config");
-const requestLogger = require("../utils/logger");
+const requestLogger = require("./requestLogger");
 
 const setupMiddleware = (app) => {
     app.use(

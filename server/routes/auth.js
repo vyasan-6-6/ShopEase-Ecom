@@ -2,7 +2,11 @@ const express = require("express");
 
 const router = express.Router();
 
-router.post("/register",);
+router.get("/u",async (req,res)=>{
+res.json("hi vyasan")
+});
+
+// router.post("/register");
 // router.post("/login");
 
 // router.get("/me");

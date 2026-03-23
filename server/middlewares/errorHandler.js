@@ -40,6 +40,7 @@ const errorHandler = (err, req, res, next) => {
     error = ErrorFactory.authentication("Token expired");
   }
 
+
   //  Final response (single pipeline)
   return sendError(res, error);
 };
