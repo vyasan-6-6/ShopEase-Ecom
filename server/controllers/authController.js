@@ -15,6 +15,11 @@ static login = BaseController.asyncHandler(async (req,res)=>{
     const result = await AuthService.login(validationData);
     BaseController.logAction("USER_LOGIN",result.user);
     BaseController.sendSuccess(res,"Login Successfull.",result);
-})
+});
+
+static getProfile = BaseController.asyncHandler(async (req,res)=>{
+    const user = await AuthService.getProfile(req.user.id);
+    BaseController.sendSuccess(res, 'Profile retrieved successfully', { user });
+});
 }
 module.exports=AuthController;
