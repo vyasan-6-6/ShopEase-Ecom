@@ -6,7 +6,7 @@ const dbConnection = require("./config/db");
 const {setupMiddleware} = require('./middlewares/setup');
 const {setupRoutes} = require("./routes/index");
 const logger = require("./utils/logger");
-
+const { notFound, errorHandler } = require("./middlewares/errorHandler");
 class Server {
     constructor() {
         this.app = express();
@@ -22,8 +22,9 @@ class Server {
         
             setupRoutes(this.app);
 
-            //notfound
-            //errorhandler
+           this.app.use(notFound);
+           this.app.use(errorHandler);
+
 
             //initialze socket
 
