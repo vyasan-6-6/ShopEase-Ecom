@@ -4,7 +4,7 @@ const config = require("./config/config");
 const http = require("http");
 const dbConnection = require("./config/db");
 const {setupMiddleware} = require('./middlewares/setup');
-const {setupRoutes} = require("./routes/index");
+const {setupRoutes} = require("./routes");
 const logger = require("./utils/logger");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 class Server {
