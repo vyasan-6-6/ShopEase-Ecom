@@ -58,6 +58,24 @@ class AuthService {
     return user.getPublicProfile();
 
     }
+
+    static async updateProfile(userId,updateData){
+        delete updateData.password;
+        delete updateData.role;
+        delete updateData.status;
+        const user = await User.findByIdAndUpdate(
+            userId,
+            updateData,
+            {new:true//Return updated document,default:false
+                ,runValidators:true//Apply schema validation on update,default:false
+            }
+        );
+        if(!user){
+            throw ErrorFactory.notFound("User not found");
+        }
+        logger.info(`Profile updated:${user.email}`);
+        return user.getPublicProfile();
+    }
 }
 
 module.exports = AuthService;

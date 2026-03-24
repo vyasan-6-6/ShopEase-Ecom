@@ -1,5 +1,5 @@
 const { AuthService } = require("../services");
-const { registerValidation, loginValidation } = require("../utils/validation");
+const { registerValidation, loginValidation, profileUpdateValidation } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
 class AuthController extends BaseController{
@@ -21,6 +21,13 @@ static getProfile = BaseController.asyncHandler(async (req,res)=>{
     const user = await AuthService.getProfile(req.user.id);
     BaseController.sendSuccess(res, 'Profile retrieved successfully', { user });
 });
+
+static updateProfile = BaseController.asyncHandler(async (req,res)=>{
+    const validatedData = BaseController.validateRequest(profileUpdateValidation,req.body);
+    const user = await AuthService.updateProfile(req.user.id,validatedData);
+  BaseController.logAction('PROFILE_UPDATE', user);
+    BaseController.sendSuccess(res, 'Profile updated successfully', { user });
+})
 
 }
 module.exports=AuthController;
