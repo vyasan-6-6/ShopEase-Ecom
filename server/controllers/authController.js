@@ -21,5 +21,6 @@ static getProfile = BaseController.asyncHandler(async (req,res)=>{
     const user = await AuthService.getProfile(req.user.id);
     BaseController.sendSuccess(res, 'Profile retrieved successfully', { user });
 });
+
 }
 module.exports=AuthController;

@@ -42,14 +42,19 @@ const loginValidation = Joi.object({
     password:Joi.string().label("Password").trim().required().messages(customMessages),
 });
 
-//
-//
-//
-//
-//
-//
+const adminLoginValidation = loginValidation;
+
+const profileUpdateValidation = Joi.object({
+  name: commonPatterns.name.messages(customMessages),
+  phone: Joi.string().pattern(/^\+?[\d\s\-\(\)]+$/).optional().messages({
+    'string.pattern.base': 'Please provide a valid phone number'
+  }),
+  bio: Joi.string().max(500).optional(),
+  avatar: Joi.string().uri().optional()
+});
+
 
 module.exports={
     registerValidation,
-    loginValidation
+    loginValidation,profileUpdateValidation
 }
