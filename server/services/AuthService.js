@@ -1,7 +1,9 @@
+const { error } = require("winston");
 const User = require("../models/User");
 const { ErrorFactory } = require("../utils/errors");
 const { generateUserToken } = require("../utils/jwt");
 const logger = require("../utils/logger");
+const { generateOTP, hashOTP } = require("../utils/otp");
 
 class AuthService {
     static async register(userData) {
@@ -9,14 +11,21 @@ class AuthService {
         if (existingUser) {
             throw ErrorFactory.conflict("User with this email already exists");
         }
-
-        const user = await User.create(userData);
-        console.log("user in services:",userData)
+const otp = generateOTP();
+        const user = await User.create({
+            ...userData,
+            otp:{
+                code:hashOTP(otp),
+                expiresAt:Date.now()+10*60*1000//10min
+            }
+        });
+        console.log(`otp for ${userData.email}:${otp}`)
         await user.save();
         logger.info(`New user registered: ${userData.email}`);
 
         return {
             user: user.getPublicProfile(),
+             message: 'OTP sent to your email'
         };
     }
 
@@ -25,6 +34,9 @@ class AuthService {
         const user = await User.findByEmail(email);
         if (!user) {
             throw ErrorFactory.authentication("Invalid email or password");
+        }
+        if(!user.isVerified){
+            throw ErrorFactory.authentication("Please verify your account with OTP.");
         }
 
         if (user.status === "banned") {
@@ -49,6 +61,43 @@ class AuthService {
             token,
         };
     }
+
+    static async verifyOtp(email,otp){
+const user = await User.findOne({email});
+if(!user){
+    throw ErrorFactory.notFound("User not found");
+}
+if(user.isVerified){
+    throw ErrorFactory.conflict("User already existed");
+}
+
+if(!user.otp || !user.otp.code){
+    throw ErrorFactory.authentication("NO OTP found");
+}
+
+const hashed = hashOTP(otp);
+if(hashed !== user.otp.code){
+    throw ErrorFactory.authentication("Invalid OTP");
+}
+if(user.otp.expiresAt < Date.now()){
+    throw ErrorFactory.authentication("OTP expired");
+}
+
+user.isVerified = true;
+user.otp = undefined;
+await user.save();
+
+const token = generateUserToken({
+    id:user._id,
+    email:user.email,
+    role:user.role
+});
+return {
+    user:user.getPublicProfile(),
+    token
+}
+    }
+    
 
     static async getProfile(userId){
 

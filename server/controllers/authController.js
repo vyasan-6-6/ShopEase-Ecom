@@ -1,48 +1,57 @@
 const { AuthService } = require("../services");
-const { registerValidation, loginValidation, profileUpdateValidation, passwordChangeValidation } = require("../utils/validation");
+const {
+    registerValidation,
+    loginValidation,
+    profileUpdateValidation,
+    passwordChangeValidation,
+} = require("../utils/validation");
 const BaseController = require("./BaseController");
 
-class AuthController extends BaseController{
-static register = BaseController.asyncHandler(async(req,res)=>{
-    const validatedData = BaseController.validateRequest(registerValidation,req.body);
-    console.log(req.body);
-    
-    const result = await AuthService.register(validatedData);
-    BaseController.logAction("USER_REGISTER",result.user);
-    BaseController.sendSuccess(res,'User registered successfully. Welcome!', result, 201)
-});
+class AuthController extends BaseController {
+    static register = BaseController.asyncHandler(async (req, res) => {
+        const validatedData = BaseController.validateRequest(registerValidation, req.body);
+        console.log(req.body);
 
-static login = BaseController.asyncHandler(async (req,res)=>{
-    const validationData = BaseController.validateRequest(loginValidation,req.body);
-    const result = await AuthService.login(validationData);
-    BaseController.logAction("USER_LOGIN",result.user);
-    BaseController.sendSuccess(res,"Login Successfull.",result);
-});
+        const result = await AuthService.register(validatedData);
+        BaseController.logAction("USER_REGISTER", result.user);
+        BaseController.sendSuccess(res, "User registered successfully. Welcome!", result, 201);
+    });
 
-static getProfile = BaseController.asyncHandler(async (req,res)=>{
-    const user = await AuthService.getProfile(req.user.id);
-    BaseController.sendSuccess(res, 'Profile retrieved successfully', { user });
-});
+    static login = BaseController.asyncHandler(async (req, res) => {
+        const validationData = BaseController.validateRequest(loginValidation, req.body);
+        const result = await AuthService.login(validationData);
+        BaseController.logAction("USER_LOGIN", result.user);
+        BaseController.sendSuccess(res, "Login Successfull.", result);
+    });
 
-static updateProfile = BaseController.asyncHandler(async (req,res)=>{
-    const validatedData = BaseController.validateRequest(profileUpdateValidation,req.body);
-    const user = await AuthService.updateProfile(req.user.id,validatedData);
-  BaseController.logAction('PROFILE_UPDATE', user);
-    BaseController.sendSuccess(res, 'Profile updated successfully', { user });
-})
+    static verifyOtp = BaseController.asyncHandler(async (req, res) => {
+        const { email, otp } = req.body;
+        const result = await AuthService.verifyOtp(email, otp);
+        BaseController.sendSuccess(res, "Account verified successfully", result);
+    });
+    static getProfile = BaseController.asyncHandler(async (req, res) => {
+        const user = await AuthService.getProfile(req.user.id);
+        BaseController.sendSuccess(res, "Profile retrieved successfully", { user });
+    });
 
-static changePassword = BaseController.asyncHandler(async (req,res)=>{
-    const validationData  = BaseController.validateRequest(passwordChangeValidation,req.body);
-    await AuthService.changePassword(req.user.id,validationData);
-    
-    BaseController.logAction('PASSWORD_CHANGE', req.user);
-    BaseController.sendSuccess(res, 'Password changed successfully');
-});
+    static updateProfile = BaseController.asyncHandler(async (req, res) => {
+        const validatedData = BaseController.validateRequest(profileUpdateValidation, req.body);
+        const user = await AuthService.updateProfile(req.user.id, validatedData);
+        BaseController.logAction("PROFILE_UPDATE", user);
+        BaseController.sendSuccess(res, "Profile updated successfully", { user });
+    });
 
+    static changePassword = BaseController.asyncHandler(async (req, res) => {
+        const validationData = BaseController.validateRequest(passwordChangeValidation, req.body);
+        await AuthService.changePassword(req.user.id, validationData);
 
-static logout = BaseController.asyncHandler(async (req,res)=>{
-    BaseController.logAction("USER_LOGOUT",req.user);
-    BaseController.sendSuccess(res,"Logged out successfull")
-})
+        BaseController.logAction("PASSWORD_CHANGE", req.user);
+        BaseController.sendSuccess(res, "Password changed successfully");
+    });
+
+    static logout = BaseController.asyncHandler(async (req, res) => {
+        BaseController.logAction("USER_LOGOUT", req.user);
+        BaseController.sendSuccess(res, "Logged out successfull");
+    });
 }
-module.exports=AuthController;
+module.exports = AuthController;
