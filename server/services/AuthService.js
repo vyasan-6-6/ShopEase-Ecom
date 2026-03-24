@@ -6,28 +6,27 @@ const logger = require("../utils/logger");
 const { generateOTP, hashOTP } = require("../utils/otp");
 const { sendOtpEmail } = require("../utils/nodemailer");
 
-
 class AuthService {
     static async register(userData) {
         const existingUser = await User.findByEmail(userData.email);
         if (existingUser) {
             throw ErrorFactory.conflict("User with this email already exists");
         }
-const otp = generateOTP();
+        const otp = generateOTP();
         const user = await User.create({
             ...userData,
-            otp:{
-                code:hashOTP(otp),
-                expiresAt:Date.now()+10*60*1000//10min
-                , lastSendAt:Date.now()
-            }
+            otp: {
+                code: hashOTP(otp),
+                expiresAt: Date.now() + 10 * 60 * 1000, //10min
+                lastSendAt: Date.now(),
+            },
         });
-       await sendOtpEmail(user.email,otp);
+        await sendOtpEmail(user.email, otp);
         logger.info(`New user registered: ${userData.email}`);
 
         return {
             user: user.getPublicProfile(),
-             message: 'OTP sent to your email'
+            message: "OTP sent to your email",
         };
     }
 
@@ -37,7 +36,7 @@ const otp = generateOTP();
         if (!user) {
             throw ErrorFactory.authentication("Invalid email or password");
         }
-        if(!user.isVerified){
+        if (!user.isVerified) {
             throw ErrorFactory.authentication("Please verify your account with OTP.");
         }
 
@@ -64,87 +63,105 @@ const otp = generateOTP();
         };
     }
 
-    static async verifyOtp(email,otp){
-const user = await User.findOne({email});
-if(!user){
-    throw ErrorFactory.notFound("User not found");
-}
-if(user.isVerified){
-    throw ErrorFactory.conflict("User already existed");
-}
+    static async verifyOtp(email, otp) {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw ErrorFactory.notFound("User not found");
+        }
+        if (user.isVerified) {
+            throw ErrorFactory.conflict("User already existed");
+        }
 
-if(!user.otp || !user.otp.code){
-    throw ErrorFactory.authentication("NO OTP found");
-    
-}
-  //  Attempt limit
-  if (user.otp.attempts >= 5) {
-    throw ErrorFactory.authentication('Too many attempts. Request new OTP');
-  }
-const hashed = hashOTP(otp);
-if(hashed !== user.otp.code){
-   user.otp.attempts +=1;
-   await user.save();
-    throw ErrorFactory.authentication("Invalid OTP");
-}
-if(user.otp.expiresAt < Date.now()){
-    throw ErrorFactory.authentication("OTP expired");
-}
+        if (!user.otp || !user.otp.code) {
+            throw ErrorFactory.authentication("NO OTP found");
+        }
+        //  Attempt limit
+        if (user.otp.attempts >= 5) {
+            throw ErrorFactory.authentication("Too many attempts. Request new OTP");
+        }
+        const hashed = hashOTP(otp);
+        if (hashed !== user.otp.code) {
+            user.otp.attempts += 1;
+            await user.save();
+            throw ErrorFactory.authentication("Invalid OTP");
+        }
+        if (user.otp.expiresAt < Date.now()) {
+            throw ErrorFactory.authentication("OTP expired");
+        }
 
-user.isVerified = true;
-user.otp = undefined;
-await user.save();
+        user.isVerified = true;
+        user.otp = undefined;
+        await user.save();
 
-const token = generateUserToken({
-    id:user._id,
-    email:user.email,
-    role:user.role
-});
-return {
-    user:user.getPublicProfile(),
-    token
-}
+        const token = generateUserToken({
+            id: user._id,
+            email: user.email,
+            role: user.role,
+        });
+        return {
+            user: user.getPublicProfile(),
+            token,
+        };
     }
 
+    static async resentOtp(email) {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw ErrorFactory.notFound("user not found");
+        }
+        if (user.isVerified) {
+            throw ErrorFactory.conflict("User already verified");
+        }
+        if (user.otp?.lastSendAt && Date.now - user.otp.lastSendAt < 60 * 1000) {
+            throw ErrorFactory.authentication("Please wait before requesting another OTP.");
+        }
 
-    static async getProfile(userId){
-
-    const user = await User.findById(userId);
-    if(!user){
-        throw ErrorFactory.notFound("User not found");
+        const otp = generateOTP();
+        user.otp = {
+            code: hashOTP(otp),
+            expiresAt: Date.now() + 10 * 60 * 1000,
+            attempts: 0,
+            lastSendAt: Date.now(),
+        };
+        await user.save();
+        await sendOtpEmail(email, otp);
+        return {
+            message: "OTP send Successfully.",
+        };
     }
-    return user.getPublicProfile();
 
+    static async getProfile(userId) {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw ErrorFactory.notFound("User not found");
+        }
+        return user.getPublicProfile();
     }
 
-    static async updateProfile(userId,updateData){
+    static async updateProfile(userId, updateData) {
         delete updateData.password;
         delete updateData.role;
         delete updateData.status;
-        const user = await User.findByIdAndUpdate(
-            userId,
-            updateData,
-            {new:true//Return updated document,default:false
-                ,runValidators:true//Apply schema validation on update,default:false
-            }
-        );
-        if(!user){
+        const user = await User.findByIdAndUpdate(userId, updateData, {
+            new: true, //Return updated document,default:false
+            runValidators: true, //Apply schema validation on update,default:false
+        });
+        if (!user) {
             throw ErrorFactory.notFound("User not found");
         }
         logger.info(`Profile updated:${user.email}`);
         return user.getPublicProfile();
     }
 
-
-    static async changePassword(userId,passwordData){
-        const {currentPassword,newPassword} = passwordData;
-        //include password 
+    static async changePassword(userId, passwordData) {
+        const { currentPassword, newPassword } = passwordData;
+        //include password
         const user = await User.findById(userId).select("+password");
-        if(!user){
+        if (!user) {
             throw ErrorFactory.notFound("user not found");
         }
         const isCurrentPasswordValid = await user.comparePassword(currentPassword);
-        if(!isCurrentPasswordValid){
+        if (!isCurrentPasswordValid) {
             throw ErrorFactory.authentication("Current password is incorrect.");
         }
         user.password = newPassword;
@@ -153,7 +170,5 @@ return {
         return true;
     }
 }
-
-
 
 module.exports = AuthService;
