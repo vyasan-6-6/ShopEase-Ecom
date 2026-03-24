@@ -53,8 +53,19 @@ const profileUpdateValidation = Joi.object({
   avatar: Joi.string().uri().optional()
 });
 
+const passwordChangeValidation = Joi.object({
+  currentPassword: Joi.string().required().messages(customMessages),
+  newPassword: commonPatterns.password.messages({
+    ...customMessages,
+    'string.min': 'New password must be at least 8 characters long'
+  }),
+  confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required().messages({
+    'any.only': 'Password confirmation does not match new password',
+    'any.required': 'Password confirmation is required'
+  }).strip()
+});
 
 module.exports={
     registerValidation,
-    loginValidation,profileUpdateValidation
+    loginValidation,profileUpdateValidation,passwordChangeValidation
 }
