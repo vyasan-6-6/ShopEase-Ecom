@@ -62,7 +62,7 @@ const passwordChangeValidation = Joi.object({
   confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required().messages({
     'any.only': 'Password confirmation does not match new password',
     'any.required': 'Password confirmation is required'
-  }).strip()
+  }).strip()//strip()=This removes confirmPassword after validation
 });
 
 module.exports={

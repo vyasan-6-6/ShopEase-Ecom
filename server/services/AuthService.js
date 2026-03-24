@@ -76,6 +76,26 @@ class AuthService {
         logger.info(`Profile updated:${user.email}`);
         return user.getPublicProfile();
     }
+
+
+    static async changePassword(userId,passwordData){
+        const {currentPassword,newPassword} = passwordData;
+        //include password 
+        const user = await User.findById(userId).select("+password");
+        if(!user){
+            throw ErrorFactory.notFound("user not found");
+        }
+        const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+        if(!isCurrentPasswordValid){
+            throw ErrorFactory.authentication("Current password is incorrect.");
+        }
+        user.password = newPassword;
+        await user.save();
+        logger.info(`Password changed for user:${user.email}`);
+        return true;
+    }
 }
+
+
 
 module.exports = AuthService;

@@ -1,5 +1,5 @@
 const { AuthService } = require("../services");
-const { registerValidation, loginValidation, profileUpdateValidation } = require("../utils/validation");
+const { registerValidation, loginValidation, profileUpdateValidation, passwordChangeValidation } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
 class AuthController extends BaseController{
@@ -29,5 +29,12 @@ static updateProfile = BaseController.asyncHandler(async (req,res)=>{
     BaseController.sendSuccess(res, 'Profile updated successfully', { user });
 })
 
+static changePassword = BaseController.asyncHandler(async (req,res)=>{
+    const validationData  = BaseController.validateRequest(passwordChangeValidation,req.body);
+    await AuthService.changePassword(req.user.id,validationData);
+    
+    BaseController.logAction('PASSWORD_CHANGE', req.user);
+    BaseController.sendSuccess(res, 'Password changed successfully');
+})
 }
 module.exports=AuthController;
