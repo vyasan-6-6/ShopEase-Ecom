@@ -35,6 +35,12 @@ static changePassword = BaseController.asyncHandler(async (req,res)=>{
     
     BaseController.logAction('PASSWORD_CHANGE', req.user);
     BaseController.sendSuccess(res, 'Password changed successfully');
+});
+
+
+static logout = BaseController.asyncHandler(async (req,res)=>{
+    BaseController.logAction("USER_LOGOUT",req.user);
+    BaseController.sendSuccess(res,"Logged out successfull")
 })
 }
 module.exports=AuthController;
