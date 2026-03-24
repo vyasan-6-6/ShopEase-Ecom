@@ -4,6 +4,8 @@ const { ErrorFactory } = require("../utils/errors");
 const { generateUserToken } = require("../utils/jwt");
 const logger = require("../utils/logger");
 const { generateOTP, hashOTP } = require("../utils/otp");
+const { sendOtpEmail } = require("../utils/nodemailer");
+
 
 class AuthService {
     static async register(userData) {
@@ -17,10 +19,10 @@ const otp = generateOTP();
             otp:{
                 code:hashOTP(otp),
                 expiresAt:Date.now()+10*60*1000//10min
+                , lastSendAt:Date.now()
             }
         });
-        console.log(`otp for ${userData.email}:${otp}`)
-        await user.save();
+       await sendOtpEmail(user.email,otp);
         logger.info(`New user registered: ${userData.email}`);
 
         return {
@@ -73,10 +75,16 @@ if(user.isVerified){
 
 if(!user.otp || !user.otp.code){
     throw ErrorFactory.authentication("NO OTP found");
+    
 }
-
+  //  Attempt limit
+  if (user.otp.attempts >= 5) {
+    throw ErrorFactory.authentication('Too many attempts. Request new OTP');
+  }
 const hashed = hashOTP(otp);
 if(hashed !== user.otp.code){
+   user.otp.attempts +=1;
+   await user.save();
     throw ErrorFactory.authentication("Invalid OTP");
 }
 if(user.otp.expiresAt < Date.now()){
@@ -97,7 +105,7 @@ return {
     token
 }
     }
-    
+
 
     static async getProfile(userId){
 
