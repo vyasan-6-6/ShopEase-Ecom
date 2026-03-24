@@ -2,92 +2,95 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, "Name is required"],
-      trim: true,
-      minlength: [2, "Name must be at least 2 characters long"],
-      maxlength: [50, "Name cannot exceed 50 characters"],
-    },
+    {
+        name: {
+            type: String,
+            required: [true, "Name is required"],
+            trim: true,
+            minlength: [2, "Name must be at least 2 characters long"],
+            maxlength: [50, "Name cannot exceed 50 characters"],
+        },
 
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      index: true,
-      lowercase: true,
-      trim: true,
-      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Please provide a valid email"],
-    },
+        email: {
+            type: String,
+            required: [true, "Email is required"],
+            unique: true,
+            index: true,
+            lowercase: true,
+            trim: true,
+            match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, "Please provide a valid email"],
+        },
 
-    password: {
-      type: String,
-      select: false,
-      required: [true, "Password is required"],
-      minlength: [8, "Password must be at least 8 characters long"],
-    },
+        password: {
+            type: String,
+            select: false,
+            required: [true, "Password is required"],
+            minlength: [8, "Password must be at least 8 characters long"],
+        },
 
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
+        isDeleted: {
+            type: Boolean,
+            default: false,
+        },
 
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user",
-    },
+        role: {
+            type: String,
+            enum: ["user", "admin"],
+            default: "user",
+        },
 
-    status: {
-      type: String,
-      enum: ["active", "banned", "inactive"],
-      default: "active",
-    },
+        status: {
+            type: String,
+            enum: ["active", "banned", "inactive"],
+            default: "active",
+        },
+        otp: {
+            code: String,
+            expiresAt: Date,
+        },
+        isVerified: {
+            type: Boolean,
+            default: false,
+        },
 
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
+        lastLogin: {
+            type: Date,
+            default: null,
+        },
 
-    lastLogin: {
-      type: Date,
-      default: null,
-    },
+        phone: {
+            type: String,
+            default: null,
+        },
 
-    phone: {
-      type: String,
-      default: null,
-    },
+        banReason: {
+            type: String,
+            default: null,
+        },
 
-    banReason: {
-      type: String,
-      default: null,
-    },
+        bannedAt: {
+            type: Date,
+            default: null,
+        },
 
-    bannedAt: {
-      type: Date,
-      default: null,
+        bannedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null,
+        },
     },
-
-    bannedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
-  },
-  { timestamps: true }
+    { timestamps: true },
 );
 
-
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
 
     try {
-        this.password = await bcrypt.hash(this.password, 12);
-        next();
+      
+      this.password = await bcrypt.hash(this.password, 12);
+       
     } catch (error) {
-        next(error);
+       throw error
     }
 });
 
@@ -106,7 +109,7 @@ userSchema.statics.findActiveUsers = function () {
 };
 
 userSchema.statics.findByEmail = function (email) {
-    return this.findOne({ email: email.toLowerCase()}).select("+password")
+    return this.findOne({ email: email.toLowerCase() }).select("+password");
 };
 
 userSchema.set("toJSON", {

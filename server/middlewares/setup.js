@@ -35,7 +35,7 @@ const setupMiddleware = (app) => {
 
     app.use(cors(corsOptions));
 
-    app.use(express.json({limit:"10m"}));//API's
+    app.use(express.json({limit:"10mb"}));//API's
     app.use(express.urlencoded({extended:true}));//form data
 
     app.use(requestLogger);//custom logging middleware

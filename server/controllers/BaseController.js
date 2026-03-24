@@ -5,7 +5,7 @@ const { sendError, sendSuccess,sendValidationError } = require("../utils/respons
 class BaseController {
     static asyncHandler(fn) {
         return (req, res, next) => {
-            Promise.resolve(fn(req, res, next)).catch(next); //.catch(next) = “Forward this error to the global error handler”
+           Promise.resolve(fn(req, res, next)).catch(next); //.catch(next) = “Forward this error to the global error handler”
         };
     }
 

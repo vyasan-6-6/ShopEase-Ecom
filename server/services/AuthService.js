@@ -11,6 +11,7 @@ class AuthService {
         }
 
         const user = await User.create(userData);
+        console.log("user in services:",userData)
         await user.save();
         logger.info(`New user registered: ${userData.email}`);
 
