@@ -107,7 +107,7 @@ class AuthService {
     static async resentOtp(email) {
         const user = await User.findOne({ email });
         if (!user) {
-            throw ErrorFactory.notFound("user not found");
+            throw ErrorFactory.notFound("OTP sent if email exists");//prevents email enumeration attacks
         }
         if (user.isVerified) {
             throw ErrorFactory.conflict("User already verified");
@@ -128,6 +128,59 @@ class AuthService {
         return {
             message: "OTP send Successfully.",
         };
+    }
+
+    static async forgotPassword(email) {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw ErrorFactory.notFound("User not found");
+        }
+        const otp = generateOTP();
+        user.resetPassword = {
+            otp: hashOTP(otp),
+            expiresAt: Date.now() + 10 * 60 * 1000,
+            attempts: 0,
+        };
+        await user.save();
+        await sendOtpEmail(email, otp);
+        return { message: "OTP sent to email" };
+    }
+
+    static async verifyResetOtp(email, otp) {
+        const user = await User.findOne({ email });
+        if (!user || !user.resetPassword) {
+            throw ErrorFactory.notFound("Invalid request");
+        }
+        if (user.resetPassword.attempts >= 5) {
+            throw ErrorFactory.authentication("Too many attempts");
+        }
+        if (user.resetPassword.expiresAt < Date.now()) {
+            throw ErrorFactory.authentication("OTP expired");
+        }
+
+        const hashed = hashOTP(otp);
+        if (hashed !== user.resetPassword.otp) {
+            user.resetPassword.attempts += 1;
+            await user.save();
+            throw ErrorFactory.authentication("Invalid OTP");
+        }
+        return {
+            message: "OTP verified",
+        };
+    }
+
+    static async resetPassword(email, newPassword) {
+        const user = await User.findOne({ email });
+        if (!user || !user.resetPassword) {
+            throw new NotFoundError("Invalid request");
+        }
+        if (user.resetPassword.expiresAt < Date.now()) {
+            throw ErrorFactory.authentication("OTP expired");
+        }
+        user.password = newPassword;
+        user.resetPassword = undefined;
+        await user.save();
+        return { message: "Password reset successful" };
     }
 
     static async getProfile(userId) {

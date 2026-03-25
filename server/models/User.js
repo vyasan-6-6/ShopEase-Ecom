@@ -44,6 +44,14 @@ const userSchema = new mongoose.Schema(
             enum: ["active", "banned", "inactive"],
             default: "active",
         },
+        resetPassword:{
+         otp:String,
+         expiresAt:Date,
+         attempts:{
+            type:Number,
+            default:0,
+         }
+        },
         otp: {
             code: String,
             expiresAt: Date,

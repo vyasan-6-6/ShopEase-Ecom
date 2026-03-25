@@ -30,10 +30,27 @@ class AuthController extends BaseController {
         BaseController.sendSuccess(res, "Account verified successfully", result);
     });
 
-    static resentOtp = BaseController.asyncHandler(async (req,res)=>{
-        const {email} = req.body;
+    static resentOtp = BaseController.asyncHandler(async (req, res) => {
+        const { email } = req.body;
         const result = await AuthService.resentOtp(email);
-        BaseController.sendSuccess(res,result.message)
+        BaseController.sendSuccess(res, result.message);
+    });
+
+    static forgotPassword = BaseController.asyncHandler(async (req, res) => {
+        const { email } = req.body;
+        const result = await AuthService.forgotPassword(email);
+        BaseController.sendSuccess(res, result.message);
+    });
+
+    static verifyResetOtp = BaseController.asyncHandler(async (req, res) => {
+        const { email, otp } = req.body;
+        const result = await AuthService.verifyResetOtp(email, otp);
+        BaseController.sendSuccess(res, result.message);
+    });
+    static resetPassword = BaseController.asyncHandler(async (req,res)=>{
+        const {newPassword,email} = req.body;
+        const result = await AuthService.resetPassword(email,newPassword);
+         BaseController.sendSuccess(res,result.message);
     })
     static getProfile = BaseController.asyncHandler(async (req, res) => {
         const user = await AuthService.getProfile(req.user.id);
