@@ -112,7 +112,7 @@ class AuthService {
         if (user.isVerified) {
             throw ErrorFactory.conflict("User already verified");
         }
-        if (user.otp?.lastSendAt && Date.now - user.otp.lastSendAt < 60 * 1000) {
+        if (user.otp?.lastSendAt && Date.now() - user.otp.lastSendAt < 60 * 1000) {
             throw ErrorFactory.authentication("Please wait before requesting another OTP.");
         }
 
@@ -135,11 +135,13 @@ class AuthService {
         if (!user) {
             throw ErrorFactory.notFound("User not found");
         }
+       
         const otp = generateOTP();
         user.resetPassword = {
             otp: hashOTP(otp),
             expiresAt: Date.now() + 10 * 60 * 1000,
             attempts: 0,
+            lastSendAt:Date.now(),
         };
         await user.save();
         await sendOtpEmail(email, otp);
@@ -157,6 +159,9 @@ class AuthService {
         if (user.resetPassword.expiresAt < Date.now()) {
             throw ErrorFactory.authentication("OTP expired");
         }
+         if (user.resetPassword?.lastSendAt && Date.now() - user.resetPassword.lastSendAt < 60 * 1000) {
+            throw ErrorFactory.authentication("Please wait before requesting another OTP.");
+        }
 
         const hashed = hashOTP(otp);
         if (hashed !== user.resetPassword.otp) {
@@ -164,6 +169,8 @@ class AuthService {
             await user.save();
             throw ErrorFactory.authentication("Invalid OTP");
         }
+        user.resetPassword.isVerified = true;
+        await user.save();
         return {
             message: "OTP verified",
         };
@@ -177,7 +184,10 @@ class AuthService {
         if (user.resetPassword.expiresAt < Date.now()) {
             throw ErrorFactory.authentication("OTP expired");
         }
-        user.password = newPassword;
+        if(!user.resetPassword.isVerified){
+throw ErrorFactory.authentication("OTP not verified");
+        }
+        user.password = newPassword; //hashed via pre
         user.resetPassword = undefined;
         await user.save();
         return { message: "Password reset successful" };

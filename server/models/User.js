@@ -44,22 +44,24 @@ const userSchema = new mongoose.Schema(
             enum: ["active", "banned", "inactive"],
             default: "active",
         },
-        resetPassword:{
-         otp:String,
-         expiresAt:Date,
-         attempts:{
-            type:Number,
-            default:0,
-         }
+        resetPassword: {
+            otp: String,
+            expiresAt: Date,
+            attempts: {
+                type: Number,
+                default: 0,
+            },
+            lastSendAt: Date,
+            isVerified: Boolean,
         },
         otp: {
             code: String,
             expiresAt: Date,
-            attempts:{
-                type:Number,
-                default:0,
+            attempts: {
+                type: Number,
+                default: 0,
             },
-            lastSendAt:Date
+            lastSendAt: Date,
         },
         isVerified: {
             type: Boolean,
@@ -97,8 +99,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
-      this.password = await bcrypt.hash(this.password, 12);
-    
+    this.password = await bcrypt.hash(this.password, 12);
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
