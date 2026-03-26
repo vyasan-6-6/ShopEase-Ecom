@@ -1,4 +1,5 @@
 import axios from "axios";
+import {Navigate} from "react-router-dom"
 import { API_CONFIG, AUTH_CONFIG } from "../config/app";
 export const tokenService = {
     getAuthToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey),
@@ -51,7 +52,8 @@ const createApiClient = (getToken) => {
             const status = error.response?.status;
             if (status === 401) {
                 clearTokens();
-                window.location.href = "/login";
+                const navigate  =  Navigate();
+               navigate("/login");
             }
             // Handle forbidden
             if (status === 403) {
@@ -68,8 +70,8 @@ const createApiClient = (getToken) => {
     return client;
 };
 
-export const userClient = createApiClient(getAuthToken);
-export const adminClient = createApiClient(getAdminToken);
+export const userClient = createApiClient(tokenService.getAuthToken);
+export const adminClient = createApiClient(tokenService.getAdminToken);
 
 export const makeRequest = async (client, config) => {
     try {
