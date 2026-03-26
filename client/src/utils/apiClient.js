@@ -1,5 +1,34 @@
 import axios from "axios";
 import { API_CONFIG, AUTH_CONFIG } from "../config/app";
+export const tokenService = {
+    getAuthToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey),
+    getAdminToken: () => localStorage.getItem(AUTH_CONFIG.adminKey),
+    getUser: () => {
+        const userData = localStorage.getItem(AUTH_CONFIG.userKey);
+        return userData ? JSON.parse(userData) : null;
+    },
+
+    setAuthToken: (token) => {
+        if (token) localStorage.setItem(AUTH_CONFIG.tokenKey, token);
+        else localStorage.removeItem(AUTH_CONFIG.tokenKey);
+    },
+
+    setAdminToken: (token) => {
+        if (token) localStorage.setItem(AUTH_CONFIG.adminKey, token);
+        else localStorage.removeItem(AUTH_CONFIG.adminKey);
+    },
+    setUser: (userData) => {
+        userData
+            ? localStorage.setItem(AUTH_CONFIG.userKey, JSON.stringify(userData))
+            : localStorage.removeItem(AUTH_CONFIG.userKey);
+    },
+
+    clearAll: () => {
+        localStorage.removeItem(AUTH_CONFIG.adminKey);
+        localStorage.removeItem(AUTH_CONFIG.tokenKey);
+        localStorage.removeItem(AUTH_CONFIG.userKey);
+    },
+};
 
 const createApiClient = (getToken) => {
     const client = axios.create({
@@ -37,38 +66,6 @@ const createApiClient = (getToken) => {
         },
     );
     return client;
-};
-
-export const getAuthToken = () => localStorage.getItem(AUTH_CONFIG.tokenKey);
-export const getAdminToken = () => localStorage.getItem(AUTH_CONFIG.adminKey);
-export const getUser = () => {
-    const userData = localStorage.getItem(AUTH_CONFIG.userKey);
-    return userData ? JSON.parse(userData) : null;
-};
-export const setAuthToken = (token) => {
-    if (token) {
-        localStorage.setItem(AUTH_CONFIG.tokenKey, token);
-    } else {
-        localStorage.removeItem(AUTH_CONFIG.tokenKey);
-    }
-};
-
-export const setAdminToken = (token) => {
-    if (token) {
-        localStorage.setItem(AUTH_CONFIG.adminKey, token);
-    } else {
-        localStorage.removeItem(AUTH_CONFIG.adminKey);
-    }
-};
-
-export const setUser = (userData) => {
-    userData
-        ? localStorage.setItem(AUTH_CONFIG.userKey, JSON.stringify(userData))
-        : localStorage.removeItem(AUTH_CONFIG.userKey);
-};
-
-export const clearTokens = () => {
-    localStorage.clear();
 };
 
 export const userClient = createApiClient(getAuthToken);
