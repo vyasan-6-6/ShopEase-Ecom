@@ -1,36 +1,53 @@
-import {makeRequest,tokenService,userClient} from "../utils/apiClient";
+import { makeRequest, tokenService, userClient } from "../utils/apiClient";
 
 export const authAPI = {
-    resgister:async (data)=>{
-        return makeRequest(userClient,{
-            url:"/auth/register",
-            method:"POST",
-            data
+    resgister: async (data) => {
+        return makeRequest(userClient, {
+            url: "/auth/register",
+            method: "POST",
+            data,
         });
     },
 
-    verifyRegisterOtp:async(data)=>{
-const res = await makeRequest(userClient,{
-    url:"/auth/verify-otp",
-    method:'POST',
-    data
-});
-
-if(res?.token){
-    tokenService.setAuthToken(res.token);
-}
-return res;
-    },
-
-    login:async (credential)=>{
-        const res = await makeRequest(userClient,{
-            url:'/auth/login',
-            method:'POST',
-            data:credential,
+    verifyRegisterOtp: async (data) => {
+        const res = await makeRequest(userClient, {
+            url: "/auth/verify-otp",
+            method: "POST",
+            data,
         });
-        if(res?.token){
+
+        if (res?.token) {
             tokenService.setAuthToken(res.token);
         }
         return res;
+    },
+
+    login: async (credential) => {
+        const res = await makeRequest(userClient, {
+            url: "/auth/login",
+            method: "POST",
+            data: credential,
+        });
+        if (res?.token) {
+            tokenService.setAuthToken(res.token);
+        }
+        return res;
+    },
+
+    getMe: async () => {
+        return makeRequest(userClient, {
+            url: "/auth/me",
+            method: "GET",
+        });
+    },
+
+    logout:async()=>{
+    try {
+        await makeRequest(userClient,{
+            url:'/auth/logout',
+            method:'POST'
+        })
+    } catch (error) {}
+    tokenService.clearAll();
     }
-}
+};
