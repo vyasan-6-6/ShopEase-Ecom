@@ -35,19 +35,58 @@ export const authAPI = {
     },
 
     getMe: async () => {
+        //in userservice
         return makeRequest(userClient, {
-            url: "/auth/me",
+            url: "/me",
             method: "GET",
         });
     },
 
-    logout:async()=>{
-    try {
-        await makeRequest(userClient,{
-            url:'/auth/logout',
-            method:'POST'
-        })
-    } catch (error) {}
-    tokenService.clearAll();
-    }
+    logout: async () => {
+        try {
+            await makeRequest(userClient, {
+                url: "/auth/logout",
+                method: "POST",
+            });
+        } catch (error) {}
+        tokenService.clearAll();
+    },
+
+    forgotPassword: async (email) => {
+        return makeRequest(userClient, {
+            url: "/auth/forgot-password",
+            method: "POST",
+            data: { email },
+        });
+    },
+
+    verifyResetOtp: async (data) => {
+        return makeRequest(userClient, {
+            url: "/auth/verify-reset-otp",
+            method: "POST",
+            data,
+        });
+    },
+    resetPassword: async (data) => {
+        return makeRequest(userClient, {
+            url: "/auth/reset-password",
+            method: "POST",
+            data,
+        });
+    },
+    updateProfile: async (data) => {//in userservice
+        return makeRequest(userClient, {
+            url: "/profile",
+            method: "PUT",
+            data,
+        });
+    },
+
+    changePassword: async (data) => {//in userservice
+        return makeRequest(userClient, {
+            url: "/change-password",
+            method: "POST",
+            data,
+        });
+    },
 };
