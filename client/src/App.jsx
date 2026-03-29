@@ -1,4 +1,5 @@
 import "./App.css";
+import { ToastContainer } from "react-toastify";
 import {BrowserRouter,Routes,Route} from "react-router-dom"
 import Register from "./pages/auth/Register";
 function App() { 
@@ -10,6 +11,7 @@ function App() {
       {/* <Route path="/login" element={<Login/>}/> */}
       {/* <Route path="/" element={<Home/>}/> */}
     </Routes>
+    <ToastContainer position="top-right" autoClose={3000}/>
     </BrowserRouter>
   )
 }

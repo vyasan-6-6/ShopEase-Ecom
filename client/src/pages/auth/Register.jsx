@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 const Register = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -48,6 +49,17 @@ const Register = () => {
         }
     }, [cooldown, dispatch]);
 
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+        }
+    }, [error]);
+    useEffect(() => {
+        if (cooldown === 60) {
+            toast.success("OTP reset successfull");
+        }
+    }, [cooldown]);
+
     return (
         <div>
             {step === "form" && (
@@ -58,24 +70,23 @@ const Register = () => {
                     <input type="password" {...register("password")} placeholder="Password" />
                     <input type="password" {...register("confirmPassword")} placeholder="Confirm Password" />
 
-                    <button type="submit"  disabled={loading}>
+                    <button type="submit" disabled={loading}>
                         {loading ? "Sending OTP..." : "Register"}
                     </button>
                 </form>
             )}
-            {step==="otp" && (
+            {step === "otp" && (
                 <div>
-                    <input value={otp} onChange={(e)=>setOtp(e.target.value)} placeholder="Enter OTP" />;
-                    <button onSubmit={handleVerify} disabled={loading}>
-{loading ? "Verifying...":"Verify OTP"};
-                    </button >
-                    <button disabled={cooldown>0}>
-{cooldown > 0 ? `Resent OTP in ${cooldown}s`:"Resent OTP"};
+                    <input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />;
+                    <button onSubmit={handleVerify}   disabled={loading}>
+                        {loading ? "Verifying..." : "Verify OTP"};
+                    </button>
+                    <button type="submit" disabled={cooldown > 0}>
+                        {cooldown > 0 ? `Resent OTP in ${cooldown}s` : "Resent OTP"};
                     </button>
                 </div>
-            )};
-
-            {error && <p style={{color:"red"}}>{error}</p>}
+            )}
+            ;{error && <p style={{ color: "red" }}>{error}</p>}
         </div>
     );
 };

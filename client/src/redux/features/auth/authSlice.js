@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { authAPI } from "../../../services";
+import { toast } from "react-toastify";
 
 export const registerUser = createAsyncThunk("auth/registerUser", async (data, { rejectWithValue }) => {
     try {
@@ -47,11 +48,15 @@ export const authSlice = createSlice({
             .addCase(registerUser.pending, (state) => {
                 ((state.loading = true), (state.error = null));
             })
+            .addCase(registerUser.rejected, (state, action) => {
+                ((state.loading = false), (state.error = action.payload.error), toast.error(action.payload.error));
+            })
             .addCase(registerUser.fulfilled, (state, action) => {
                 ((state.loading = false),
                     (state.step = "otp"),
                     (state.cooldown = 60),
-                    (state.email = action.payload.email));
+                    (state.email = action.payload.email),
+                    toast.success("Register Successfull"));
             })
             .addCase(verifyOtp.pending, (state) => {
                 state.loading = true;
@@ -60,10 +65,10 @@ export const authSlice = createSlice({
                 ((state.loading = false), (state.user = action.payload.user), (state.step = "verified"));
             })
             .addCase(verifyOtp.rejected, (state, action) => {
-                ((state.loading = false), (state.error = action.payload));
+                ((state.loading = false), (state.error = action.payload), toast.error("Invalid OTP"));
             });
     },
 });
 
-export const {clearError,tickCooldown,resetAuthFlow,startCooldown} = authSlice.actions;
+export const { clearError, tickCooldown, resetAuthFlow, startCooldown } = authSlice.actions;
 export default authSlice.reducer;
