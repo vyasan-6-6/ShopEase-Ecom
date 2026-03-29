@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 export const registerUser = createAsyncThunk("auth/registerUser", async (data, { rejectWithValue }) => {
     try {
-        await authAPI.resgister(data);
+        await authAPI.register(data);
         return { email: data.email };
     } catch (error) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -17,6 +17,14 @@ export const verifyOtp = createAsyncThunk("auth/verifyOtp", async ({ email, otp 
         return res; //{user,token} present
     } catch (error) {
         return rejectWithValue(error.response?.data.message || error.message);
+    }
+});
+export const resentOtp = createAsyncThunk("auth/resent-otp", async (email, { rejectWithValue }) => {
+    try {
+        await authAPI.register({ email });
+        return true;
+    } catch (error) {
+        return rejectWithValue(error.message);
     }
 });
 export const authSlice = createSlice({
@@ -66,6 +74,15 @@ export const authSlice = createSlice({
             })
             .addCase(verifyOtp.rejected, (state, action) => {
                 ((state.loading = false), (state.error = action.payload), toast.error("Invalid OTP"));
+            })
+            .addCase(resentOtp.pending, (state) => {
+                ((state.loading = true), (state.error = null));
+            })
+            .addCase(resentOtp.rejected, (state, action) => {
+                ((state.loading = false), (state.error = action.payload));
+            })
+            .addCase(resentOtp.fulfilled, (state, action) => {
+                ((state.loading = false), (state.cooldown = 60));
             });
     },
 });

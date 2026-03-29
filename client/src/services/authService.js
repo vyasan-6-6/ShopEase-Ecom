@@ -1,7 +1,7 @@
 import { makeRequest, tokenService, userClient } from "../utils/apiClient";
 
 export const authAPI = {
-    resgister: async (data) => {
+    register: async (data) => {
         return makeRequest(userClient, {
             url: "/auth/register",
             method: "POST",

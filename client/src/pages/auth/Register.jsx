@@ -1,4 +1,4 @@
-import { registerUser, tickCooldown, verifyOtp } from "../../redux/features/auth/authSlice";
+import { registerUser, resentOtp, tickCooldown, verifyOtp } from "../../redux/features/auth/authSlice";
 import {
     selectAuthEmail,
     selectAuthError,
@@ -33,6 +33,11 @@ const Register = () => {
     const handleVerify = () => {
         dispatch(verifyOtp({ email, otp }));
     };
+
+    const handleResent =()=>{
+        if(cooldown>0) return;
+        dispatch(resentOtp(email))
+    }
     useEffect(() => {
         if (user) {
             navigate("/");
@@ -80,9 +85,12 @@ const Register = () => {
                     <input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />;
                     <button onSubmit={handleVerify}   disabled={loading}>
                         {loading ? "Verifying..." : "Verify OTP"};
-                    </button>
+                    </button> <br />
                     <button type="submit" disabled={cooldown > 0}>
                         {cooldown > 0 ? `Resent OTP in ${cooldown}s` : "Resent OTP"};
+                    </button><br />
+                    <button disabled={cooldown>0 || loading}  onClick={handleResent}>
+                        {cooldown >0 ? `Resent in ${cooldown}s `:"Resent OTP"}
                     </button>
                 </div>
             )}
