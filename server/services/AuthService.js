@@ -22,6 +22,7 @@ class AuthService {
             },
         });
         await sendOtpEmail(user.email, otp);
+        
         logger.info(`New user registered: ${userData.email}`);
 
         return {
