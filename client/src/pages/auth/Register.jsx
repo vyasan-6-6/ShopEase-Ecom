@@ -9,10 +9,10 @@ import {
 } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-const Register = () => {
+const Register = memo(() => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -26,18 +26,19 @@ const Register = () => {
     const { register, handleSubmit } = useForm();
     const [otp, setOtp] = useState("");
 
-    const onSubmit = (data) => {
-        if (data.password !== data.confirmPassword) return;
+    const onSubmit = useCallback((data) => {
+        if (data.password !== data.confirmPassword)   { toast.error('Passwords do not match') 
+            return};
         dispatch(registerUser({ name: `${data.firstName} ${data.lastName}`, email: data.email, password: data.password }));
-    };
-    const handleVerify = () => {
+    });
+    const handleVerify = useCallback(() => {
         dispatch(verifyOtp({ email, otp }));
-    };
+    });
 
-    const handleResent =()=>{
+    const handleResent =useCallback(()=>{
         if(cooldown>0) return;
         dispatch(resentOtp(email))
-    }
+    })
     useEffect(() => {
         if (user) {
             navigate("/");
@@ -97,6 +98,6 @@ const Register = () => {
             ;{error && <p style={{ color: "red" }}>{error}</p>}
         </div>
     );
-};
+});
 
 export default Register;
