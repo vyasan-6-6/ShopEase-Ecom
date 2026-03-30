@@ -61,13 +61,12 @@ const Register = memo(() => {
         }
     }, [otp, handleVerify]);
 
-useEffect(() => {
- const user = localStorage.getItem(AUTH_CONFIG.userKey);
- if(user){
-    dispatch(setUser(JSON.parse(user)));
- }
-  
-}, [ ])
+    useEffect(() => {
+        const user = localStorage.getItem(AUTH_CONFIG.userKey);
+        if (user) {
+            dispatch(setUser(JSON.parse(user)));
+        }
+    }, []);
 
     useEffect(() => {
         if (user) {
@@ -103,56 +102,46 @@ useEffect(() => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Input
                             label={"FirstName"}
-                            name={"firstName"}
                             type="text"
-                            register={register}
+                            {...register("name", { required: "First name is required" })}
                             error={errors.firstName?.message}
-                            rules={{ required: "First name is required" }}
                             placeholder="First Name"
                         />
                         <Input
                             label={"Last Name"}
-                            name={"lastName"}
                             type="text"
-                            register={register}
+                            {...register("lastname", { required: "Last name is required" })}
                             error={errors.lastName?.message}
-                            rules={{ required: "Last name is required" }}
                             placeholder="Last Name"
                         />
                         <Input
-                            name={"email"}
                             label={"Email"}
                             type="email"
-                            register={register}
-                            rules={{
+                            {...register("email", {
                                 required: "Email is required",
                                 pattern: {
                                     value: /^\S+@\S+$/i,
                                     message: "Invalid email",
                                 },
-                            }}
+                            })}
                             error={errors.email?.message}
                             placeholder="Email"
                         />
                         <Input
-                            name={"password"}
                             label={"Password"}
-                            register={register}
-                            error={errors.password?.message}
-                            type="password"
-                            rules={{
+                            {...register("password", {
                                 required: "Password is required",
                                 minLength: { value: 6, message: "Min 6 characters" },
-                            }}
+                            })}
+                            error={errors.password?.message}
+                            type="password"
                             placeholder="Password"
                         />
                         <Input
-                            name={"confirmPassword"}
                             label={"Confirm Password"}
-                            register={register}
+                            {...register("confirmPassword", { required: "Confrim your password" })}
                             error={errors.confirmPassword?.message}
                             type="password"
-                            rules={{ required: "Confirm your password" }}
                             placeholder="Confirm Password"
                         />
 
