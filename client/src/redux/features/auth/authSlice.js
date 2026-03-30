@@ -7,7 +7,7 @@ export const registerUser = createAsyncThunk("auth/registerUser", async (data, {
         await authAPI.register(data);
         return { email: data.email };
     } catch (error) {
-        return rejectWithValue(error.response?.data.message || error.message);
+         return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
 
@@ -16,7 +16,7 @@ export const verifyOtp = createAsyncThunk("auth/verifyOtp", async ({ email, otp 
         const res = await authAPI.verifyRegisterOtp({ email, otp });
         return res; //{user,token} present
     } catch (error) {
-        return rejectWithValue(error.response?.data.message || error.message);
+          return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
 export const resentOtp = createAsyncThunk("auth/resent-otp", async (email, { rejectWithValue }) => {
@@ -24,7 +24,16 @@ export const resentOtp = createAsyncThunk("auth/resent-otp", async (email, { rej
         await authAPI.register({ email });
         return true;
     } catch (error) {
-         return rejectWithValue(error.response?.data.message || error.message);
+          return rejectWithValue(error.response?.data?.message || error.message);
+    }
+});
+
+export const loginUser = createAsyncThunk("auth/loginUser",async(data,{rejectWithValue})=>{
+    try {
+        const res = await authAPI.login(data);
+        return res.data.user;
+    } catch (error) {
+           return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
 export const authSlice = createSlice({
@@ -91,7 +100,21 @@ export const authSlice = createSlice({
             })
             .addCase(resentOtp.fulfilled, (state, action) => {
                 ((state.loading = false), (state.cooldown = 60));
-            });
+            })
+            .addCase(loginUser.pending,(state)=>{
+                state.loading=true,
+                state.error=null
+            })
+            .addCase(loginUser.fulfilled,(state,action)=>{
+                state.loading=false,
+                state.user=action.payload,
+                state.step= "authenticated"
+            })
+            .addCase(loginUser.rejected,(state,action)=>{
+                state.loading=false,
+                state.error=action.payload
+            })
+            
     }
 });
 
