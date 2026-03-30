@@ -9,9 +9,12 @@ import {
 } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import AuthLayout from "../../components/ui/AuthLayout";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
 const Register = memo(() => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -23,22 +26,33 @@ const Register = memo(() => {
     const cooldown = useAppSelector(selectCooldown);
     const user = useAppSelector(selectUser);
 
-    const { register, handleSubmit } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
     const [otp, setOtp] = useState("");
 
-    const onSubmit = useCallback((data) => {
-        if (data.password !== data.confirmPassword)   { toast.error('Passwords do not match') 
-            return};
-        dispatch(registerUser({ name: `${data.firstName} ${data.lastName}`, email: data.email, password: data.password }));
-    });
+    const onSubmit = useCallback(
+        (data) => {
+            if (data.password !== data.confirmPassword) {
+                toast.error("Passwords do not match");
+                return;
+            }
+            dispatch(
+                registerUser({ name: `${data.firstName} ${data.lastName}`, email: data.email, password: data.password }),
+            );
+        },
+        [dispatch],
+    );
     const handleVerify = useCallback(() => {
         dispatch(verifyOtp({ email, otp }));
-    });
+    }, [dispatch]);
 
-    const handleResent =useCallback(()=>{
-        if(cooldown>0) return;
-        dispatch(resentOtp(email))
-    })
+    const handleResent = useCallback(() => {
+        if (cooldown > 0) return;
+        dispatch(resentOtp(email));
+    });
     useEffect(() => {
         if (user) {
             navigate("/");
@@ -67,36 +81,85 @@ const Register = memo(() => {
     }, [cooldown]);
 
     return (
-        <div>
-            {step === "form" && (
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <input {...register("firstName")} placeholder="First Name" />
-                    <input {...register("lasttName")} placeholder="Last Name" />
-                    <input {...register("email")} placeholder="Email" />
-                    <input type="password" {...register("password")} placeholder="Password" />
-                    <input type="password" {...register("confirmPassword")} placeholder="Confirm Password" />
+        <AuthLayout  >
+            <div>
+                {step === "form" && (
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Input
+                            label={"FirstName"}
+                            name={"name"}
+                            type="text"
+                            register={register}
+                            error={errors.name?.message}
+                            rules={{ required: "First name is required" }}
+                            placeholder="First Name"
+                        />
+                        <Input
+                            label={"Last Name"}
+                            name={"lastName"}
+                            type="text"
+                            register={register}
+                            error={errors.lastName?.message}
+                            rules={{ required: "Last name is required" }}
+                            placeholder="Last Name"
+                        />
+                        <Input
+                            name={"email"}
+                            label={"Email"}
+                            type="email"
+                            register={register}
+                            rules={{
+                                required: "Email is required",
+                                pattern: {
+                                    value: /^\S+@\S+$/i,
+                                    message: "Invalid email",
+                                },
+                            }}
+                            error={errors.email?.message}
+                            placeholder="Email"
+                        />
+                        <Input
+                            name={"password"}
+                            label={"Password"}
+                            register={register}
+                            error={errors.password?.message}
+                            type="password"
+                            rules={{
+                                required: "Password is required",
+                                minLength: { value: 6, message: "Min 6 characters" },
+                            }}
+                            placeholder="Password"
+                        />
+                        <Input
+                            name={"confirmPassword"}
+                            label={"Confirm Password"}
+                            register={register}
+                            error={errors.confirmPassword?.message}
+                            type="password"
+                            rules={{ required: "Confirm your password" }}
+                            placeholder="Confirm Password"
+                        />
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? "Sending OTP..." : "Register"}
-                    </button>
-                </form>
-            )}
-            {step === "otp" && (
-                <div>
-                    <input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />;
-                    <button onSubmit={handleVerify}   disabled={loading}>
-                        {loading ? "Verifying..." : "Verify OTP"};
-                    </button> <br />
-                    <button type="submit" disabled={cooldown > 0}>
-                        {cooldown > 0 ? `Resent OTP in ${cooldown}s` : "Resent OTP"};
-                    </button><br />
-                    <button disabled={cooldown>0 || loading}  onClick={handleResent}>
-                        {cooldown >0 ? `Resent in ${cooldown}s `:"Resent OTP"}
-                    </button>
-                </div>
-            )}
-            ;{error && <p style={{ color: "red" }}>{error}</p>}
-        </div>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? "Sending OTP..." : "Register"}
+                        </Button>
+                    </form>
+                )}
+                {step === "otp" && (
+                    <div>
+                        <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />;
+                        <Button onClick={handleVerify} disabled={loading}>
+                            {loading ? "Verifying..." : "Verify OTP"};
+                        </Button>{" "}
+                        <br />
+                        <Button disabled={cooldown > 0 || loading} fullWidth variant="outline" onClick={handleResent}>
+                            {cooldown > 0 ? `Resent OTP in ${cooldown}s ` : "Resent OTP"}
+                        </Button>
+                    </div>
+                )}
+                {error && <p style={{ color: "red" }}>{error}</p>}
+            </div>
+        </AuthLayout>
     );
 });
 

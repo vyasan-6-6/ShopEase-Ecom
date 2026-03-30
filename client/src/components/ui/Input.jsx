@@ -1,17 +1,21 @@
-import React from "react";
+ 
 import clsx from "clsx";
+import { useState } from "react";
 
 const Input = ({
   label,
   type = "text",
   name,
-  register,        // from react-hook-form
+  register,
+  rules,        // from react-hook-form
   error,           // error message
   placeholder = "",
   disabled = false,
-  className = "",
+  className = "", 
   ...props
 }) => {
+    const [showPassword,setShowPassword] = useState(false);
+    const isPassword = type ==="password";
   return (
     <div className="flex flex-col gap-1 w-full">
       {label && (
@@ -19,10 +23,11 @@ const Input = ({
           {label}
         </label>
       )}
-
+  
+      <div className="relative">
       <input
         id={name}
-        type={type}
+        type={isPassword&&showPassword?"text":type}
         placeholder={placeholder}
         disabled={disabled}
         {...(register ? register(name) : {})}
@@ -36,8 +41,17 @@ const Input = ({
           className
         )}
         {...props}
-      />
-
+      /> 
+        {/* Password Toggle */}
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        )}</div>
       {error && (
         <span className="text-xs text-red-500">{error}</span>
       )}
