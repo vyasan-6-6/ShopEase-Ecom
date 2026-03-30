@@ -45,6 +45,7 @@ export const authSlice = createSlice({
         step: "form",
         email: null,
         cooldown: 0,
+        isAuthChecked:false
     },
     reducers: {
         logout:(state)=>{
