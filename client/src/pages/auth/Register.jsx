@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import AuthLayout from "../../components/ui/AuthLayout";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
+import OtpInput from "../../components/ui/OtpInput";
 const Register = memo(() => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -47,12 +48,18 @@ const Register = memo(() => {
     );
     const handleVerify = useCallback(() => {
         dispatch(verifyOtp({ email, otp }));
-    }, [dispatch]);
+    }, [dispatch, email, otp]);
 
     const handleResent = useCallback(() => {
         if (cooldown > 0) return;
         dispatch(resentOtp(email));
-    });
+    }, [dispatch, cooldown, email]);
+    useEffect(() => {
+        if (otp.length === 6) {
+            handleVerify();
+        }
+    }, [otp, handleVerify]);
+
     useEffect(() => {
         if (user) {
             navigate("/");
@@ -81,16 +88,16 @@ const Register = memo(() => {
     }, [cooldown]);
 
     return (
-        <AuthLayout  >
+        <AuthLayout>
             <div>
                 {step === "form" && (
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Input
                             label={"FirstName"}
-                            name={"name"}
+                            name={"firstName"}
                             type="text"
                             register={register}
-                            error={errors.name?.message}
+                            error={errors.firstName?.message}
                             rules={{ required: "First name is required" }}
                             placeholder="First Name"
                         />
@@ -146,14 +153,15 @@ const Register = memo(() => {
                     </form>
                 )}
                 {step === "otp" && (
-                    <div>
-                        <Input value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="Enter OTP" />;
-                        <Button onClick={handleVerify} disabled={loading}>
-                            {loading ? "Verifying..." : "Verify OTP"};
-                        </Button>{" "}
-                        <br />
+                    <div className="space-y-4 text-center">
+                        <OtpInput value={otp} onChange={setOtp} />
+
+                        <Button onClick={handleVerify} disabled={loading || otp.length !== 6} fullWidth>
+                            {loading ? "Verifying..." : "Verify OTP"}
+                        </Button>
+
                         <Button disabled={cooldown > 0 || loading} fullWidth variant="outline" onClick={handleResent}>
-                            {cooldown > 0 ? `Resent OTP in ${cooldown}s ` : "Resent OTP"}
+                            {cooldown > 0 ? `Resend OTP in ${cooldown}s` : "Resend OTP"}
                         </Button>
                     </div>
                 )}
