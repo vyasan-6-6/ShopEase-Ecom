@@ -24,7 +24,7 @@ export const resentOtp = createAsyncThunk("auth/resent-otp", async (email, { rej
         await authAPI.register({ email });
         return true;
     } catch (error) {
-        return rejectWithValue(error.message);
+         return rejectWithValue(error.response?.data.message || error.message);
     }
 });
 export const authSlice = createSlice({
@@ -38,6 +38,14 @@ export const authSlice = createSlice({
         cooldown: 0,
     },
     reducers: {
+        logout:(state)=>{
+            state.user= null,
+            state.email=null,
+            state.step="form"
+        },
+        setUser:(state,action)=>{
+            state.user = action.payload;
+        },
         clearError: (state) => {
             state.error = null;
         },
@@ -84,8 +92,8 @@ export const authSlice = createSlice({
             .addCase(resentOtp.fulfilled, (state, action) => {
                 ((state.loading = false), (state.cooldown = 60));
             });
-    },
+    }
 });
 
-export const { clearError, tickCooldown, resetAuthFlow, startCooldown } = authSlice.actions;
+export const { clearError, tickCooldown,logout,setUser, resetAuthFlow, startCooldown } = authSlice.actions;
 export default authSlice.reducer;

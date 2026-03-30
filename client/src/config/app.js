@@ -10,7 +10,7 @@ export const API_CONFIG = {
 export const AUTH_CONFIG = {
     tokenKey: "authToken",
     adminKey: "adminToken",
-    userKey: "User",
+    userKey: "user",
     refreshThreshold: 5 * 60 * 1000, // 5 minutes before expiry
     maxLoginAttempts: 5,
     lockoutDuration: 15 * 60 * 1000,
