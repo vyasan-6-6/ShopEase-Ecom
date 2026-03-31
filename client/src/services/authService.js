@@ -67,6 +67,14 @@ export const authAPI = {
             data,
         });
     },
+    resentOtp:async(data)=>{
+        return makeRequest(userClient,{
+            url:"/auth/resent-otp",
+            method:'POST',
+            data
+        })
+    }
+    ,
     
     resetPassword: async (data) => {
         return makeRequest(userClient, {

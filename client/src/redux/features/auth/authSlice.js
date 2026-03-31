@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { authAPI } from "../../../services";
-import { toast } from "react-toastify";
 
 export const registerUser = createAsyncThunk("auth/registerUser", async (data, { rejectWithValue }) => {
     try {
@@ -14,14 +13,14 @@ export const registerUser = createAsyncThunk("auth/registerUser", async (data, {
 export const verifyOtp = createAsyncThunk("auth/verifyOtp", async ({ email, otp }, { rejectWithValue }) => {
     try {
         const res = await authAPI.verifyRegisterOtp({ email, otp });
-        return res; //{user,token} present
+        return res.data; //{user,token} present
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
 export const resentOtp = createAsyncThunk("auth/resentOtp", async (email, { rejectWithValue }) => {
     try {
-        await authAPI.register({ email });
+        await authAPI.resentOtp({ email });
         return true;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || error.message);
@@ -46,7 +45,7 @@ export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (ema
     }
 });
 
-export const verifyResetOtp = createAsyncThunk("auh/verifyResetOtp", async ({ email, otp }, { rejectWithValue }) => {
+export const verifyResetOtp = createAsyncThunk("auth/verifyResetOtp", async ({ email, otp }, { rejectWithValue }) => {
     try {
         await authAPI.verifyResetOtp({ email, otp });
         return true;
@@ -64,111 +63,145 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ ema
     }
 });
 
-export const authSlice = createSlice({
-    name: "auth",
-    initialState: {
-        user: null,
-        loading: false,
-        error: null,
+const initialState = {
+    user: null,
+    loading: false,
+    error: null,
+    registerFlow: {
         step: "form",
         email: null,
         cooldown: 0,
-        isAuthChecked: false,
     },
+    forgotFlow: {
+        step: "email",
+        email: null,
+        cooldown: 0,
+    },
+};
+export const authSlice = createSlice({
+    name: "auth",
+    initialState: initialState,
     reducers: {
         logout: (state) => {
-            ((state.user = null), (state.email = null), (state.step = "form"));
-        },
+            state.user = null;
+            state.registerFlow = initialState.registerFlow;
+            state.forgotFlow = initialState.forgotFlow;
+        }
+        ,
         setUser: (state, action) => {
             state.user = action.payload;
         },
         clearError: (state) => {
             state.error = null;
         },
-        startCooldown: (state) => {
-            state.cooldown = 60;
+        tickRegisterCooldown: (state) => {
+            if (state.registerFlow.cooldown > 0) state.registerFlow.cooldown -= 1;
         },
-        tickCooldown: (state) => {
-            if (state.cooldown > 0) state.cooldown -= 1;
+        tickForgotCooldown: (state) => {
+            if (state.forgotFlow.cooldown > 0) state.forgotFlow.cooldown -= 1;
         },
-        resetAuthFlow: (state) => {
-            ((state.step = "form"), (state.email = null), (state.cooldown = 0));
+        resetForgotFlow: (state) => {
+            state.forgotFlow = initialState.forgotFlow;
         },
-        forgotStep:(state)=>{
-            state.step = "forgot"
-        }
     },
+
     extraReducers: (builder) => {
         builder
             .addCase(registerUser.pending, (state) => {
-                ((state.loading = true), (state.error = null));
+                state.loading = true;
+                state.error = null;
             })
             .addCase(registerUser.rejected, (state, action) => {
-                ((state.loading = false), (state.error = action.payload.error), toast.error(action.payload.error));
+                state.loading = false;
+                state.error = action.payload?.error;
             })
             .addCase(registerUser.fulfilled, (state, action) => {
-                ((state.loading = false),
-                    (state.step = "otp"),
-                    (state.cooldown = 60),
-                    (state.email = action.payload.email),
-                    toast.success("Register Successfull"));
+                state.loading = false;
+                state.registerFlow.step = "otp";
+                state.registerFlow.cooldown = 60;
+                state.registerFlow.email = action.payload.email;
             })
+
             .addCase(verifyOtp.pending, (state) => {
                 state.loading = true;
             })
             .addCase(verifyOtp.fulfilled, (state, action) => {
-                ((state.loading = false), (state.user = action.payload.user), (state.step = "verified"));
+                state.loading = false;
+                state.user = action.payload.user;
             })
             .addCase(verifyOtp.rejected, (state, action) => {
-                ((state.loading = false), (state.error = action.payload), toast.error("Invalid OTP"));
+                state.loading = false;
+                state.error = action.payload;
             })
+
             .addCase(resentOtp.pending, (state) => {
-                ((state.loading = true), (state.error = null));
+                state.loading = true;
+                state.error = null;
             })
             .addCase(resentOtp.rejected, (state, action) => {
-                ((state.loading = false), (state.error = action.payload));
+                state.loading = false;
+                state.error = action.payload;
             })
-            .addCase(resentOtp.fulfilled, (state, action) => {
-                ((state.loading = false), (state.cooldown = 60));
+            .addCase(resentOtp.fulfilled, (state) => {
+                state.loading = false;
+                state.registerFlow.cooldown = 60;
             })
+
             .addCase(loginUser.pending, (state) => {
-                ((state.loading = true), (state.error = null));
+                state.loading = true;
+                state.error = null;
             })
             .addCase(loginUser.fulfilled, (state, action) => {
-                ((state.loading = false), (state.user = action.payload), (state.step = "authenticated"));
+                state.loading = false;
+                state.user = action.payload;
             })
             .addCase(loginUser.rejected, (state, action) => {
-                ((state.loading = false), (state.error = action.payload));
+                state.loading = false;
+                state.error = action.payload;
             })
+
             .addCase(forgotPassword.pending, (state) => {
-                ((state.loading = true), (state.error = null));
+                state.loading = true;
+                state.error = null;
             })
             .addCase(forgotPassword.fulfilled, (state, action) => {
-                ((state.loading = false), (state.step = "otp"), (state.email = action.payload), (state.cooldown = 60));
+                state.loading = false;
+                state.forgotFlow.step = "otp";
+                state.forgotFlow.email = action.payload;
+                state.forgotFlow.cooldown = 60;
             })
             .addCase(forgotPassword.rejected, (state, action) => {
-                ((state.loading = false), (state.error = action.payload));
+                state.loading = false;
+                state.error = action.payload;
             })
+
             .addCase(verifyResetOtp.pending, (state) => {
-                ((state.loading = true), (state.error = null));
+                state.loading = true;
+                state.error = null;
             })
-            .addCase(verifyResetOtp.fulfilled, (state, action) => {
-                ((state.loading = false), (state.step = "reset"));
+            .addCase(verifyResetOtp.fulfilled, (state) => {
+                state.loading = false;
+                state.forgotFlow.step = "reset";
             })
             .addCase(verifyResetOtp.rejected, (state, action) => {
-                ((state.loading = false), (state.error = action.payload));
+                state.loading = false;
+                state.error = action.payload;
             })
+
             .addCase(resetPassword.pending, (state) => {
-                ((state.loading = true), (state.error = null));
+                state.loading = true;
+                state.error = null;
             })
             .addCase(resetPassword.fulfilled, (state) => {
-                ((state.loading = false), (state.step = "done"));
+                state.loading = false;
+                state.forgotFlow.step = "done";
             })
-            .addCase(resetPassword.rejected, (state) => {
-                ((state.loading = true), (state.error = null));
+            .addCase(resetPassword.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
     },
 });
 
-export const { clearError, tickCooldown,forgotStep, logout, setUser, resetAuthFlow, startCooldown } = authSlice.actions;
+export const { clearError,startForgotFlow,tickForgotCooldown,tickRegisterCooldown, logout, setUser, resetForgotFlow, startCooldown } = authSlice.actions;
 export default authSlice.reducer;

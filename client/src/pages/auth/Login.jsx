@@ -1,4 +1,4 @@
-import { forgotStep, loginUser } from "../../redux/features/auth/authSlice";
+import { loginUser} from "../../redux/features/auth/authSlice";
 import { selectAuthError, selectAuthLoading, selectAuthStep, selectUser } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
@@ -31,9 +31,7 @@ const Login = memo(() => {
         [dispatch],
     );
 
-const handleForgot = ()=>{
-    dispatch(forgotStep());
-}
+
 
     useEffect(() => {
         if (user) {
@@ -80,7 +78,7 @@ const handleForgot = ()=>{
                     Login
                 </Button>{" "}
                 <div className="flex justify-between text-sm mt-4">
-                    <Link to="/auth/forgot-password" className="text-blue-600" onClick={handleForgot}>
+                    <Link to="/auth/forgot-password" className="text-blue-600"  >
                         Forgot Password?
                     </Link>
 

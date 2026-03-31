@@ -1,39 +1,30 @@
 import {
     forgotPassword,
-    registerUser,
     resentOtp,
     resetPassword,
-    setUser,
-    tickCooldown,
-    verifyOtp,
+    tickForgotCooldown,
     verifyResetOtp,
 } from "../../redux/features/auth/authSlice";
 import {
-    selectAuthEmail,
     selectAuthError,
     selectAuthLoading,
-    selectAuthStep,
-    selectCooldown,
-    selectUser,
+    selectForgotFlow,
 } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
-import { memo, useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { memo, useCallback, useEffect, useState } from "react"; 
 import { toast } from "react-toastify";
 import AuthLayout from "../../components/ui/AuthLayout";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import OtpInput from "../../components/ui/OtpInput";
 
-const ForgotPassword = () => {
+const ForgotPassword = memo(() => {
     const dispatch = useAppDispatch();
-
-    const step = useAppSelector(selectAuthStep);
+  
+    const {email,cooldown,step}  = useAppSelector(selectForgotFlow)
     const error = useAppSelector(selectAuthError);
-    const loading = useAppSelector(selectAuthLoading);
-    const email = useAppSelector(selectAuthEmail);
-    const cooldown = useAppSelector(selectCooldown);
+    const loading = useAppSelector(selectAuthLoading); 
 
     const {
         register,
@@ -64,14 +55,14 @@ const ForgotPassword = () => {
         dispatch(resentOtp(email));
     }, [dispatch, cooldown, email]);
 
-    useEffect(() => {
-        if (cooldown > 0) {
-            const t = setInterval(() => {
-                dispatch(tickCooldown());
-            }, 1000);
-            return () => clearInterval(t);
-        }
-    }, [cooldown, dispatch]);
+useEffect(() => {
+    if (cooldown > 0) {
+        const t = setInterval(() => {
+            dispatch(tickForgotCooldown());
+        }, 1000);
+        return () => clearInterval(t);
+    }
+}, [cooldown, dispatch]);
 
     useEffect(() => {
         if (error) {
@@ -82,7 +73,7 @@ const ForgotPassword = () => {
     return (
         <AuthLayout title={`Forgot Password`}>
             {/* STEP 1 */}
-            {step === "forgot" && (
+            {step === "email" && (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <Input
                         label="Email"
@@ -134,6 +125,6 @@ const ForgotPassword = () => {
             )}
         </AuthLayout>
     );
-};
+});
 
 export default ForgotPassword;

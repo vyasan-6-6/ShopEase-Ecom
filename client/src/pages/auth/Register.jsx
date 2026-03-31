@@ -1,10 +1,8 @@
-import { registerUser, resentOtp, setUser, tickCooldown, verifyOtp } from "../../redux/features/auth/authSlice";
+import { registerUser, resentOtp, tickRegisterCooldown, verifyOtp } from "../../redux/features/auth/authSlice";
 import {
-    selectAuthEmail,
     selectAuthError,
     selectAuthLoading,
-    selectAuthStep,
-    selectCooldown,
+    selectRegisterFlow,
     selectUser,
 } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -20,11 +18,10 @@ const Register = memo(() => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const step = useAppSelector(selectAuthStep);
+
+    const {email,cooldown,step} = useAppSelector(selectRegisterFlow)
     const error = useAppSelector(selectAuthError);
     const loading = useAppSelector(selectAuthLoading);
-    const email = useAppSelector(selectAuthEmail);
-    const cooldown = useAppSelector(selectCooldown);
     const user = useAppSelector(selectUser);
 
     const {
@@ -69,7 +66,7 @@ const Register = memo(() => {
     useEffect(() => {
         if (cooldown > 0) {
             const timer = setInterval(() => {
-                dispatch(tickCooldown());
+                dispatch(tickRegisterCooldown());
             }, 1000);
 
             return () => clearInterval(timer);
