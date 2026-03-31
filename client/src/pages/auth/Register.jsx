@@ -1,4 +1,4 @@
-import { registerUser, resentOtp, tickRegisterCooldown, verifyOtp } from "../../redux/features/auth/authSlice";
+import { registerUser, resendOtp, tickRegisterCooldown, verifyOtp } from "../../redux/features/auth/authSlice";
 import {
     selectAuthError,
     selectAuthLoading,
@@ -49,7 +49,7 @@ const Register = memo(() => {
 
     const handleResent = useCallback(() => {
         if (cooldown > 0) return;
-        dispatch(resentOtp(email));
+        dispatch(resendOtp(email));
     }, [dispatch, cooldown, email]);
     useEffect(() => {
         if (otp.length === 6) {
@@ -92,14 +92,14 @@ const Register = memo(() => {
                         <Input
                             label={"FirstName"}
                             type="text"
-                            {...register("name", { required: "First name is required" })}
+                            {...register("firstName", { required: "First name is required" })}
                             error={errors.firstName?.message}
                             placeholder="First Name"
                         />
                         <Input
-                            label={"Last Name"}
+                            label={"LastName"}
                             type="text"
-                            {...register("lastname", { required: "Last name is required" })}
+                            {...register("lastName", { required: "Last name is required" })}
                             error={errors.lastName?.message}
                             placeholder="Last Name"
                         />

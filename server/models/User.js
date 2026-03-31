@@ -106,11 +106,11 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-userSchema.methods.getPublicProfile = function () {
-    const userObject = this.toObject(); //this.toObject() creates a plain JavaScript copy of the Mongoose document.
-    delete userObject.password; //removes the password only from that copy.
-    return userObject;
-};
+// userSchema.methods.getPublicProfile = function () {
+//     const userObject = this.toObject(); //this.toObject() creates a plain JavaScript copy of the Mongoose document.
+//     delete userObject.password; //removes the password only from that copy.
+//     return userObject;
+// };
 
 userSchema.statics.findActiveUsers = function () {
     return this.find({ status: "active" });

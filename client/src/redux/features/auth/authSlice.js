@@ -18,9 +18,9 @@ export const verifyOtp = createAsyncThunk("auth/verifyOtp", async ({ email, otp 
         return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
-export const resentOtp = createAsyncThunk("auth/resentOtp", async (email, { rejectWithValue }) => {
+export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { rejectWithValue }) => {
     try {
-        await authAPI.resentOtp({ email });
+        await authAPI.resendOtp({ email });
         return true;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || error.message);
@@ -134,15 +134,15 @@ export const authSlice = createSlice({
                 state.error = action.payload;
             })
 
-            .addCase(resentOtp.pending, (state) => {
+            .addCase(resendOtp.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(resentOtp.rejected, (state, action) => {
+            .addCase(resendOtp.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
-            .addCase(resentOtp.fulfilled, (state) => {
+            .addCase(resendOtp.fulfilled, (state) => {
                 state.loading = false;
                 state.registerFlow.cooldown = 60;
             })

@@ -1,4 +1,4 @@
-const { error } = require("winston");
+
 const User = require("../models/User");
 const { ErrorFactory } = require("../utils/errors");
 const { generateUserToken } = require("../utils/jwt");
@@ -18,15 +18,19 @@ class AuthService {
             otp: {
                 code: hashOTP(otp),
                 expiresAt: Date.now() + 10 * 60 * 1000, //10min
+                attempts:0,
                 lastSendAt: Date.now(),
             },
         });
-        await sendOtpEmail(user.email, otp);
-        
+        setImmediate(() => {
+  sendOtpEmail(user.email, otp).catch(err => {
+    logger.error("OTP email failed:", err);
+  });
+});
         logger.info(`New user registered: ${userData.email}`);
 
         return {
-            user: user.getPublicProfile(),
+            user: user,
             message: "OTP sent to your email",
         };
     }
@@ -59,7 +63,7 @@ class AuthService {
         logger.info(`User logged in: ${email}`);
 
         return {
-            user: user.getPublicProfile(),
+            user: user,
             token,
         };
     }
@@ -80,14 +84,14 @@ class AuthService {
         if (user.otp.attempts >= 5) {
             throw ErrorFactory.authentication("Too many attempts. Request new OTP");
         }
+        if (user.otp.expiresAt < Date.now()) {
+            throw ErrorFactory.authentication("OTP expired");
+        }
         const hashed = hashOTP(otp);
         if (hashed !== user.otp.code) {
             user.otp.attempts += 1;
             await user.save();
             throw ErrorFactory.authentication("Invalid OTP");
-        }
-        if (user.otp.expiresAt < Date.now()) {
-            throw ErrorFactory.authentication("OTP expired");
         }
 
         user.isVerified = true;
@@ -105,7 +109,7 @@ class AuthService {
         };
     }
 
-    static async resentOtp(email) {
+    static async resendOtp(email) {
         const user = await User.findOne({ email });
         if (!user) {
             throw ErrorFactory.notFound("OTP sent if email exists");//prevents email enumeration attacks
@@ -125,7 +129,11 @@ class AuthService {
             lastSendAt: Date.now(),
         };
         await user.save();
-        await sendOtpEmail(email, otp);
+         setImmediate(() => {
+  sendOtpEmail(user.email, otp).catch(err => {
+    logger.error("OTP email failed:", err);
+  });
+});
         return {
             message: "OTP send Successfully.",
         };

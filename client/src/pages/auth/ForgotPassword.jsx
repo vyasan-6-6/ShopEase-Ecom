@@ -1,6 +1,6 @@
 import {
     forgotPassword,
-    resentOtp,
+    resendOtp,
     resetPassword,
     tickForgotCooldown,
     verifyResetOtp,
@@ -52,7 +52,7 @@ const ForgotPassword = memo(() => {
 
     const handleResent = useCallback(() => {
         if (cooldown > 0) return;
-        dispatch(resentOtp(email));
+        dispatch(resendOtp(email));
     }, [dispatch, cooldown, email]);
 
 useEffect(() => {

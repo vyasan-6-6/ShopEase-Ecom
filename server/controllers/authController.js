@@ -30,9 +30,9 @@ class AuthController extends BaseController {
         BaseController.sendSuccess(res, "Account verified successfully", result);
     });
 
-    static resentOtp = BaseController.asyncHandler(async (req, res) => {
+    static resendOtp = BaseController.asyncHandler(async (req, res) => {
         const { email } = req.body;
-        const result = await AuthService.resentOtp(email);
+        const result = await AuthService.resendOtp(email);
         BaseController.sendSuccess(res, result.message);
     });
 
