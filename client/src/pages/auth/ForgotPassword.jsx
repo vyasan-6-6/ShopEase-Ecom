@@ -44,10 +44,11 @@ const ForgotPassword = memo(() => {
 
     const handleVerify = useCallback(() => {
         dispatch(verifyResetOtp({ email, otp }));
+        
     }, [dispatch, otp, email]);
 
     const handleReset = useCallback(() => {
-        dispatch(resetPassword({ email, password }));
+        dispatch(resetPassword({ email, newPassword: password }));
     }, [dispatch, email, password]);
 
     const handleResent = useCallback(() => {
@@ -77,9 +78,9 @@ useEffect(() => {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <Input
                         label="Email"
-                        name="email"
-                        register={register}
-                        rules={{ required: "Email required" }}
+                        placeholder="Enter Email"
+                       {...register("email",{required:"Email required"})}
+                        
                         error={errors.email?.message}
                     />
                     <Button type="submit" loading={loading} fullWidth>
@@ -93,7 +94,7 @@ useEffect(() => {
                 <div className="space-y-4">
                     <OtpInput value={otp} onChange={setOtp} />
 
-                    <Button onClick={handleVerify} disabled={otp.length !== 6 || loading} fullWidth>
+                    <Button onClick={handleVerify} disabled={otp.length !== 6 || loading} fullWidth >
                         Verify OTP
                     </Button>
 

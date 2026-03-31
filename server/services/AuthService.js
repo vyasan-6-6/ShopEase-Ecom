@@ -104,7 +104,7 @@ class AuthService {
             role: user.role,
         });
         return {
-            user: user.getPublicProfile(),
+            user: user,
             token,
         };
     }
@@ -140,7 +140,7 @@ class AuthService {
     }
 
     static async forgotPassword(email) {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({email});
         if (!user) {
             throw ErrorFactory.notFound("User not found");
         }
@@ -168,9 +168,7 @@ class AuthService {
         if (user.resetPassword.expiresAt < Date.now()) {
             throw ErrorFactory.authentication("OTP expired");
         }
-         if (user.resetPassword?.lastSendAt && Date.now() - user.resetPassword.lastSendAt < 60 * 1000) {
-            throw ErrorFactory.authentication("Please wait before requesting another OTP.");
-        }
+        
 
         const hashed = hashOTP(otp);
         if (hashed !== user.resetPassword.otp) {
@@ -188,7 +186,7 @@ class AuthService {
     static async resetPassword(email, newPassword) {
         const user = await User.findOne({ email });
         if (!user || !user.resetPassword) {
-            throw new NotFoundError("Invalid request");
+            throw ErrorFactory.notFound("Invalid request");
         }
         if (user.resetPassword.expiresAt < Date.now()) {
             throw ErrorFactory.authentication("OTP expired");
@@ -207,7 +205,7 @@ throw ErrorFactory.authentication("OTP not verified");
         if (!user) {
             throw ErrorFactory.notFound("User not found");
         }
-        return user.getPublicProfile();
+        return user;
     }
 
     static async updateProfile(userId, updateData) {
@@ -222,7 +220,7 @@ throw ErrorFactory.authentication("OTP not verified");
             throw ErrorFactory.notFound("User not found");
         }
         logger.info(`Profile updated:${user.email}`);
-        return user.getPublicProfile();
+        return user;
     }
 
     static async changePassword(userId, passwordData) {

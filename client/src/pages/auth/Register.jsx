@@ -45,6 +45,7 @@ const Register = memo(() => {
     );
     const handleVerify = useCallback(() => {
         dispatch(verifyOtp({ email, otp }));
+        navigate("/auth/login");
     }, [dispatch, email, otp]);
 
     const handleResent = useCallback(() => {

@@ -38,6 +38,8 @@ class AuthController extends BaseController {
 
     static forgotPassword = BaseController.asyncHandler(async (req, res) => {
         const { email } = req.body;
+        console.log("email from forgot :",email);
+        
         const result = await AuthService.forgotPassword(email);
         BaseController.sendSuccess(res, result.message);
     });
@@ -48,7 +50,9 @@ class AuthController extends BaseController {
         BaseController.sendSuccess(res, result.message);
     });
     static resetPassword = BaseController.asyncHandler(async (req,res)=>{
-        const {newPassword,email} = req.body;
+        const {email,newPassword} = req.body;
+        console.log("reset pass,email",newPassword,email);
+        
         const result = await AuthService.resetPassword(email,newPassword);
          BaseController.sendSuccess(res,result.message);
     })

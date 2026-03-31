@@ -117,7 +117,7 @@ userSchema.statics.findActiveUsers = function () {
 };
 
 userSchema.statics.findByEmail = function (email) {
-    return this.findOne({ email: email.toLowerCase() }).select("+password");
+    return this.findOne({ email: email.trim().toLowerCase()}).select("+password");
 };
 
 userSchema.set("toJSON", {

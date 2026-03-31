@@ -56,7 +56,7 @@ export const authAPI = {
         return makeRequest(userClient, {
             url: "/auth/forgot-password",
             method: "POST",
-            data: { email },
+            data:  {email },
         });
     },
 

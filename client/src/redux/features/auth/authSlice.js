@@ -54,9 +54,9 @@ export const verifyResetOtp = createAsyncThunk("auth/verifyResetOtp", async ({ e
     }
 });
 
-export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ email, password }, { rejectWithValue }) => {
+export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ email, newPassword }, { rejectWithValue }) => {
     try {
-        await authAPI.resetPassword({ email, password });
+        await authAPI.resetPassword({ email, newPassword });
         return true;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || error.message);
