@@ -7,7 +7,7 @@ export const registerUser = createAsyncThunk("auth/registerUser", async (data, {
         await authAPI.register(data);
         return { email: data.email };
     } catch (error) {
-         return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
 
@@ -16,26 +16,54 @@ export const verifyOtp = createAsyncThunk("auth/verifyOtp", async ({ email, otp 
         const res = await authAPI.verifyRegisterOtp({ email, otp });
         return res; //{user,token} present
     } catch (error) {
-          return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
-export const resentOtp = createAsyncThunk("auth/resent-otp", async (email, { rejectWithValue }) => {
+export const resentOtp = createAsyncThunk("auth/resentOtp", async (email, { rejectWithValue }) => {
     try {
         await authAPI.register({ email });
         return true;
     } catch (error) {
-          return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
 
-export const loginUser = createAsyncThunk("auth/loginUser",async(data,{rejectWithValue})=>{
+export const loginUser = createAsyncThunk("auth/loginUser", async (data, { rejectWithValue }) => {
     try {
         const res = await authAPI.login(data);
         return res.data.user;
     } catch (error) {
-           return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.response?.data?.message || error.message);
     }
 });
+
+export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (email, { rejectWithValue }) => {
+    try {
+        await authAPI.forgotPassword(email);
+        return email;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message);
+    }
+});
+
+export const verifyResetOtp = createAsyncThunk("auh/verifyResetOtp", async ({ email, otp }, { rejectWithValue }) => {
+    try {
+        await authAPI.verifyResetOtp({ email, otp });
+        return true;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message);
+    }
+});
+
+export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ email, password }, { rejectWithValue }) => {
+    try {
+        await authAPI.resetPassword({ email, password });
+        return true;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || error.message);
+    }
+});
+
 export const authSlice = createSlice({
     name: "auth",
     initialState: {
@@ -45,15 +73,13 @@ export const authSlice = createSlice({
         step: "form",
         email: null,
         cooldown: 0,
-        isAuthChecked:false
+        isAuthChecked: false,
     },
     reducers: {
-        logout:(state)=>{
-            state.user= null,
-            state.email=null,
-            state.step="form"
+        logout: (state) => {
+            ((state.user = null), (state.email = null), (state.step = "form"));
         },
-        setUser:(state,action)=>{
+        setUser: (state, action) => {
             state.user = action.payload;
         },
         clearError: (state) => {
@@ -68,6 +94,9 @@ export const authSlice = createSlice({
         resetAuthFlow: (state) => {
             ((state.step = "form"), (state.email = null), (state.cooldown = 0));
         },
+        forgotStep:(state)=>{
+            state.step = "forgot"
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -102,22 +131,44 @@ export const authSlice = createSlice({
             .addCase(resentOtp.fulfilled, (state, action) => {
                 ((state.loading = false), (state.cooldown = 60));
             })
-            .addCase(loginUser.pending,(state)=>{
-                state.loading=true,
-                state.error=null
+            .addCase(loginUser.pending, (state) => {
+                ((state.loading = true), (state.error = null));
             })
-            .addCase(loginUser.fulfilled,(state,action)=>{
-                state.loading=false,
-                state.user=action.payload,
-                state.step= "authenticated"
+            .addCase(loginUser.fulfilled, (state, action) => {
+                ((state.loading = false), (state.user = action.payload), (state.step = "authenticated"));
             })
-            .addCase(loginUser.rejected,(state,action)=>{
-                state.loading=false,
-                state.error=action.payload
+            .addCase(loginUser.rejected, (state, action) => {
+                ((state.loading = false), (state.error = action.payload));
             })
-            
-    }
+            .addCase(forgotPassword.pending, (state) => {
+                ((state.loading = true), (state.error = null));
+            })
+            .addCase(forgotPassword.fulfilled, (state, action) => {
+                ((state.loading = false), (state.step = "otp"), (state.email = action.payload), (state.cooldown = 60));
+            })
+            .addCase(forgotPassword.rejected, (state, action) => {
+                ((state.loading = false), (state.error = action.payload));
+            })
+            .addCase(verifyResetOtp.pending, (state) => {
+                ((state.loading = true), (state.error = null));
+            })
+            .addCase(verifyResetOtp.fulfilled, (state, action) => {
+                ((state.loading = false), (state.step = "reset"));
+            })
+            .addCase(verifyResetOtp.rejected, (state, action) => {
+                ((state.loading = false), (state.error = action.payload));
+            })
+            .addCase(resetPassword.pending, (state) => {
+                ((state.loading = true), (state.error = null));
+            })
+            .addCase(resetPassword.fulfilled, (state) => {
+                ((state.loading = false), (state.step = "done"));
+            })
+            .addCase(resetPassword.rejected, (state) => {
+                ((state.loading = true), (state.error = null));
+            });
+    },
 });
 
-export const { clearError, tickCooldown,logout,setUser, resetAuthFlow, startCooldown } = authSlice.actions;
+export const { clearError, tickCooldown,forgotStep, logout, setUser, resetAuthFlow, startCooldown } = authSlice.actions;
 export default authSlice.reducer;

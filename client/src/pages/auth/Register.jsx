@@ -16,7 +16,6 @@ import AuthLayout from "../../components/ui/AuthLayout";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import OtpInput from "../../components/ui/OtpInput";
-import { AUTH_CONFIG } from "../../config/app";
 const Register = memo(() => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -60,13 +59,6 @@ const Register = memo(() => {
             handleVerify();
         }
     }, [otp, handleVerify]);
-
-    useEffect(() => {
-        const user = localStorage.getItem(AUTH_CONFIG.userKey);
-        if (user) {
-            dispatch(setUser(JSON.parse(user)));
-        }
-    }, []);
 
     useEffect(() => {
         if (user) {

@@ -1,5 +1,5 @@
-import { loginUser } from "../../redux/features/auth/authSlice";
-import { selectAuthError, selectAuthLoading, selectUser } from "../../redux/features/auth/authSelectors";
+import { forgotStep, loginUser } from "../../redux/features/auth/authSlice";
+import { selectAuthError, selectAuthLoading, selectAuthStep, selectUser } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
 import { memo, useCallback, useEffect } from "react";
@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import AuthLayout from "../../components/ui/AuthLayout";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
+import { AUTH_CONFIG } from "../../config/app";
 
 const Login = memo(() => {
     const dispatch = useAppDispatch();
@@ -30,17 +31,31 @@ const Login = memo(() => {
         [dispatch],
     );
 
+const handleForgot = ()=>{
+    dispatch(forgotStep());
+}
+
     useEffect(() => {
         if (user) {
             navigate("/");
         }
     }, [navigate, user]);
 
+    
+    useEffect(() => {
+        const user = localStorage.getItem(AUTH_CONFIG.userKey);
+        if (user) {
+            dispatch(setUser(JSON.parse(user)));
+        }
+    }, []);
+
     useEffect(() => {
         if (error) {
             toast.error(error);
         }
     }, [error]);
+
+
     return (
         <AuthLayout>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -65,7 +80,7 @@ const Login = memo(() => {
                     Login
                 </Button>{" "}
                 <div className="flex justify-between text-sm mt-4">
-                    <Link to="/auth/forgot-password" className="text-blue-600">
+                    <Link to="/auth/forgot-password" className="text-blue-600" onClick={handleForgot}>
                         Forgot Password?
                     </Link>
 

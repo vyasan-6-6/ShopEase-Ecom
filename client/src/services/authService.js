@@ -67,6 +67,7 @@ export const authAPI = {
             data,
         });
     },
+    
     resetPassword: async (data) => {
         return makeRequest(userClient, {
             url: "/auth/reset-password",

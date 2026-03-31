@@ -18,11 +18,6 @@ export const tokenService = {
         if (token) localStorage.setItem(AUTH_CONFIG.adminKey, token);
         else localStorage.removeItem(AUTH_CONFIG.adminKey);
     },
-    setUser: (userData) => {
-        userData
-            ? localStorage.setItem(AUTH_CONFIG.userKey, JSON.stringify(userData))
-            : localStorage.removeItem(AUTH_CONFIG.userKey);
-    },
 
     clearAll: () => {
         localStorage.removeItem(AUTH_CONFIG.adminKey);
