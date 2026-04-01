@@ -23,49 +23,67 @@ const strongPasswordValidation = Joi.string()
     .trim()
     .min(8)
     .max(128)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).+$/)//These are lookaheads (?=) They don’t consume characters,They just check if condition exists anywhere
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).+$/) //These are lookaheads (?=) They don’t consume characters,They just check if condition exists anywhere
     .required()
     .messages({
         "string.pattern.base":
             "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     });
 
-
 const registerValidation = Joi.object({
-  name: commonPatterns.name.messages(customMessages),
-  email: commonPatterns.email.messages(customMessages),
-  password: commonPatterns.password.messages(customMessages)
+    name: commonPatterns.name.messages(customMessages),
+    email: commonPatterns.email.messages(customMessages),
+    password: commonPatterns.password.messages(customMessages),
 });
 
 const loginValidation = Joi.object({
-    email:commonPatterns.email.messages(customMessages),
-    password:Joi.string().label("Password").trim().required().messages(customMessages),
+    email: commonPatterns.email.messages(customMessages),
+    password: Joi.string().label("Password").trim().required().messages(customMessages),
 });
 
 const adminLoginValidation = loginValidation;
 
+const resetPasswordValidation = Joi.object({
+    email: commonPatterns.email.messages(customMessages),
+    newPassword: commonPatterns.password.messages({
+        ...customMessages,
+        "string.min": "New password must be at least 8 characters long",
+    }),
+});
+
 const profileUpdateValidation = Joi.object({
-  name: commonPatterns.name.messages(customMessages),
-  phone: Joi.string().pattern(/^\+?[\d\s\-\(\)]+$/).optional().messages({
-    'string.pattern.base': 'Please provide a valid phone number'
-  }),
-  bio: Joi.string().max(500).optional(),
-  avatar: Joi.string().uri().optional()
+    name: commonPatterns.name.messages(customMessages),
+    phone: Joi.string()
+        .pattern(/^\+?[\d\s\-\(\)]+$/)
+        .optional()
+        .messages({
+            "string.pattern.base": "Please provide a valid phone number",
+        }),
+    bio: Joi.string().max(500).optional(),
+    avatar: Joi.string().uri().optional(),
 });
 
 const passwordChangeValidation = Joi.object({
-  currentPassword: Joi.string().required().messages(customMessages),
-  newPassword: commonPatterns.password.messages({
-    ...customMessages,
-    'string.min': 'New password must be at least 8 characters long'
-  }),
-  confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required().messages({
-    'any.only': 'Password confirmation does not match new password',
-    'any.required': 'Password confirmation is required'
-  }).strip()//strip()=This removes confirmPassword after validation
+    currentPassword: Joi.string().required().messages(customMessages),
+    newPassword: commonPatterns.password.messages({
+        ...customMessages,
+        "string.min": "New password must be at least 8 characters long",
+    }),
+    confirmPassword: Joi.string()
+        .valid(Joi.ref("newPassword"))
+        .required()
+        .messages({
+            "any.only": "Password confirmation does not match new password",
+            "any.required": "Password confirmation is required",
+        })
+        .strip(), //strip()=This removes confirmPassword after validation
 });
 
-module.exports={
+module.exports = {
     registerValidation,
-    loginValidation,profileUpdateValidation,passwordChangeValidation
-}
+    loginValidation,
+    profileUpdateValidation,
+    resetPasswordValidation,
+    passwordChangeValidation,
+    adminLoginValidation,
+};

@@ -4,6 +4,7 @@ const {
     loginValidation,
     profileUpdateValidation,
     passwordChangeValidation,
+    resetPasswordValidation,
 } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
@@ -50,8 +51,9 @@ class AuthController extends BaseController {
         BaseController.sendSuccess(res, result.message);
     });
     static resetPassword = BaseController.asyncHandler(async (req,res)=>{
-        const {email,newPassword} = req.body;
-        console.log("reset pass,email",newPassword,email);
+        const validatedData = BaseController.validateRequest(resetPasswordValidation,req.body); 
+        const {email,newPassword} = validatedData;
+         
         
         const result = await AuthService.resetPassword(email,newPassword);
          BaseController.sendSuccess(res,result.message);

@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-// router.post("/login");
+router.post("/login",AdminController.login);
 // router.get("/users");
 // router.get("/users/:id");
 // router.put("/users/:id");
