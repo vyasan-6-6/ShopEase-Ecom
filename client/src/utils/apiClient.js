@@ -1,5 +1,5 @@
 import axios from "axios";
-import {Navigate} from "react-router-dom"
+
 import { API_CONFIG, AUTH_CONFIG } from "../config/app";
 export const tokenService = {
     getAuthToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey),
@@ -46,9 +46,8 @@ const createApiClient = (getToken) => {
         (error) => {
             const status = error.response?.status;
             if (status === 401) {
-                clearTokens();
-                const navigate  =  Navigate();
-               navigate("/login");
+                tokenService.clearAll();
+               window.location.href = "/login"
             }
             // Handle forbidden
             if (status === 403) {
@@ -75,7 +74,8 @@ export const makeRequest = async (client, config) => {
         return response.data;
     } catch (error) {
         const message =
-            error.response?.data?.message || error.response?.data?.error || error.message || "Something went Wrong.";
-        throw new Error("makeRequest error:", message);
+            error.response?.data?.error?.message || error.response?.data?.error?.message || error.message || "Something went Wrong.";
+            console.log("register error findings:",error)
+        throw new Error(`makeRequest error: ${message}`);
     }
 };

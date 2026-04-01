@@ -6,7 +6,7 @@ export const registerUser = createAsyncThunk("auth/registerUser", async (data, {
         await authAPI.register(data);
         return { email: data.email };
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.message);
     }
 });
 
@@ -15,7 +15,7 @@ export const verifyOtp = createAsyncThunk("auth/verifyOtp", async ({ email, otp 
         const res = await authAPI.verifyRegisterOtp({ email, otp });
         return res.data; //{user,token} present
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.message );
     }
 });
 export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { rejectWithValue }) => {
@@ -23,7 +23,7 @@ export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { reje
         await authAPI.resendOtp({ email });
         return true;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.message );
     }
 });
 
@@ -32,7 +32,7 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (data, { rejec
         const res = await authAPI.login(data);
         return res.data.user;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.message );
     }
 });
 
@@ -41,7 +41,8 @@ export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (ema
         await authAPI.forgotPassword(email);
         return email;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message);
+        
+        return rejectWithValue(error.message );
     }
 });
 
@@ -50,7 +51,7 @@ export const verifyResetOtp = createAsyncThunk("auth/verifyResetOtp", async ({ e
         await authAPI.verifyResetOtp({ email, otp });
         return true;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.message );
     }
 });
 
@@ -59,7 +60,7 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ ema
         await authAPI.resetPassword({ email, newPassword });
         return true;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || error.message);
+        return rejectWithValue(error.message );
     }
 });
 
@@ -113,7 +114,7 @@ export const authSlice = createSlice({
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.error;
+                state.error = action.payload;
             })
             .addCase(registerUser.fulfilled, (state, action) => {
                 state.loading = false;
