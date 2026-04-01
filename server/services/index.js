@@ -1,4 +1,4 @@
 module.exports={
     AuthService:require("./AuthService"),
-    // AdminService:require("./AdminService"),
+    AdminService:require("./AdminService"),
 }

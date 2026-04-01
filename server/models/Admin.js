@@ -64,6 +64,7 @@ adminSchema.methods.comparePassword = async function (candidatePassword) {
 };
 // Static helper to find by email
 adminSchema.statics.findByEmail = function (email) {
+    if(!email) return null;
     return this.findOne({ email: email.trim().toLowerCase() }).select("+password");
 };
 // Clean up response objects globally
