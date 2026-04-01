@@ -7,6 +7,7 @@ const {setupMiddleware} = require('./middlewares/setup');
 const {setupRoutes} = require("./routes");
 const logger = require("./utils/logger");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
+const { seedAdmin } = require("./utils/seeder");
 class Server {
     constructor() {
         this.app = express();
@@ -21,6 +22,8 @@ class Server {
             setupMiddleware(this.app);
         
             setupRoutes(this.app);
+
+            seedAdmin();
 
            this.app.use(notFound);
            this.app.use(errorHandler);
