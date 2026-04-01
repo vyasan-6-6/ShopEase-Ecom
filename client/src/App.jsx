@@ -5,6 +5,7 @@ import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import AdminLogin from "./pages/admin/AdminLogin";
 function App() { 
   return (
     <BrowserRouter>
@@ -12,6 +13,7 @@ function App() {
       <Route path="auth/login" element={<Login/>}/>
       <Route path="/auth/register" element={<Register/>}/>
       <Route path="/auth/forgot-password" element={<ForgotPassword/>}/>
+      <Route path="/admin/login" element={<AdminLogin/>}/>
 
 
       {/* <Route element={<ProtectedRoute/>}> 
