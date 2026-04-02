@@ -1,10 +1,11 @@
 const express = require('express');
 const AdminController = require('../controllers/AdminController');
+const { authenticateAdmin } = require('../middlewares/auth');
 
 const router = express.Router();
 
 router.post("/login",AdminController.login);
-// router.get("/users");
+router.get("/getProfile",authenticateAdmin,AdminController.getProfile);
 // router.get("/users/:id");
 // router.put("/users/:id");
 // router.post("/users/:id/ban");

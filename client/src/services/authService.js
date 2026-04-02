@@ -28,16 +28,16 @@ export const authAPI = {
             method: "POST",
             data: credential,
         });
-        if (res?.token) {
-            tokenService.setAuthToken(res.token);
+        if (res?.data?.token) {
+            tokenService.setAuthToken(res?.data?.token);
         }
         return res;
     },
 
-    getMe: async () => {
+    getProfile: async () => {
         //in userservice
         return makeRequest(userClient, {
-            url: "/me",
+            url: "/getProfile",
             method: "GET",
         });
     },

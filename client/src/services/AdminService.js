@@ -1,21 +1,23 @@
+ 
 import { adminClient, makeRequest, tokenService } from "../utils/apiClient"
 
 export const adminApi = {
-    // getDashboard :async ()=>{
-    //     return makeRequest(adminClient,{
-    //         url:"admin/getDashboard",
-    //         method:'GET',
-    //     });
-    // },
+    getProfile :async ()=>{
+        return  makeRequest(adminClient,{
+            url:"admin/getProfile",
+            method:'GET',
+            
+        });
+    },
     
     adminLogin :async (credentials)=>{
-        const res = makeRequest(adminClient,{
+        const res =await makeRequest(adminClient,{
             url:"admin/login",
             method:'POST',
             data:credentials,
         });
-        if(res?.token) {
-            tokenService.setAdminToken(res.token)
+        if(res?.data?.token) {
+            tokenService.setAdminToken(res?.data?.token);
         }
         return res;
     }
