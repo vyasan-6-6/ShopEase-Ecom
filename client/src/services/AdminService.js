@@ -4,7 +4,7 @@ import { adminClient, makeRequest, tokenService } from "../utils/apiClient"
 export const adminApi = {
     getProfile :async ()=>{
         return  makeRequest(adminClient,{
-            url:"admin/getProfile",
+            url:"/admin/getProfile",
             method:'GET',
             
         });
@@ -12,7 +12,7 @@ export const adminApi = {
     
     adminLogin :async (credentials)=>{
         const res =await makeRequest(adminClient,{
-            url:"admin/login",
+            url:"/admin/login",
             method:'POST',
             data:credentials,
         });

@@ -1,6 +1,7 @@
 const Admin = require("../models/Admin");
 const { ErrorFactory } = require("../utils/errors");
 const { generateAdminToken } = require("../utils/jwt");
+const logger = require("../utils/logger");
 
 class AdminService {
     static async login(data) {

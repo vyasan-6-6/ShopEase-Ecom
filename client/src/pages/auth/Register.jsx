@@ -158,5 +158,5 @@ const Register = memo(() => {
         </AuthLayout>
     );
 });
-
+Register.displayName = "Register";
 export default Register;

@@ -127,5 +127,5 @@ useEffect(() => {
         </AuthLayout>
     );
 });
-
+forgotPassword.displayName = "forgotPassword";
 export default ForgotPassword;

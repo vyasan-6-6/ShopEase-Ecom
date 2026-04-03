@@ -1,12 +1,13 @@
 import clsx from "clsx";
+import { forwardRef, memo } from "react";
 import { useState } from "react";
 
-const Input = ({
+const Input = memo(forwardRef(({
     label,
     type = "text",
     error, // error message
     ...inputProps
-}) => {
+},ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === "password";
     return (
@@ -16,7 +17,7 @@ const Input = ({
             <div className="relative">
                 <input
                     type={isPassword && showPassword ? "text" : type}
-                    
+                    ref={ref}
                     className={clsx(
                         "w-full px-4 py-2 rounded-2xl border text-sm outline-none transition",
                         "focus:ring-2 focus:ring-black",
@@ -38,6 +39,7 @@ const Input = ({
             {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
     );
-};
+}));
 
+Input.displayName = "Input";
 export default Input;

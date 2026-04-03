@@ -4,9 +4,9 @@ import { authAPI } from "../../../services";
 export const registerUser = createAsyncThunk("auth/registerUser", async (data, { rejectWithValue }) => {
     try {
         await authAPI.register(data);
-        return { email: data.email };
+        return { email: data.email };// this is your payload
     } catch (error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue(error.message);//payload for rejected
     }
 });
 

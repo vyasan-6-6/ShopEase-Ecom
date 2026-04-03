@@ -20,7 +20,7 @@ const seedAdmin = async () => {
         const admin = await Admin.create({
             name: process.env.ADMIN_NAME || "Super Admin", // Fallback name
             email: process.env.ADMIN_EMAIL,
-            password: process.env.ADMIN_PASSWORD,
+                        password: process.env.ADMIN_PASSWORD,
             role: "admin" // Or "admin" depending on your schema
         });
         

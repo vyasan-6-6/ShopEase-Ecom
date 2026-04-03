@@ -90,5 +90,5 @@ const Login = memo(() => {
         </AuthLayout>
     );
 });
-
+Login.displayName = "Login";
 export default Login;
