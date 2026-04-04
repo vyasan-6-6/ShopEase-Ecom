@@ -1,4 +1,4 @@
-const AdminService = require("../services/AdminService");
+const {AdminService} = require("../services");
 const { adminLoginValidation } = require("../utils/validation");
 const BaseController = require("./BaseController");
 
