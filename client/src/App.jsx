@@ -15,10 +15,15 @@ function App() {
       <Route path="/auth/forgot-password" element={<ForgotPassword/>}/>
       <Route path="/admin/login" element={<AdminLogin/>}/>
 
-
-      {/* <Route element={<ProtectedRoute/>}> 
+{/* 
+      <Route element={<ProtectedRoute allowedRoles={['user']}/>}> 
       <Route path="/" element={<Home/>}/>
-       <Route path="/" element={<Product/>}/>
+       <Route path="/" element={<Cart/>}/>
+       </Route> */}
+{/* 
+      <Route element={<ProtectedRoute allowedRoles={['admin']}/>}> 
+      <Route path="/" element={<AdminDasboard/>}/>
+       <Route path="/" element={<ManageUsers/>}/>
        </Route> */}
     </Routes>
     <ToastContainer position="top-right" autoClose={3000}/>
