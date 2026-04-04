@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { authAPI } from "../../../services";
+import { authAPI, userApi } from "../../../services";
 
 export const registerUser = createAsyncThunk("auth/registerUser", async (data, { rejectWithValue }) => {
     try {
         await authAPI.register(data);
-        return { email: data.email };// this is your payload
+        return { email: data.email }; // this is your payload
     } catch (error) {
-        return rejectWithValue(error.message);//payload for rejected
+        return rejectWithValue(error.message); //payload for rejected
     }
 });
 
@@ -15,7 +15,7 @@ export const verifyOtp = createAsyncThunk("auth/verifyOtp", async ({ email, otp 
         const res = await authAPI.verifyRegisterOtp({ email, otp });
         return res.data; //{user,token} present
     } catch (error) {
-        return rejectWithValue(error.message );
+        return rejectWithValue(error.message);
     }
 });
 export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { rejectWithValue }) => {
@@ -23,7 +23,7 @@ export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { reje
         await authAPI.resendOtp({ email });
         return true;
     } catch (error) {
-        return rejectWithValue(error.message );
+        return rejectWithValue(error.message);
     }
 });
 
@@ -32,7 +32,7 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (data, { rejec
         const res = await authAPI.login(data);
         return res.data.user;
     } catch (error) {
-        return rejectWithValue(error.message );
+        return rejectWithValue(error.message);
     }
 });
 
@@ -41,8 +41,7 @@ export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (ema
         await authAPI.forgotPassword(email);
         return email;
     } catch (error) {
-        
-        return rejectWithValue(error.message );
+        return rejectWithValue(error.message);
     }
 });
 
@@ -51,7 +50,7 @@ export const verifyResetOtp = createAsyncThunk("auth/verifyResetOtp", async ({ e
         await authAPI.verifyResetOtp({ email, otp });
         return true;
     } catch (error) {
-        return rejectWithValue(error.message );
+        return rejectWithValue(error.message);
     }
 });
 
@@ -60,7 +59,27 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ ema
         await authAPI.resetPassword({ email, newPassword });
         return true;
     } catch (error) {
-        return rejectWithValue(error.message );
+        return rejectWithValue(error.message);
+    }
+});
+
+//USERS
+
+export const getProfile = createAsyncThunk("user/getProfile", async (_, { rejectWithValue }) => {
+    try {
+        const res = await userApi.getProfile();
+        return res.data.user;
+    } catch (error) {
+        return rejectWithValue(error.message);
+    }
+});
+
+export const updateProfile = createAsyncThunk("user/updateProfile", async (profileData, { rejectWithValue }) => {
+    try {
+        const res = await userApi.updateProfile(profileData);
+        return res.data.user; // Return the updated user from backend!
+    } catch (error) {
+        return rejectWithValue(error.message);
     }
 });
 
@@ -68,6 +87,7 @@ const initialState = {
     user: null,
     loading: false,
     error: null,
+    isAuthenticated: false,
     registerFlow: {
         step: "form",
         email: null,
@@ -87,8 +107,8 @@ export const authSlice = createSlice({
             state.user = null;
             state.registerFlow = initialState.registerFlow;
             state.forgotFlow = initialState.forgotFlow;
-        }
-        ,
+            state.isAuthenticated = false;
+        },
         setUser: (state, action) => {
             state.user = action.payload;
         },
@@ -155,6 +175,7 @@ export const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.isAuthenticated = true;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -200,9 +221,44 @@ export const authSlice = createSlice({
             .addCase(resetPassword.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            .addCase(getProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+                state.isAuthenticated = true; // Make sure they stay authenticated!
+            })
+            .addCase(getProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                state.isAuthenticated = false; // Log them out if the fetch fails (e.g., token expired)
+            })
+            .addCase(updateProfile.pending, (state, action) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+            })
+            .addCase(updateProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
     },
 });
 
-export const { clearError,startForgotFlow,tickForgotCooldown,tickRegisterCooldown, logout, setUser, resetForgotFlow, startCooldown } = authSlice.actions;
+export const {
+    clearError,
+    startForgotFlow,
+    tickForgotCooldown,
+    tickRegisterCooldown,
+    logout,
+    setUser,
+    resetForgotFlow,
+    startCooldown,
+} = authSlice.actions;
 export default authSlice.reducer;
