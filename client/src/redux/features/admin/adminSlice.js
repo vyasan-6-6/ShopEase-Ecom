@@ -10,7 +10,7 @@ try {
 });
 export const loginAdmin = createAsyncThunk('admin/login',async(data,{rejectWithValue})=>{
 try {
-    const res = await adminApi.adminLogin(data);
+    const res = await adminApi.loginAdmin(data);
     return res.data.admin;
 } catch (error) {
     return rejectWithValue(error?.message);

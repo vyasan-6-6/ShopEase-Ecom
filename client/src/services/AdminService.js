@@ -10,7 +10,7 @@ export const adminApi = {
         });
     },
     
-    adminLogin :async (credentials)=>{
+    loginAdmin : async (credentials)=>{
         const res =await makeRequest(adminClient,{
             url:"/admin/login",
             method:'POST',

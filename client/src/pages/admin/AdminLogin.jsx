@@ -13,14 +13,14 @@ const dispatch  = useAppDispatch();
 
 const navigate = useNavigate()
 const loading = useSelector(selectAdminLoading);
-const users = useSelector(selectAdminUser);
+const admin = useSelector(selectAdminUser);
     const {register,handleSubmit,formState:{errors}} = useForm();
 const onSubmit = (data)=>{
     dispatch(loginAdmin(data));
 }
 
 useEffect(()=>{
-    if(users?.role==='admin'){
+    if(admin?.role==='admin'){
         navigate("/admin/dashboard")
     }
 },[navigate,users])
