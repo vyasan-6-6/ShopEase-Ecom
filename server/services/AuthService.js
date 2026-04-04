@@ -1,4 +1,3 @@
-
 const User = require("../models/User");
 const { ErrorFactory } = require("../utils/errors");
 const { generateUserToken } = require("../utils/jwt");
@@ -18,15 +17,15 @@ class AuthService {
             otp: {
                 code: hashOTP(otp),
                 expiresAt: Date.now() + 10 * 60 * 1000, //10min
-                attempts:0,
+                attempts: 0,
                 lastSendAt: Date.now(),
             },
         });
         setImmediate(() => {
-  sendOtpEmail(user.email, otp).catch(err => {
-    logger.error("OTP email failed:", err);
-  });
-});
+            sendOtpEmail(user.email, otp).catch((err) => {
+                logger.error("OTP email failed:", err);
+            });
+        });
         logger.info(`New user registered: ${userData.email}`);
 
         return {
@@ -112,7 +111,7 @@ class AuthService {
     static async resendOtp(email) {
         const user = await User.findOne({ email });
         if (!user) {
-            throw ErrorFactory.notFound("OTP sent if email exists");//prevents email enumeration attacks
+            throw ErrorFactory.notFound("OTP sent if email exists"); //prevents email enumeration attacks
         }
         if (user.isVerified) {
             throw ErrorFactory.conflict("User already verified");
@@ -129,28 +128,28 @@ class AuthService {
             lastSendAt: Date.now(),
         };
         await user.save();
-         setImmediate(() => {
-  sendOtpEmail(user.email, otp).catch(err => {
-    logger.error("OTP email failed:", err);
-  });
-});
+        setImmediate(() => {
+            sendOtpEmail(user.email, otp).catch((err) => {
+                logger.error("OTP email failed:", err);
+            });
+        });
         return {
             message: "OTP send Successfully.",
         };
     }
 
     static async forgotPassword(email) {
-        const user = await User.findOne({email});
+        const user = await User.findOne({ email });
         if (!user) {
             throw ErrorFactory.notFound("User not found");
         }
-       
+
         const otp = generateOTP();
         user.resetPassword = {
             otp: hashOTP(otp),
             expiresAt: Date.now() + 10 * 60 * 1000,
             attempts: 0,
-            lastSendAt:Date.now(),
+            lastSendAt: Date.now(),
         };
         await user.save();
         await sendOtpEmail(email, otp);
@@ -168,7 +167,6 @@ class AuthService {
         if (user.resetPassword.expiresAt < Date.now()) {
             throw ErrorFactory.authentication("OTP expired");
         }
-        
 
         const hashed = hashOTP(otp);
         if (hashed !== user.resetPassword.otp) {
@@ -191,8 +189,8 @@ class AuthService {
         if (user.resetPassword.expiresAt < Date.now()) {
             throw ErrorFactory.authentication("OTP expired");
         }
-        if(!user.resetPassword.isVerified){
-throw ErrorFactory.authentication("OTP not verified");
+        if (!user.resetPassword.isVerified) {
+            throw ErrorFactory.authentication("OTP not verified");
         }
         user.password = newPassword; //hashed via pre
         user.resetPassword = undefined;

@@ -1,25 +1,25 @@
 const { ErrorFactory } = require("../utils/errors");
 const logger = require("../utils/logger");
-const { sendError, sendSuccess,sendValidationError } = require("../utils/response");
+const { sendError, sendSuccess, sendValidationError } = require("../utils/response");
 
 class BaseController {
     static asyncHandler(fn) {
         return (req, res, next) => {
-           Promise.resolve(fn(req, res, next)).catch(next); //.catch(next) = “Forward this error to the global error handler”
+            Promise.resolve(fn(req, res, next)).catch(next); //.catch(next) = “Forward this error to the global error handler”
         };
     }
 
     static validateRequest(schema, data) {
         const { error, value } = schema.validate(data, { abortEarly: false });
-        
+
         if (error) {
             throw ErrorFactory.validation("Validation fails.", error.details);
         }
         return value;
     }
 
-    static handleValidationError (res,error){
-return sendValidationError(res, { error });
+    static handleValidationError(res, error) {
+        return sendValidationError(res, { error });
     }
 
     static sendSuccess(res, message, data = null, statusCode = 200) {

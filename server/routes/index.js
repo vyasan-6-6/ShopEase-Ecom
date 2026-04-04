@@ -3,15 +3,17 @@ const { createAuthLimiter } = require("../middlewares/setup");
 
 const adminRoutes = require("./admin");
 const authRoutes = require("./auth");
+const userRoutes = require("./user");
 
 const setupRoutes = (app) => {
     const authLimiter = createAuthLimiter();
     const shouldAuthLimiter = config.NODE_ENV === "production";
 
-    app.use("/api/auth",...(shouldAuthLimiter ? [authLimiter] :[]),authRoutes);
-    app.use("/api/admin",adminRoutes);
+    app.use("/api/auth", ...(shouldAuthLimiter ? [authLimiter] : []), authRoutes);
+    app.use("/api/admin", adminRoutes);
+    app.use("/api/user", userRoutes);
 };
 
-module.exports={
-    setupRoutes
-}
+module.exports = {
+    setupRoutes,
+};
