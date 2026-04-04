@@ -1,6 +1,21 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+const addressSchema = new mongoose.Schema({
+    label:{
+        type:String,
+        enum:['home','work','other'],
+        default:'home'
+    },
+     street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zipCode: { type: String, required: true },
+    country: { type: String, required: true },
+    isDefault: { type: Boolean, default: false }
+
+});
+
 const userSchema = new mongoose.Schema(
     {
         name: {
@@ -93,6 +108,7 @@ const userSchema = new mongoose.Schema(
             ref: "User",
             default: null,
         },
+        addressess:[addressSchema],
     },
     { timestamps: true },
 );
@@ -131,5 +147,25 @@ userSchema.set("toJSON", {
         return ret;
     },
 });
+
+userSchema.methods.addAddress = async function(addressData){
+if(addressData.isDefault || this.addressess.length ===0){
+this.addressess.forEach(addr=>addr.isDefault=false);
+addressData.isDefault = true;
+}
+this.addressess.push(addressData);
+return this.save;
+};
+
+userSchema.methods.setDefaultAddress = async function(addressId){
+    const address = this.addressess.id(addressId);
+     if (!address) throw new Error("Address not found");
+
+  this.addresses.forEach(addr => addr.isDefault = false);
+  address.isDefault = true;
+
+  return this.save();
+}
+
 
 module.exports = mongoose.model("User", userSchema);
