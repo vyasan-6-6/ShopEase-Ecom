@@ -79,6 +79,17 @@ const passwordChangeValidation = Joi.object({
         .strip(), //strip()=This removes confirmPassword after validation
 });
 
+
+const addressValidation = Joi.object({
+    label: Joi.string().valid("home", "work", "other").optional(),
+    street: Joi.string().required().messages(customMessages),
+    city: Joi.string().required().messages(customMessages),
+    state: Joi.string().required().messages(customMessages),
+    zipCode: Joi.string().required().messages(customMessages),
+    country: Joi.string().required().messages(customMessages),
+    isDefault: Joi.boolean().optional()
+})
+
 module.exports = {
     registerValidation,
     loginValidation,
