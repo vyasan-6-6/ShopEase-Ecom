@@ -6,7 +6,18 @@ import Login from "./pages/auth/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
+import { getProfile } from './redux/features/auth/authSlice'
+import { useAppDispatch } from "./redux/hooks";
+import { useEffect } from "react"; 
+import { AUTH_CONFIG } from "./config/app";
 function App() { 
+  const dispatch = useAppDispatch();
+  useEffect(()=>{
+    const token = localStorage.getItem(AUTH_CONFIG.tokenKey);
+    if(token){
+      dispatch(getProfile());
+    }
+  },[dispatch,token])
   return (
     <BrowserRouter>
     <Routes>
