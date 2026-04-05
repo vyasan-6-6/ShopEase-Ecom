@@ -10,6 +10,8 @@ import { getProfile } from './redux/features/auth/authSlice'
 import { useAppDispatch } from "./redux/hooks";
 import { useEffect } from "react"; 
 import { AUTH_CONFIG } from "./config/app";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserDashboard from "./pages/user/UserDashboard";
 function App() { 
   const dispatch = useAppDispatch();
   useEffect(()=>{
@@ -17,11 +19,12 @@ function App() {
     if(token){
       dispatch(getProfile());
     }
-  },[dispatch,token])
+  },[dispatch])
   return (
     <BrowserRouter>
     <Routes>
-      <Route path="auth/login" element={<Login/>}/>
+      <Route path="/admin" element={<UserDashboard/>}/>
+      <Route path="/auth/login" element={<Login/>}/>
       <Route path="/auth/register" element={<Register/>}/>
       <Route path="/auth/forgot-password" element={<ForgotPassword/>}/>
       <Route path="/admin/login" element={<AdminLogin/>}/>
