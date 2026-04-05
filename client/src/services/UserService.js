@@ -9,4 +9,17 @@ export const userApi = {
         });
     },
     getProfile: () => makeRequest(userClient, { url: "/user/profile", method: "GET" }),
+    addAddress:(addressData)=> {
+return makeRequest(userClient,{
+    url:'/user/address',
+    method:'POST',
+    data:addressData
+})
+    },
+    setDefaultAddress:(addressId)=>{
+        return makeRequest(userApi,{
+            url:`user/address/${addressId}/default`,
+            method:'PATCH'
+        })
+    }
 };

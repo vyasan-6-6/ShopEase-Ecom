@@ -13,6 +13,7 @@ import { AUTH_CONFIG } from "./config/app";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
 import UserProfile from "./pages/user/UserProfile";
+import AddressBook from "./pages/user/AddressBook";
 function App() { 
   const dispatch = useAppDispatch();
   useEffect(()=>{
