@@ -83,6 +83,16 @@ export const updateProfile = createAsyncThunk("user/updateProfile", async (profi
     }
 });
 
+export const addAddress = createAsyncThunk("user/addAddress",async(addressData,{rejectWithValue})=>{
+    try {
+        const res = await userApi.addAddress(addressData);
+return res.data.user;
+    } catch (error) {
+        
+        return rejectWithValue(error.message);
+    }
+})
+
 const initialState = {
     user: null,
     loading: false,
@@ -236,7 +246,7 @@ export const authSlice = createSlice({
                 state.error = action.payload;
                 state.isAuthenticated = false; // Log them out if the fetch fails (e.g., token expired)
             })
-            .addCase(updateProfile.pending, (state, action) => {
+            .addCase(updateProfile.pending, (state ) => {
                 state.loading = true;
                 state.error = null;
             })
@@ -247,7 +257,19 @@ export const authSlice = createSlice({
             .addCase(updateProfile.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+            .addCase(addAddress.pending, (state ) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addAddress.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+            })
+            .addCase(addAddress.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     },
 });
 
