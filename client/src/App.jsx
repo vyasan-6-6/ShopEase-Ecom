@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { AUTH_CONFIG } from "./config/app";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
+import UserProfile from "./pages/user/UserProfile";
 function App() { 
   const dispatch = useAppDispatch();
   useEffect(()=>{
@@ -22,8 +23,7 @@ function App() {
   },[dispatch])
   return (
     <BrowserRouter>
-    <Routes>
-      <Route path="/admin" element={<UserDashboard/>}/>
+    <Routes> 
       <Route path="/auth/login" element={<Login/>}/>
       <Route path="/auth/register" element={<Register/>}/>
       <Route path="/auth/forgot-password" element={<ForgotPassword/>}/>
