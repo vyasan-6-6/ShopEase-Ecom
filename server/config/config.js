@@ -26,7 +26,7 @@ module.exports = {
     DEFAULT_ADMIN: {
         EMAIL: process.env.ADMIN_EMAIL,
         PASSWORD: process.env.ADMIN_PASSWORD,
-        NAME: "Administrator",
+        NAME: process.env.ADMIN_NAME,
     },
 
     SOCKET: {

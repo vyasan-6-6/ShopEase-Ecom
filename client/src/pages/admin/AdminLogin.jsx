@@ -23,7 +23,7 @@ useEffect(()=>{
     if(admin?.role==='admin'){
         navigate("/admin/dashboard")
     }
-},[navigate,users])
+},[navigate,admin])
     return (
     <AuthLayout title={`Admin Portal`} subtitle={`Sign in to access the dashboard`}>
         <form onSubmit={handleSubmit(onSubmit)}>
