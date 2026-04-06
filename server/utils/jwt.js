@@ -26,7 +26,7 @@ const verifyUserToken = (token) => {
         if (!config.JWT.USER_SECRET) {
             throw ErrorFactory.generic("JWT_USER_SECRET not configured");
         }
-        return jwt.verify(token,config.JWT.USER_SECRET);
+       return jwt.verify(token,config.JWT.USER_SECRET);
     } catch (error) {
      throw  ErrorFactory.authentication("Token verification failed");
     }

@@ -36,9 +36,9 @@ const AddressBook = () => {
                                     <span className="text-black font-extrabold text-xs  tracking-wider">★ DEFAULT</span>
                                 )}
                             </div>
-                            <p className="text-gray-800 font-medium">1234 Commerce Street</p>
-                            <p className="text-gray-500 text-sm mt-1">Los Angeles , CA 900001</p>
-                            <p className="text-gray-500 text-sm">United States</p>
+                            <p className="text-gray-800 font-medium">{addr.country}</p>
+                            <p className="text-gray-500 text-sm mt-1">{addr.street} , {addr.zipCode}</p>
+                            <p className="text-gray-500 text-sm">{addr.country}</p>
                             {index !== 0 && (
                                 <button className="text-sm font-semibold text-gray-600 mt-4 hover:text-black transition">
                                     Set as Default

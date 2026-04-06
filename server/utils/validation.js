@@ -88,7 +88,7 @@ const addressValidation = Joi.object({
     zipCode: Joi.string().required().messages(customMessages),
     country: Joi.string().required().messages(customMessages),
     isDefault: Joi.boolean().optional()
-})
+}).required();
 
 module.exports = {
     registerValidation,

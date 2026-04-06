@@ -17,7 +17,8 @@ const authHeader = req.headers.authorization;
         role:decoded.role
     }
     next();
-  } catch (error) {
+  } catch (error) { 
+    
     next(ErrorFactory.authentication("Invalid or expired token"));
   }
 }
