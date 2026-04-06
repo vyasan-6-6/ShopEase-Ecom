@@ -23,7 +23,7 @@ const AddressBook = () => {
                 <div className="w-full md:w-1/2">
                 <h3 className="text-2xl font-bold mb-6 text-gray-800">Saved Addressess</h3>
             <div className="grid gap-4">
-                    {[1, 2].map((addr, index) => (
+                    {user?.addressess?.map((addr, index) => (
                         <div
                             key={index}
                             className={`p-5 border-2 rounded-2xl transition-all ${index === 0 ? "border-black bg-gray-50" : "border-gray-100 bg-white hover:border-gray-300"}`}
