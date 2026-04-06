@@ -97,4 +97,5 @@ module.exports = {
     resetPasswordValidation,
     passwordChangeValidation,
     adminLoginValidation,
+    addressValidation
 };

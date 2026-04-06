@@ -154,7 +154,7 @@ this.addresses.forEach(addr=>addr.isDefault=false);
 addressData.isDefault = true;
 }
 this.addresses.push(addressData);
-return this.save;
+return this.save();
 };
 
 userSchema.methods.setDefaultAddress = async function(addressId){
