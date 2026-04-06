@@ -1,10 +1,21 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { logout } from "../../redux/features/admin/adminSlice";
+import { useAppDispatch } from "../../redux/hooks";
+import { AUTH_CONFIG } from "../../config/app";
 // import { selectAdminUser } from "../../redux/features/admin/adminSelector";
 
-const AdminDashboard = () => {
-    // const admin = useSelector(selectAdminUser);
+const AdminDashboard = () => { 
 
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate()
+
+    const handleLogout =()=>{
+        localStorage.removeItem(AUTH_CONFIG.adminKey);
+        dispatch(logout());
+        navigate("/admin/login",{replace:true});
+
+    }
     return (
         <div className="flex bg-gray-50 min-h-screen">
             {/* BLACK ADMIN SIDEBAR */}
@@ -19,7 +30,11 @@ const AdminDashboard = () => {
                 </nav>
                 
 
-                {/* Logout Button goes down here later! */}
+               <div  className="mt-auto pt-6 border-t border-gray-800">
+                <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-3 text-red-400 bg-red-950/30 rounded-xl hover:bg-red-900/50 hover:text-red-300 transition font-bold">
+                      🚪 Log Out
+                </button>
+               </div>
             </div>
 
             {/* MAIN CONTENT AREA */}

@@ -108,7 +108,7 @@ const userSchema = new mongoose.Schema(
             ref: "User",
             default: null,
         },
-        addressess:[addressSchema],
+        addresses:[addressSchema],
     },
     { timestamps: true },
 );
@@ -149,16 +149,16 @@ userSchema.set("toJSON", {
 });
 
 userSchema.methods.addAddress = async function(addressData){
-if(addressData.isDefault || this.addressess.length ===0){
-this.addressess.forEach(addr=>addr.isDefault=false);
+if(addressData.isDefault || this.addresses.length ===0){
+this.addresses.forEach(addr=>addr.isDefault=false);
 addressData.isDefault = true;
 }
-this.addressess.push(addressData);
+this.addresses.push(addressData);
 return this.save;
 };
 
 userSchema.methods.setDefaultAddress = async function(addressId){
-    const address = this.addressess.id(addressId);
+    const address = this.addresses.id(addressId);
      if (!address) throw new Error("Address not found");
 
   this.addresses.forEach(addr => addr.isDefault = false);

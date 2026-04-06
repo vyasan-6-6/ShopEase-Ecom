@@ -43,17 +43,41 @@ const seedTestUsers = async () => {
             role: "user",
             status: "active",
             phone: "555-0100",
-            isVerified: true
-        },{
-        name: "Test join",
-        email: "join@shopease.com",
-        password: "password123", // The Schema's pre('save') hook will hash this!
-        role: "user",
-        status: "active" ,
-        phone: "234-0430",
-        isVerified: true
-    },
+            isVerified: true,
+            addresses: [
+                {
+                    label: "home",
+                    street: "123 Main St",
+                    city: "New York",
+                    state: "NY",
+                    zipCode: "10001",
+                    country: "USA",
+                    isDefault: true
+                }
+            ]
+        },
+        {
+            name: "Test join",
+            email: "join@shopease.com",
+            password: "password123", // The Schema's pre('save') hook will hash this!
+            role: "user",
+            status: "active",
+            phone: "234-0430",
+            isVerified: true,
+            addresses: [
+                {
+                    label: "work",
+                    street: "456 Tech Park",
+                    city: "San Francisco",
+                    state: "CA",
+                    zipCode: "94105",
+                    country: "USA",
+                    isDefault: true
+                }
+            ]
+        }
     ];
+
     // Wipe existing users first to avoid duplicate email array index crashes!
     await User.deleteMany(); 
     logger.warn("Cleared existing normal users from database.");
