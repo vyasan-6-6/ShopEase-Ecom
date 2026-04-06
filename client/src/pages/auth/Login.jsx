@@ -1,5 +1,5 @@
 import { loginUser} from "../../redux/features/auth/authSlice";
-import { selectAuthError, selectAuthLoading, selectAuthStep, selectUser } from "../../redux/features/auth/authSelectors";
+import { selectAuthError, selectAuthLoading, selectUser } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
 import { memo, useCallback, useEffect } from "react";
@@ -7,8 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import AuthLayout from "../../components/ui/AuthLayout";
 import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
-import { AUTH_CONFIG } from "../../config/app";
+import Button from "../../components/ui/Button"; 
 
 const Login = memo(() => {
     const dispatch = useAppDispatch();
@@ -34,18 +33,15 @@ const Login = memo(() => {
 
 
     useEffect(() => {
+        console.log("user inlogin page:",user);
+        
         if (user) {
-            navigate("/");
+            navigate("/user/dashboard");
         }
     }, [navigate, user]);
 
     
-    useEffect(() => {
-        const user = localStorage.getItem(AUTH_CONFIG.userKey);
-        if (user) {
-            dispatch(setUser(JSON.parse(user)));
-        }
-    }, []);
+     
 
     useEffect(() => {
         if (error) {
@@ -55,7 +51,7 @@ const Login = memo(() => {
 
 
     return (
-        <AuthLayout>
+        <AuthLayout title={`User Portal`} subtitle={`New Here. Sign in  `}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <Input
                     label="Email"
@@ -76,7 +72,7 @@ const Login = memo(() => {
                 />
                 <Button type="submit" loading={loading} fullWidth>
                     Login
-                </Button>{" "}
+                </Button> 
                 <div className="flex justify-between text-sm mt-4">
                     <Link to="/auth/forgot-password" className="text-blue-600"  >
                         Forgot Password?

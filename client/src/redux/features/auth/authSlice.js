@@ -27,9 +27,10 @@ export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { reje
     }
 });
 
-export const loginUser = createAsyncThunk("auth/loginUser", async (data, { rejectWithValue }) => {
+export const loginUser = createAsyncThunk("auth/loginUser", async (userCredentials, { rejectWithValue }) => {
     try {
-        const res = await authAPI.login(data);
+        const res = await authAPI.login(userCredentials); 
+        
         return res.data.user;
     } catch (error) {
         return rejectWithValue(error.message);
@@ -67,8 +68,9 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ ema
 
 export const getProfile = createAsyncThunk("user/getProfile", async (_, { rejectWithValue }) => {
     try {
-        const res = await userApi.getProfile();
-        return res.data.user;
+        const res = await authAPI.getProfile();
+        console.log("getProfile user:",res);
+        return res.data;
     } catch (error) {
         return rejectWithValue(error.message);
     }
@@ -120,6 +122,7 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
         },
         setUser: (state, action) => {
+            state.isAuthenticated=true;
             state.user = action.payload;
         },
         clearError: (state) => {
@@ -184,8 +187,8 @@ export const authSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
                 state.isAuthenticated = true;
+                state.user = action.payload;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -238,8 +241,8 @@ export const authSlice = createSlice({
             })
             .addCase(getProfile.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
                 state.isAuthenticated = true; // Make sure they stay authenticated!
+                state.user = action.payload;
             })
             .addCase(getProfile.rejected, (state, action) => {
                 state.loading = false;

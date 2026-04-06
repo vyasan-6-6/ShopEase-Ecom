@@ -47,7 +47,7 @@ const createApiClient = (getToken) => {
             const status = error.response?.status;
             if (status === 401) {
                 tokenService.clearAll();
-               window.location.href = "/login"
+               window.location.href = "/auth/login"
             }
             // Handle forbidden
             if (status === 403) {

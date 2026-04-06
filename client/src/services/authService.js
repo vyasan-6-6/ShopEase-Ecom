@@ -30,14 +30,15 @@ export const authAPI = {
         });
         if (res?.data?.token) {
             tokenService.setAuthToken(res?.data?.token);
+            console.log("authToken set in apiclient:",res.data.token);
         }
         return res;
     },
 
     getProfile: async () => {
-        //in userservice
+         
         return makeRequest(userClient, {
-            url: "/getProfile",
+            url: "auth/getProfile",
             method: "GET",
         });
     },

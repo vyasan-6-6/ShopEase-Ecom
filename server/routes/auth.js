@@ -11,7 +11,7 @@ router.post("/resend-otp",AuthController.resendOtp);
 router.post("/forgot-password",AuthController.forgotPassword);
 router.post("/verify-reset-otp",AuthController.verifyResetOtp);
 router.post("/reset-password",AuthController.resetPassword);
-router.get("/getProfile",authenticateUser,checkUserStatus,AuthController.getProfile);//in userRoute
+router.get("/getProfile",authenticateUser,checkUserStatus,AuthController.getProfile); 
 router.post("/change-password",authenticateUser,checkUserStatus,AuthController.changePassword)//in userRoute
 router.post("/logout",authenticateUser,checkUserStatus,AuthController.logout);
 module.exports=router;

@@ -7,8 +7,7 @@ export const userApi = {
             method: "PATCH",
             data: data,
         });
-    },
-    getProfile: () => makeRequest(userClient, { url: "/user/profile", method: "GET" }),
+    }, 
     addAddress:(addressData)=> {
 return makeRequest(userClient,{
     url:'/user/address',

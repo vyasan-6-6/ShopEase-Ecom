@@ -58,9 +58,9 @@ class AuthController extends BaseController {
         const result = await AuthService.resetPassword(email,newPassword);
          BaseController.sendSuccess(res,result.message);
     })
-    static getProfile = BaseController.asyncHandler(async (req, res) => {//in usercontroller
+    static getProfile = BaseController.asyncHandler(async (req, res) => { 
         const user = await AuthService.getProfile(req.user.id);
-        BaseController.sendSuccess(res, "Profile retrieved successfully", { user });
+        BaseController.sendSuccess(res, "Profile retrieved successfully", user);
     });
 
     static updateProfile = BaseController.asyncHandler(async (req, res) => {//in usercontroller

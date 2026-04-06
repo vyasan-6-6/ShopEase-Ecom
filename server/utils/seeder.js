@@ -39,7 +39,7 @@ const seedTestUsers = async () => {
         {
             name: "John Customer",
             email: "john@example.com",
-            password: "password123",
+            password: "passwrd123",
             role: "user",
             status: "active",
             phone: "555-0100",
