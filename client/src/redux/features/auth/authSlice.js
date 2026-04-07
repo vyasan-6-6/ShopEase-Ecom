@@ -88,7 +88,7 @@ export const updateProfile = createAsyncThunk("user/updateProfile", async (profi
 export const addAddress = createAsyncThunk("user/addAddress",async(addressData,{rejectWithValue})=>{
     try {
         const res = await userApi.addAddress(addressData);
-return res.data.user;
+return res.data;
     } catch (error) {
         
         return rejectWithValue(error.message);

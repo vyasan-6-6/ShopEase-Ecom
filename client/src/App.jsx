@@ -26,8 +26,7 @@ function App() {
     }, [dispatch]);
     return (
         <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<AddressBook />} />
+            <Routes> 
                 <Route path="/auth/login" element={<Login />} />
                 <Route path="/auth/register" element={<Register />} />
                 <Route path="/auth/forgot-password" element={<ForgotPassword />} />
