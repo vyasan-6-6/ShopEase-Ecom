@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { memo, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import AuthLayout from "../../components/ui/AuthLayout";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button"; 
+import AuthLayout from "../../components/layout/AuthLayout";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button"; 
 
 const Login = memo(() => {
     const dispatch = useAppDispatch();

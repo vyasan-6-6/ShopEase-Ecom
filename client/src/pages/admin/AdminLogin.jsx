@@ -5,9 +5,9 @@ import { selectAdminLoading, selectAdminUser } from "../../redux/features/admin/
 import { loginAdmin } from "../../redux/features/admin/adminSlice";
 import { memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthLayout from "../../components/ui/AuthLayout";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
+import AuthLayout from "../../components/layout/AuthLayout";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button";
  const AdminLogin = memo(() => {
 const dispatch  = useAppDispatch();
 

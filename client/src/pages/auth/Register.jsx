@@ -10,10 +10,10 @@ import { useForm } from "react-hook-form";
 import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import AuthLayout from "../../components/ui/AuthLayout";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
-import OtpInput from "../../components/ui/OtpInput";
+import AuthLayout from "../../components/layout/AuthLayout";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button";
+import OtpInput from "../../components/common/OtpInput";
 const Register = memo(() => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();

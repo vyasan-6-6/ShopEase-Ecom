@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { selectAdminUser } from "../../redux/features/admin/adminSelector";
 import { useAppSelector } from "../../redux/hooks";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button";
 
 const AdminProfile = () => {
     const admin = useAppSelector(selectAdminUser);

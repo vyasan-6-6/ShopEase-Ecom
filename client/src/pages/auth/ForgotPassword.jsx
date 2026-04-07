@@ -14,10 +14,10 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
 import { memo, useCallback, useEffect, useState } from "react"; 
 import { toast } from "react-toastify";
-import AuthLayout from "../../components/ui/AuthLayout";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
-import OtpInput from "../../components/ui/OtpInput";
+import AuthLayout from "../../components/layout/AuthLayout";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button";
+import OtpInput from "../../components/common/OtpInput";
 
 const ForgotPassword = memo(() => {
     const dispatch = useAppDispatch();

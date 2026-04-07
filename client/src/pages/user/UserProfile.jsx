@@ -3,8 +3,8 @@ import { useAppDispatch } from "../../redux/hooks";
 import { selectUser } from "../../redux/features/auth/authSelectors";
 import { useForm } from "react-hook-form";
 import { updateProfile } from "../../redux/features/auth/authSlice";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button";
 
 const UserProfile = () => {
     const dispatch = useAppDispatch();

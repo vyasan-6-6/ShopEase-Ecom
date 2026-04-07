@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectUser } from "../../redux/features/auth/authSelectors";
 import { addAddress } from "../../redux/features/auth/authSlice";
-import Input from "../../components/ui/Input";
+import Input from "../../components/common/Input";
 
 const AddressBook = () => {
     const dispatch = useAppDispatch();
