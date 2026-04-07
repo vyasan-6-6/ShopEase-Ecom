@@ -15,6 +15,7 @@ import UserDashboard from "./pages/user/UserDashboard";
 import UserProfile from "./pages/user/UserProfile";
 import AddressBook from "./pages/user/AddressBook";
 import AdminProfile from "./pages/admin/AdminProfile"; 
+import AddressCard from "./components/user/AddressCard";
 function App() {
     const dispatch = useAppDispatch();
     useEffect(() => {
@@ -25,7 +26,8 @@ function App() {
     }, [dispatch]);
     return (
         <BrowserRouter>
-            <Routes> 
+            <Routes>
+                <Route path="/" element={<AddressBook />} />
                 <Route path="/auth/login" element={<Login />} />
                 <Route path="/auth/register" element={<Register />} />
                 <Route path="/auth/forgot-password" element={<ForgotPassword />} />

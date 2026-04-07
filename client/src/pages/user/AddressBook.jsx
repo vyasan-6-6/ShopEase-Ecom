@@ -3,10 +3,12 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectUser } from "../../redux/features/auth/authSelectors";
 import { addAddress } from "../../redux/features/auth/authSlice";
 import Input from "../../components/common/Input";
+import { useState } from "react";
 
 const AddressBook = () => {
     const dispatch = useAppDispatch();
     const user = useAppSelector(selectUser);
+    const [isModalOpen,setIsModalOpen] = useState(false);
     const {
         register,
         handleSubmit,
