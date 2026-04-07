@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const Modal = ({ isOpen, onClose, title = "Hui Modal", children }) => {
+const Modal = ({ isOpen, onClose, title = " ", children }) => {
     if(!isOpen) return null;// If it's closed, render nothing!
     useEffect(()=>{
         if(isOpen){
