@@ -10,14 +10,14 @@ export const userApi = {
     }, 
     addAddress:(addressData)=> {
 return makeRequest(userClient,{
-    url:'/user/address',
+    url:'/user/addresses',
     method:'POST',
     data:addressData
 })
     },
     setDefaultAddress:(addressId)=>{
         return makeRequest(userApi,{
-            url:`user/address/${addressId}/default`,
+            url:`user/addresses/${addressId}/default`,
             method:'PATCH'
         })
     }
