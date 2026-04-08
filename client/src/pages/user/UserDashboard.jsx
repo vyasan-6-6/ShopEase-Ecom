@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate } from "react-router-dom"; 
 import { useAppDispatch } from "../../redux/hooks";
 import { AUTH_CONFIG } from "../../config/app";
-import { logout } from "../../redux/features/auth/authSlice"; 
+import { logout, uploadAvatar } from "../../redux/features/auth/authSlice"; 
 
 const UserDashboard = () => {
     const dispatch = useAppDispatch();
@@ -13,6 +13,7 @@ const UserDashboard = () => {
         navigate("/auth/login");
     }
 
+   
     return (
         <div className="flex bg-gray-50 min-h-screen">
             {/* LIGHT CUSTOMER SIDEBAR */}

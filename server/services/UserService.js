@@ -49,7 +49,7 @@ class UserService {
          const updatedUser = await User.findByIdAndUpdate(
             userId, 
             { avatar: uploadResponse.secure_url }, 
-            { new: true, runValidators: true }
+         { returnDocument: 'after', runValidators: true }// (node:4272) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
         );
 return {
     user:updatedUser

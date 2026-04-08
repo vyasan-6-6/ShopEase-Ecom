@@ -20,5 +20,16 @@ return makeRequest(userClient,{
             url:`user/addresses/${addressId}/default`,
             method:'PATCH'
         })
+    },
+    uploadAvatar:(formData)=>{
+        return makeRequest(userClient,{
+             url: "/user/avatar",
+            method: "POST",
+            data: formData, // The multipart/form-data payload
+              headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        })
     }
+
 };

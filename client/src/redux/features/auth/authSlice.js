@@ -93,7 +93,19 @@ return res.data;
         
         return rejectWithValue(error.message);
     }
-})
+});
+
+
+
+
+export const uploadAvatar = createAsyncThunk("user/uploadAvatar", async (formData, { rejectWithValue }) => {
+    try {
+        const res = await userApi.uploadAvatar(formData);
+        return res.data; // This is the updated user returned from the server
+    } catch (error) {
+        return rejectWithValue(error.message);
+    }
+});
 
 const initialState = {
     user: null,
@@ -273,6 +285,19 @@ export const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+                        .addCase(uploadAvatar.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(uploadAvatar.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload; // Immediately replace the user with the new one carrying the avatar URL!
+            })
+            .addCase(uploadAvatar.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
     },
 });
 
