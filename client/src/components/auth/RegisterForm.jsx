@@ -1,50 +1,41 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { registerSchema } from "../../utils/authSchema";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { 
-    registerUser, 
-    resendOtp, 
-    tickRegisterCooldown, 
-    verifyOtp 
-} from "../../redux/features/auth/authSlice";
+import Input from "../common/Input";
 
-import { 
-    selectAuthError, 
-    selectAuthLoading, 
-    selectRegisterFlow 
-} from "../../redux/features/auth/authSelectors";
+import { clearError, registerUser, resendOtp, tickRegisterCooldown, verifyOtp } from "../../redux/features/auth/authSlice";
+
+import { selectAuthError, selectAuthLoading, selectRegisterFlow } from "../../redux/features/auth/authSelectors";
 
 import OtpInput from "../common/OtpInput";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import Button from "../common/Button";
 
 const RegisterForm = () => {
-    
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    
+
     const { email, cooldown, step } = useAppSelector(selectRegisterFlow);
     const error = useAppSelector(selectAuthError);
     const loading = useAppSelector(selectAuthLoading);
-
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
-
+    } = useForm({
+        resolver: yupResolver(registerSchema),
+        mode: "onChange",//By setting this to "onChange", the form checks the rules every time the user types a single character.
+    });
 
     const [otp, setOtp] = useState("");
 
-
-
     const onSubmit = useCallback(
         (data) => {
-            if (data.password !== data.confirmPassword) {
-                toast.error("Passwords do not match");
-                return;
-            }
             dispatch(
                 registerUser({ name: `${data.firstName} ${data.lastName}`, email: data.email, password: data.password }),
             );
@@ -54,22 +45,19 @@ const RegisterForm = () => {
 
     const handleVerify = useCallback(() => {
         dispatch(verifyOtp({ email, otp }));
-        navigate("/auth/login");
+        navigate("/auth/login");  
     }, [dispatch, email, otp]);
-
 
     const handleResent = useCallback(() => {
         if (cooldown > 0) return;
         dispatch(resendOtp(email));
     }, [dispatch, cooldown, email]);
 
-
     useEffect(() => {
         if (otp.length === 6) {
             handleVerify();
         }
     }, [otp, handleVerify]);
-
 
     useEffect(() => {
         if (cooldown > 0) {
@@ -81,22 +69,18 @@ const RegisterForm = () => {
         }
     }, [cooldown, dispatch]);
 
-
-
-    useEffect(() => {
-        if (error) {
-            toast.error(error);
-        }
-    }, [error]);
-
-
+  useEffect(() => {
+    if (error) {
+        toast.error(error);
+        dispatch(clearError()); // <--- Add this! Now it clears out instantly!
+    }
+}, [error, dispatch]);
 
     useEffect(() => {
         if (cooldown === 60) {
             toast.success("OTP reset successfull");
         }
     }, [cooldown]);
-
 
     return (
         <div>
@@ -105,43 +89,34 @@ const RegisterForm = () => {
                     <Input
                         label={"FirstName"}
                         type="text"
-                        {...register("firstName", { required: "First name is required" })}
+                        {...register("firstName")}
                         error={errors.firstName?.message}
                         placeholder="First Name"
                     />
                     <Input
                         label={"LastName"}
                         type="text"
-                        {...register("lastName", { required: "Last name is required" })}
+                        {...register("lastName")}
                         error={errors.lastName?.message}
                         placeholder="Last Name"
                     />
                     <Input
                         label={"Email"}
                         type="email"
-                        {...register("email", {
-                            required: "Email is required",
-                            pattern: {
-                                value: /^\S+@\S+$/i,
-                                message: "Invalid email",
-                            },
-                        })}
+                        {...register("email")}
                         error={errors.email?.message}
                         placeholder="Email"
                     />
                     <Input
                         label={"Password"}
-                        {...register("password", {
-                            required: "Password is required",
-                            minLength: { value: 6, message: "Min 6 characters" },
-                        })}
+                        {...register("password")}
                         error={errors.password?.message}
                         type="password"
                         placeholder="Password"
                     />
                     <Input
                         label={"Confirm Password"}
-                        {...register("confirmPassword", { required: "Confrim your password" })}
+                        {...register("confirmPassword")}
                         error={errors.confirmPassword?.message}
                         type="password"
                         placeholder="Confirm Password"

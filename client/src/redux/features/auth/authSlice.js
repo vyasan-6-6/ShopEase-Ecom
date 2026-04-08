@@ -29,11 +29,11 @@ export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { reje
 
 export const loginUser = createAsyncThunk("auth/loginUser", async (userCredentials, { rejectWithValue }) => {
     try {
-        const res = await authAPI.login(userCredentials); 
-        
+        const res = await authAPI.login(userCredentials);
+
         return res.data.user;
     } catch (error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue(error?.message);
     }
 });
 
@@ -69,7 +69,7 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ ema
 export const getProfile = createAsyncThunk("user/getProfile", async (_, { rejectWithValue }) => {
     try {
         const res = await authAPI.getProfile();
-        console.log("getProfile user:",res);
+        console.log("getProfile user:", res);
         return res.data;
     } catch (error) {
         return rejectWithValue(error.message);
@@ -85,12 +85,11 @@ export const updateProfile = createAsyncThunk("user/updateProfile", async (profi
     }
 });
 
-export const addAddress = createAsyncThunk("user/addAddress",async(addressData,{rejectWithValue})=>{
+export const addAddress = createAsyncThunk("user/addAddress", async (addressData, { rejectWithValue }) => {
     try {
         const res = await userApi.addAddress(addressData);
-return res.data;
+        return res.data;
     } catch (error) {
-        
         return rejectWithValue(error.message);
     }
 });
@@ -104,8 +103,6 @@ export const setDefaultAddress = createAsyncThunk("user/setDefaultAddress", asyn
     }
 });
 
-
-
 export const uploadAvatar = createAsyncThunk("user/uploadAvatar", async (formData, { rejectWithValue }) => {
     try {
         const res = await userApi.uploadAvatar(formData);
@@ -114,9 +111,6 @@ export const uploadAvatar = createAsyncThunk("user/uploadAvatar", async (formDat
         return rejectWithValue(error.message);
     }
 });
-
-
-
 
 const initialState = {
     user: null,
@@ -145,7 +139,7 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
         },
         setUser: (state, action) => {
-            state.isAuthenticated=true;
+            state.isAuthenticated = true;
             state.user = action.payload;
         },
         clearError: (state) => {
@@ -159,6 +153,11 @@ export const authSlice = createSlice({
         },
         resetForgotFlow: (state) => {
             state.forgotFlow = initialState.forgotFlow;
+        },
+        setVerificationFlow: (state, action) => {
+            state.registerFlow.step = "otp";
+            state.registerFlow.email = action.payload; // Saves the email they typed into Login!
+            state.registerFlow.cooldown = 60;
         },
     },
 
@@ -272,7 +271,7 @@ export const authSlice = createSlice({
                 state.error = action.payload;
                 state.isAuthenticated = false; // Log them out if the fetch fails (e.g., token expired)
             })
-            .addCase(updateProfile.pending, (state ) => {
+            .addCase(updateProfile.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
@@ -284,7 +283,7 @@ export const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            .addCase(addAddress.pending, (state ) => {
+            .addCase(addAddress.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
@@ -296,7 +295,7 @@ export const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-                        .addCase(uploadAvatar.pending, (state) => {
+            .addCase(uploadAvatar.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
@@ -318,8 +317,7 @@ export const authSlice = createSlice({
             .addCase(setDefaultAddress.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            })
-
+            });
     },
 });
 
@@ -331,6 +329,6 @@ export const {
     logout,
     setUser,
     resetForgotFlow,
-    startCooldown,
+    startCooldown,setVerificationFlow
 } = authSlice.actions;
 export default authSlice.reducer;

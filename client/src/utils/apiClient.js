@@ -45,9 +45,9 @@ const createApiClient = (getToken) => {
         (res) => res,
         (error) => {
             const status = error.response?.status;
-            if (status === 401) {
-                tokenService.clearAll();
-               window.location.href = "/auth/login"
+            // Only trigger the hard redirect if they aren't ALREADY on the login or register page!
+            if (!window.location.href.includes("/auth/")) {
+                window.location.href = "/auth/login";
             }
             // Handle forbidden
             if (status === 403) {
@@ -75,7 +75,7 @@ export const makeRequest = async (client, config) => {
     } catch (error) {
         const message =
             error.response?.data?.error?.message || error.response?.data?.error?.message || error.message || "Something went Wrong.";
-            console.log("register error findings:",error)
+        console.log("register error findings:", error)
         throw new Error(`makeRequest error: ${message}`);
     }
 };

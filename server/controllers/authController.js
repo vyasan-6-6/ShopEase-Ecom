@@ -10,9 +10,7 @@ const BaseController = require("./BaseController");
 
 class AuthController extends BaseController {
     static register = BaseController.asyncHandler(async (req, res) => {
-        const validatedData = BaseController.validateRequest(registerValidation, req.body);
-        console.log(req.body);
-
+        const validatedData = BaseController.validateRequest(registerValidation, req.body); 
         const result = await AuthService.register(validatedData);
         BaseController.logAction("USER_REGISTER", result.user);
         BaseController.sendSuccess(res, "User registered successfully. Welcome!", result, 201);

@@ -1,4 +1,4 @@
-import "./App.css";
+ 
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Register from "./pages/auth/Register";
@@ -15,7 +15,6 @@ import UserDashboard from "./pages/user/UserDashboard";
 import UserProfile from "./pages/user/UserProfile";
 import AddressBook from "./pages/user/AddressBook";
 import AdminProfile from "./pages/admin/AdminProfile";
-import Footer from "./components/common/Footer";
 import MainLayout from "./components/layout/MainLayout";
 function App() {
     const dispatch = useAppDispatch();
