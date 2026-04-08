@@ -19,7 +19,7 @@ const Register = memo(() => {
     const navigate = useNavigate();
 
 
-    const {email,cooldown,step} = useAppSelector(selectRegisterFlow)
+    const { email, cooldown, step } = useAppSelector(selectRegisterFlow)
     const error = useAppSelector(selectAuthError);
     const loading = useAppSelector(selectAuthLoading);
     const user = useAppSelector(selectUser);
