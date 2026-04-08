@@ -43,14 +43,20 @@ const RegisterForm = () => {
         [dispatch],
     );
 
-    const handleVerify = useCallback(() => {
-        dispatch(verifyOtp({ email, otp }));
-        navigate("/auth/login");  
-    }, [dispatch, email, otp]);
+    const handleVerify = useCallback(async () => {
+        const result = await dispatch(verifyOtp({ email, otp }));
+        if (verifyOtp.fulfilled.match(result)) {
+            toast.success("Account verified successfully!");
+            navigate("/auth/login");
+        }
+    }, [dispatch, email, otp, navigate]);
 
-    const handleResent = useCallback(() => {
+    const handleResent = useCallback(async () => {
         if (cooldown > 0) return;
-        dispatch(resendOtp(email));
+        const result = await dispatch(resendOtp(email));
+        if (resendOtp.fulfilled.match(result)) {
+            toast.success("OTP resent successfully!");
+        }
     }, [dispatch, cooldown, email]);
 
     useEffect(() => {

@@ -201,6 +201,7 @@ export const authSlice = createSlice({
             .addCase(resendOtp.fulfilled, (state) => {
                 state.loading = false;
                 state.registerFlow.cooldown = 60;
+                state.forgotFlow.cooldown = 60;
             })
 
             .addCase(loginUser.pending, (state) => {

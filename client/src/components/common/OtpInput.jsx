@@ -23,14 +23,14 @@ const handleKeydown =(e,index)=>{
     }
 };
     return (
-        <div>
+        <div className="flex justify-center flex-wrap gap-2">
             {Array.from({ length }).map((_, index) => (
                 <input
                     type="text"
                     key={index}
                     maxLength={1}
                     value={value[index] || ""}
-                    className="w-10 h-12 text-center border rounded-lg text-lg focus:ring-2 focus:ring-black outline-none"
+                    className="w-10 h-12 text-center border rounded-xl text-lg font-semibold focus:ring-2 focus:ring-black focus:border-black outline-none transition-all shadow-sm"
                     ref={(el) => (inputsRef.current[index] = el)}
                     onKeyDown={(e) => handleKeydown(e, index)}
                     onChange={(e) => handleChange(e, index)}

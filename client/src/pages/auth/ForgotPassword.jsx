@@ -4,6 +4,7 @@ import {
     resetPassword,
     tickForgotCooldown,
     verifyResetOtp,
+    resetForgotFlow,
 } from "../../redux/features/auth/authSlice";
 import {
     selectAuthError,
@@ -12,16 +13,19 @@ import {
 } from "../../redux/features/auth/authSelectors";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { forgotPasswordSchema } from "../../utils/authSchema";
 import { memo, useCallback, useEffect, useState } from "react"; 
 import { toast } from "react-toastify";
 import AuthLayout from "../../components/layout/AuthLayout";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import OtpInput from "../../components/common/OtpInput";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = memo(() => {
     const dispatch = useAppDispatch();
-  
+    const navigate = useNavigate();
     const {email,cooldown,step}  = useAppSelector(selectForgotFlow)
     const error = useAppSelector(selectAuthError);
     const loading = useAppSelector(selectAuthLoading); 
@@ -30,30 +34,48 @@ const ForgotPassword = memo(() => {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
+    } = useForm({
+        resolver: yupResolver(forgotPasswordSchema),
+        mode: "onChange",
+    });
 
     const [otp, setOtp] = useState("");
     const [password, setPassword] = useState("");
 
     const onSubmit = useCallback(
-        (data) => {
-            dispatch(forgotPassword(data.email));
+        async (data) => {
+            const result = await dispatch(forgotPassword(data.email));
+            if (forgotPassword.fulfilled.match(result)) {
+                toast.success("OTP sent to your email!");
+            }
         },
         [dispatch],
     );
 
-    const handleVerify = useCallback(() => {
-        dispatch(verifyResetOtp({ email, otp }));
-        
+    const handleVerify = useCallback(async () => {
+        const result = await dispatch(verifyResetOtp({ email, otp }));
+        if (verifyResetOtp.fulfilled.match(result)) {
+            toast.success("OTP verified! Set your new password.");
+        }
     }, [dispatch, otp, email]);
 
-    const handleReset = useCallback(() => {
-        dispatch(resetPassword({ email, newPassword: password }));
+    const handleReset = useCallback(async () => {
+        if (!password || password.length < 6) {
+            toast.error("Password must be at least 6 characters");
+            return;
+        }
+        const result = await dispatch(resetPassword({ email, newPassword: password }));
+        if (resetPassword.fulfilled.match(result)) {
+            toast.success("Password reset successful!");
+        }
     }, [dispatch, email, password]);
 
-    const handleResent = useCallback(() => {
+    const handleResent = useCallback(async () => {
         if (cooldown > 0) return;
-        dispatch(resendOtp(email));
+        const result = await dispatch(resendOtp(email));
+        if (resendOtp.fulfilled.match(result)) {
+            toast.success("OTP resent successfully!");
+        }
     }, [dispatch, cooldown, email]);
 
 useEffect(() => {
@@ -71,6 +93,25 @@ useEffect(() => {
         }
     }, [error]);
 
+    useEffect(() => {
+        if (step === "done") {
+            const timer = setTimeout(() => {
+                navigate("/", { replace: true });
+                dispatch(resetForgotFlow());
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [step, navigate, dispatch]);
+
+    // Cleanup on unmount to ensure the flow starts fresh next time
+    useEffect(() => {
+        return () => {
+            // Only reset if we are NOT in the finished state (otherwise the timer handle it)
+            // Actually, safety reset is better
+            dispatch(resetForgotFlow());
+        };
+    }, [dispatch]);
+
     return (
         <AuthLayout title={`Forgot Password`}>
             {/* STEP 1 */}
@@ -79,8 +120,7 @@ useEffect(() => {
                     <Input
                         label="Email"
                         placeholder="Enter Email"
-                       {...register("email",{required:"Email required"})}
-                        
+                        {...register("email")}
                         error={errors.email?.message}
                     />
                     <Button type="submit" loading={loading} fullWidth>
@@ -121,7 +161,8 @@ useEffect(() => {
             {/* STEP 4 */}
             {step === "done" && (
                 <div className="text-center space-y-2">
-                    <p>Password updated successfully</p>
+                    <p className="text-green-600 font-medium">Password updated successfully!</p>
+                    <p className="text-sm text-gray-500">Redirecting to home page in 3 seconds...</p>
                 </div>
             )}
         </AuthLayout>
