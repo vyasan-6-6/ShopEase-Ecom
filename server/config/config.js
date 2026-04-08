@@ -4,9 +4,9 @@ module.exports = {
     MONGODB_URI: process.env.MONGODB_URI || "mongodb://localhost:27017/ShopEase_Ecomm",
 
     JWT: {
-        USER_SECRET: process.env.JWT_USER_SECRET ,
-        ADMIN_SECRET: process.env.JWT_ADMIN_SECRET ,
-        EXPIRES_IN: process.env.JWT_EXPIRES_IN ,
+        USER_SECRET: process.env.JWT_USER_SECRET,
+        ADMIN_SECRET: process.env.JWT_ADMIN_SECRET,
+        EXPIRES_IN: process.env.JWT_EXPIRES_IN,
         REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "30d",
     },
     BCRYPT_ROUNDS: 12,
@@ -30,7 +30,7 @@ module.exports = {
     },
 
     SOCKET: {
-        CORS_ORIGIN: process.env.FRONTEND_URL ,
+        CORS_ORIGIN: process.env.FRONTEND_URL,
         METHODS: ["GET", "POST"],
         CREDENTIALS: true,
     },
@@ -44,5 +44,10 @@ module.exports = {
         LEVEL: process.env.LOG_LEVEL || "info",
         MAX_FILES: 5,
         MAX_SIZE: "20m",
+    },
+    CLOUDINARY: {
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
     },
 };

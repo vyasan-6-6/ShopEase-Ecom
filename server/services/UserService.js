@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const { uploadToCloudinary } = require("../utils/cloudinary");
 const { ErrorFactory } = require("../utils/errors");
 
 class UserService {
@@ -32,6 +33,27 @@ class UserService {
         return {
             user,
         };
+    }
+
+    static async uploadAvatar(userId,localFilePath){
+  if (!localFilePath) {
+            throw ErrorFactory.validation("No image file provided");
+        }
+
+        const uploadResponse = await uploadToCloudinary(localFilePath);
+
+         if (!uploadResponse || !uploadResponse.secure_url) {
+            throw ErrorFactory.generic("Failed to upload image to cloud storage");
+        }
+
+         const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { avatar: uploadResponse.secure_url }, 
+            { new: true, runValidators: true }
+        );
+return {
+    user:updatedUser
+}
     }
 }
 module.exports = UserService;

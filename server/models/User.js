@@ -2,18 +2,17 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const addressSchema = new mongoose.Schema({
-    label:{
-        type:String,
-        enum:['home','work','other'],
-        default:'home'
+    label: {
+        type: String,
+        enum: ["home", "work", "other"],
+        default: "home",
     },
-     street: { type: String, required: true },
+    street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
     zipCode: { type: String, required: true },
     country: { type: String, required: true },
-    isDefault: { type: Boolean, default: false }
-
+    isDefault: { type: Boolean, default: false },
 });
 
 const userSchema = new mongoose.Schema(
@@ -24,6 +23,10 @@ const userSchema = new mongoose.Schema(
             trim: true,
             minlength: [2, "Name must be at least 2 characters long"],
             maxlength: [50, "Name cannot exceed 50 characters"],
+        },
+        avatar: {
+            type: String,
+            default: null,
         },
 
         email: {
@@ -108,7 +111,7 @@ const userSchema = new mongoose.Schema(
             ref: "User",
             default: null,
         },
-        addresses:[addressSchema],
+        addresses: [addressSchema],
     },
     { timestamps: true },
 );
@@ -133,7 +136,7 @@ userSchema.statics.findActiveUsers = function () {
 };
 
 userSchema.statics.findByEmail = function (email) {
-    return this.findOne({ email: email.trim().toLowerCase()}).select("+password");
+    return this.findOne({ email: email.trim().toLowerCase() }).select("+password");
 };
 
 userSchema.set("toJSON", {
@@ -148,24 +151,23 @@ userSchema.set("toJSON", {
     },
 });
 
-userSchema.methods.addAddress = async function(addressData){
-if(addressData.isDefault || this.addresses.length ===0){
-this.addresses.forEach(addr=>addr.isDefault=false);
-addressData.isDefault = true;
-}
-this.addresses.push(addressData);
-return this.save();
+userSchema.methods.addAddress = async function (addressData) {
+    if (addressData.isDefault || this.addresses.length === 0) {
+        this.addresses.forEach((addr) => (addr.isDefault = false));
+        addressData.isDefault = true;
+    }
+    this.addresses.push(addressData);
+    return this.save();
 };
 
-userSchema.methods.setDefaultAddress = async function(addressId){
+userSchema.methods.setDefaultAddress = async function (addressId) {
     const address = this.addresses.id(addressId);
-     if (!address) throw new Error("Address not found");
+    if (!address) throw new Error("Address not found");
 
-  this.addresses.forEach(addr => addr.isDefault = false);
-  address.isDefault = true;
+    this.addresses.forEach((addr) => (addr.isDefault = false));
+    address.isDefault = true;
 
-  return this.save();
-}
-
+    return this.save();
+};
 
 module.exports = mongoose.model("User", userSchema);

@@ -20,5 +20,13 @@ class UserController extends BaseController {
         BaseController.logAction("ADD_ADDRESSES", result.user);
         BaseController.sendSuccess(res, "Add addresses successful", result.user);
     }); 
+    static uploadAvatar = BaseController.asyncHandler(async (req, res) => {
+         
+        const result = await UserService.uploadAvatar(req.user.id,req.file?.path);
+  BaseController.logAction("AVATAR_UPLOAD", result.user);
+        BaseController.sendSuccess(res, "Avatar uploaded successfully", result.user);
+    }); 
+    
+    
 }
 module.exports = UserController;
