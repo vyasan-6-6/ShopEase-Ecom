@@ -15,6 +15,16 @@ const addressSchema = new mongoose.Schema({
     isDefault: { type: Boolean, default: false },
 });
 
+addressSchema.set("toJSON", {
+    transform: (doc, ret) => {
+        ret.id = ret._id;      // rename _id to id
+        delete ret._id;        // wipe the old _id field
+        delete ret.__v;        // wipe the version key if it exists
+        return ret;
+    },
+});
+
+
 const userSchema = new mongoose.Schema(
     {
         name: {

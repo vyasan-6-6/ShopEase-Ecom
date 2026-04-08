@@ -95,6 +95,14 @@ return res.data;
     }
 });
 
+export const setDefaultAddress = createAsyncThunk("user/setDefaultAddress", async (addressId, { rejectWithValue }) => {
+    try {
+        const res = await userApi.setDefaultAddress(addressId);
+        return res.data; // This returns the updated user array with the new default flags
+    } catch (error) {
+        return rejectWithValue(error.message);
+    }
+});
 
 
 
@@ -106,6 +114,9 @@ export const uploadAvatar = createAsyncThunk("user/uploadAvatar", async (formDat
         return rejectWithValue(error.message);
     }
 });
+
+
+
 
 const initialState = {
     user: null,
@@ -294,6 +305,17 @@ export const authSlice = createSlice({
                 state.user = action.payload; // Immediately replace the user with the new one carrying the avatar URL!
             })
             .addCase(uploadAvatar.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(setDefaultAddress.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(setDefaultAddress.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload; // Saves the fresh addresses to state
+            })
+            .addCase(setDefaultAddress.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })

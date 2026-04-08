@@ -16,7 +16,7 @@ return makeRequest(userClient,{
 })
     },
     setDefaultAddress:(addressId)=>{
-        return makeRequest(userApi,{
+        return makeRequest(userClient,{
             url:`user/addresses/${addressId}/default`,
             method:'PATCH'
         })

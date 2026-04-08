@@ -1,6 +1,13 @@
+ 
 import Button from "../common/Button";
+import { setDefaultAddress } from "../../redux/features/auth/authSlice";
+import { useAppDispatch } from "../../redux/hooks";
 
 const AddressCard = ({ address }) => {
+const dispatch = useAppDispatch();
+const handleSetDefault  =()=>{
+    dispatch(setDefaultAddress(address.id))
+}
     return (
         <div className="border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition">
             {/* Display the Label (Home, Work) and a "Default" badge if true */}
@@ -20,7 +27,7 @@ const AddressCard = ({ address }) => {
             {/* Action Buttons */}
             <div className="flex gap-2">
                 {!address?.isDefault && (
-                    <Button variant="outline" size="sm">
+                    <Button  onClick={handleSetDefault} variant="outline" size="sm">
                         Make Default
                     </Button>
                 )}
