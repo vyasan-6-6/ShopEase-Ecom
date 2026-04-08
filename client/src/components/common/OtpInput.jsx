@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { memo, useRef } from "react";
 
 const OtpInput = ({ length = 6, onChange, value = "" }) => {
     const inputsRef = useRef([]);
@@ -40,4 +40,4 @@ const handleKeydown =(e,index)=>{
     );
 };
 
-export default OtpInput;
+export default memo(OtpInput);

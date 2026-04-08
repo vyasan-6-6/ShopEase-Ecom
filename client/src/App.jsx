@@ -14,8 +14,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
 import UserProfile from "./pages/user/UserProfile";
 import AddressBook from "./pages/user/AddressBook";
-import AdminProfile from "./pages/admin/AdminProfile"; 
-import Navbar from "./components/layout/Navbar";
+import AdminProfile from "./pages/admin/AdminProfile";
+import Footer from "./components/common/Footer";
+import MainLayout from "./components/layout/MainLayout";
 function App() {
     const dispatch = useAppDispatch();
     useEffect(() => {
@@ -26,17 +27,19 @@ function App() {
     }, [dispatch]);
     return (
         <BrowserRouter>
-            <Routes>  
+            <Routes>
                 <Route path="/auth/login" element={<Login />} />
                 <Route path="/auth/register" element={<Register />} />
                 <Route path="/auth/forgot-password" element={<ForgotPassword />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
 
-                <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
-                    <Route path="/user/dashboard" element={<UserDashboard />}>
-                        <Route index element={<UserProfile />} />
-                        <Route path="profile" element={<UserProfile />} />
-                        <Route path="addresses" element={<AddressBook />} />
+                <Route element={<MainLayout/>}>
+                    <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+                        <Route path="/user/dashboard" element={<UserDashboard />}>
+                            <Route index element={<UserProfile />} />
+                            <Route path="profile" element={<UserProfile />} />
+                            <Route path="addresses" element={<AddressBook />} />
+                        </Route>
                     </Route>
                 </Route>
 

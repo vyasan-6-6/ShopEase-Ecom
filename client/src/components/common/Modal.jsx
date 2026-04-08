@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 
 const Modal = ({ isOpen, onClose, title = " ", children }) => {
     if(!isOpen) return null;// If it's closed, render nothing!
@@ -31,4 +31,4 @@ const Modal = ({ isOpen, onClose, title = " ", children }) => {
     );
 };
 
-export default Modal;
+export default memo(Modal);

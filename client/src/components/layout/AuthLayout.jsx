@@ -1,3 +1,5 @@
+import { memo } from "react";
+
  
 const AuthLayout = ({
   children,
@@ -40,4 +42,4 @@ const AuthLayout = ({
   );
 };
 
-export default AuthLayout;
+export default memo(AuthLayout);
