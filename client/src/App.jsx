@@ -1,9 +1,9 @@
- 
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Register from "./pages/auth/Register";
 import Home from "./pages/public/Home";
 import Login from "./pages/auth/Login";
+import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -17,26 +17,37 @@ import UserProfile from "./pages/user/UserProfile";
 import AddressBook from "./pages/user/AddressBook";
 import AdminProfile from "./pages/admin/AdminProfile";
 import MainLayout from "./components/layout/MainLayout";
+
 function App() {
     const dispatch = useAppDispatch();
+
     useEffect(() => {
         const token = localStorage.getItem(AUTH_CONFIG.tokenKey);
         if (token) {
             dispatch(getProfile());
         }
     }, [dispatch]);
+
     return (
         <BrowserRouter>
             <Routes>
-                <Route element={<MainLayout/>}>
+                {/* Public + Guest-only routes inside MainLayout */}
+                <Route element={<MainLayout />}>
                     <Route index element={<Home />} />
-                    <Route path="/auth/login" element={<Login />} />
-                    <Route path="/auth/register" element={<Register />} />
-                    <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+
+                    {/* Guest-only: logged-in users are redirected to dashboard */}
+                    <Route element={<GuestRoute />}>
+                        <Route path="/auth/login" element={<Login />} />
+                        <Route path="/auth/register" element={<Register />} />
+                        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                    </Route>
                 </Route>
+
+                {/* Admin login — no MainLayout */}
                 <Route path="/admin/login" element={<AdminLogin />} />
 
-                <Route element={<MainLayout/>}>
+                {/* User protected routes */}
+                <Route element={<MainLayout />}>
                     <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
                         <Route path="/user/dashboard" element={<UserDashboard />}>
                             <Route index element={<UserProfile />} />
@@ -46,11 +57,11 @@ function App() {
                     </Route>
                 </Route>
 
+                {/* Admin protected routes */}
                 <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
                     <Route path="/admin/dashboard" element={<AdminDashboard />}>
                         <Route index element={<AdminProfile />} />
                         <Route path="profile" element={<AdminProfile />} />
-                        {/* <Route path="/" element={<ManageUsers />} /> */}
                     </Route>
                 </Route>
             </Routes>
