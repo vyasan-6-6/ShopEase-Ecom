@@ -8,15 +8,41 @@ const { sendOtpEmail } = require("../utils/nodemailer");
 class AuthService {
     static async register(userData) {
         const existingUser = await User.findByEmail(userData.email);
+
         if (existingUser) {
-            throw ErrorFactory.conflict("User with this email already exists");
+            //   Already fully verified → reject as duplicate
+            if (existingUser.isVerified) {
+                throw ErrorFactory.conflict("An account with this email already exists. Please log in.");
+            }
+
+            //   Exists but never verified → resend OTP so they can complete registration
+            const otp = generateOTP();
+            existingUser.otp = {
+                code: hashOTP(otp),
+                expiresAt: Date.now() + 10 * 60 * 1000,
+                attempts: 0,
+                lastSendAt: Date.now(),
+            };
+            await existingUser.save();
+            setImmediate(() => {
+                sendOtpEmail(existingUser.email, otp).catch((err) => {
+                    logger.error("OTP resend email failed:", err);
+                });
+            });
+            logger.info(`OTP resent to unverified user: ${existingUser.email}`);
+            return {
+                user: existingUser,
+                message: "A new OTP has been sent to your email. Please verify to complete registration.",
+            };
         }
+
+        //  Brand new user → create and send OTP
         const otp = generateOTP();
         const user = await User.create({
             ...userData,
             otp: {
                 code: hashOTP(otp),
-                expiresAt: Date.now() + 10 * 60 * 1000, //10min
+                expiresAt: Date.now() + 10 * 60 * 1000,
                 attempts: 0,
                 lastSendAt: Date.now(),
             },
