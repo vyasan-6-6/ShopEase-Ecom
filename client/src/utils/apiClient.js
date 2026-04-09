@@ -75,7 +75,6 @@ export const makeRequest = async (client, config) => {
     } catch (error) {
         const message =
             error.response?.data?.error?.message || error.response?.data?.error?.message || error.message || "Something went Wrong.";
-        console.log("register error findings:", error)
         throw new Error(message);
     }
 };

@@ -70,7 +70,7 @@ export const authAPI = {
     },
     resendOtp:async(data)=>{
         return makeRequest(userClient,{
-            url:"/auth/resent-otp",
+            url:"/auth/resend-otp",
             method:'POST',
             data
         })

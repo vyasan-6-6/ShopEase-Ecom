@@ -154,6 +154,7 @@ export const authSlice = createSlice({
         resetForgotFlow: (state) => {
             state.forgotFlow = initialState.forgotFlow;
         },
+        
         setVerificationFlow: (state, action) => {
             state.registerFlow.step = "otp";
             state.registerFlow.email = action.payload; // Saves the email they typed into Login!
@@ -330,6 +331,6 @@ export const {
     logout,
     setUser,
     resetForgotFlow,
-    startCooldown,setVerificationFlow
+    startCooldown, setVerificationFlow,  
 } = authSlice.actions;
 export default authSlice.reducer;

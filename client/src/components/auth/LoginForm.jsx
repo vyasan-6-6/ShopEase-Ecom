@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../common/Input";
 import { useForm } from "react-hook-form";
@@ -9,10 +9,14 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectAuthLoading } from "../../redux/features/auth/authSelectors";
 import Button from "../common/Button";
 
+const UNVERIFIED_MSG = "Please verify your account with OTP.";
+
 const LoginForm = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const loading = useAppSelector(selectAuthLoading);
+    const [formError, setFormError] = useState("");
+
     const {
         register,
         handleSubmit,
@@ -27,17 +31,20 @@ const LoginForm = () => {
 
     const onSubmit = useCallback(
         async (data) => {
-            // We await the dispatch to inspect the result
+            setFormError(""); // clear previous error
             const actionResult = await dispatch(loginUser(data));
-            console.log("daat:", data.email);
 
-            // If the login was rejected...
             if (loginUser.rejected.match(actionResult)) {
-                // And the error is specifically the unverified account error...
-                if (actionResult.payload === "Please verify your account with OTP.") {
-                    dispatch(setVerificationFlow(data.email)); // Setup the Redux state
-                    dispatch(resendOtp(data.email)); // Ask the backend to text them!
-                    navigate("/auth/register"); // Push them to the screen with the OTP Input
+                const errorMsg = actionResult.payload;
+
+                if (errorMsg === UNVERIFIED_MSG) {
+                    // Unverified account → resend OTP and redirect to OTP screen
+                    dispatch(setVerificationFlow(data.email));
+                    dispatch(resendOtp(data.email));
+                    navigate("/auth/register");
+                } else {
+                    // Wrong password or any other login error → show inline in form
+                    setFormError(errorMsg || "Login failed. Please try again.");
                 }
             }
         },
@@ -60,6 +67,15 @@ const LoginForm = () => {
                 error={errors.password?.message}
                 placeholder="Enter your password"
             />
+
+            {/* Inline server error — shown only when login fails */}
+            {formError && (
+                <div className="flex items-start gap-3 px-4 py-3.5 bg-red-50 border border-red-100 rounded-2xl">
+                    <span className="text-red-500 mt-0.5">⚠</span>
+                    <p className="text-sm font-medium text-red-600">{formError}</p>
+                </div>
+            )}
+
             <Button type="submit" loading={loading} fullWidth>
                 Login
             </Button>

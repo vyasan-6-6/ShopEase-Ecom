@@ -75,12 +75,12 @@ const RegisterForm = () => {
         }
     }, [cooldown, dispatch]);
 
-  useEffect(() => {
-    if (error) {
-        toast.error(error);
-        dispatch(clearError()); // <--- Add this! Now it clears out instantly!
-    }
-}, [error, dispatch]);
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+            dispatch(clearError()); // <--- Add this! Now it clears out instantly!
+        }
+    }, [error, dispatch]);
 
     useEffect(() => {
         if (cooldown === 60) {
