@@ -146,7 +146,12 @@ const RegisterForm = () => {
                     </Button>
                 </div>
             )}
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && (
+                <div className="flex items-start gap-3 px-4 py-3.5 bg-red-50 border border-red-100 rounded-2xl mt-4">
+                    <span className="text-red-500 mt-0.5">⚠</span>
+                    <p className="text-sm font-medium text-red-600">{error}</p>
+                </div>
+            )}
         </div>
     );
 };

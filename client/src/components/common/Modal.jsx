@@ -1,7 +1,7 @@
 import { memo, useEffect } from "react";
 
 const Modal = ({ isOpen, onClose, title = " ", children }) => {
-    // ✅ useEffect must be called BEFORE any early returns (Rules of Hooks)
+    //   useEffect must be called BEFORE any early returns (Rules of Hooks)
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = "hidden"; // Lock scroll when open
@@ -30,7 +30,7 @@ const Modal = ({ isOpen, onClose, title = " ", children }) => {
                         &times;
                     </button>
                 </div>
-                <div>{children}</div>//injected content
+                <div>{children}</div> 
             </div>
         </div>
     );

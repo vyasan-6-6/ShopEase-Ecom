@@ -76,6 +76,6 @@ export const makeRequest = async (client, config) => {
         const message =
             error.response?.data?.error?.message || error.response?.data?.error?.message || error.message || "Something went Wrong.";
         console.log("register error findings:", error)
-        throw new Error(`makeRequest error: ${message}`);
+        throw new Error(message);
     }
 };

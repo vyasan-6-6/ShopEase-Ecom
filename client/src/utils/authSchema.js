@@ -45,3 +45,35 @@ export const forgotPasswordSchema = yup.object().shape({
         .required("Email is required")
         .email("Please enter a valid email address"),
 });
+
+export const addressSchema = yup.object().shape({
+    label: yup
+        .string()
+        .required("Address type is required")
+        .oneOf(["home", "work", "other"], "Invalid address type"),
+    street: yup
+        .string()
+        .required("Street address is required")
+        .min(5, "Street address is too short")
+        .max(200, "Street address is too long"),
+    city: yup
+        .string()
+        .required("City is required")
+        .min(2, "City name is too short")
+        .max(100, "City name is too long"),
+    state: yup
+        .string()
+        .required("State is required")
+        .min(2, "State name is too short")
+        .max(100, "State name is too long"),
+    zipCode: yup
+        .string()
+        .required("Zip code is required")
+        .matches(/^[0-9]{5,6}$/, "Enter a valid zip code (5-6 digits)"),
+    country: yup
+        .string()
+        .required("Country is required")
+        .min(2, "Country name is too short")
+        .max(100, "Country name is too long"),
+    isDefault: yup.boolean(),
+});
