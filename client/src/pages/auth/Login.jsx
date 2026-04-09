@@ -27,7 +27,7 @@ const Login = memo(() => {
     }, [error, dispatch]);
 
     return (
-        <AuthLayout title={`User Portal`} subtitle={`New Here. Sign in  `}>
+        <AuthLayout title={`Login Page`} subtitle={`Welcome back! Sign in to your account`}>
             <LoginForm />
         </AuthLayout>
     );

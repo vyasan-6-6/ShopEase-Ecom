@@ -16,7 +16,7 @@ const Register = memo(() => {
     }, [user, navigate]);
 
     return (
-        <AuthLayout>
+        <AuthLayout title={`Register Page`} subtitle={`New here? Sign up to create an account`} >
             <RegisterForm />
         </AuthLayout>
     );
