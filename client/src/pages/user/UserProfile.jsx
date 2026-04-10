@@ -7,6 +7,7 @@ import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { Camera, User, Mail, Phone } from "lucide-react";
 import clsx from "clsx";
+import { toast } from "react-toastify";
 
 const UserProfile = () => {
     const dispatch = useAppDispatch();
@@ -15,7 +16,8 @@ const UserProfile = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors, isDirty },
+        reset,
+        formState: { errors, isDirty, isSubmitting },
     } = useForm({ 
         defaultValues: { 
             email: user?.email, 
@@ -24,8 +26,18 @@ const UserProfile = () => {
         } 
     });
 
-    const onSubmit = (data) => {
-        dispatch(updateProfile(data));
+    const onSubmit = async (data,e) => {
+       if(e) e.preventDefault();
+        const result = await dispatch(updateProfile({name:data.name,phone:data.phone}));
+        console.log("result",result);
+        console.log("result.payload",result.payload);
+        if (updateProfile.fulfilled.match(result)) {
+            toast.success("Profile updated successfully!");
+            // Reset the form with the newly saved values so it is no longer 'dirty'
+            reset(data);
+        } else {
+            toast.error(result.payload || "Failed to update profile");
+        }
     };
 
     const handleAvatarChange = (e) => {
@@ -119,7 +131,9 @@ const UserProfile = () => {
 
                     <div className="pt-8 flex justify-end">
                         <Button 
-                            disabled={!isDirty}
+                            type="submit"
+                            disabled={!isDirty || isSubmitting}
+                            loading={isSubmitting}
                             className={clsx(
                                 "px-10 py-4 rounded-2xl font-bold transition-all shadow-xl active:scale-95",
                                 isDirty ? "bg-indigo-600 text-white shadow-indigo-100 hover:bg-indigo-700" : "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"

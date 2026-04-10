@@ -33,7 +33,7 @@ const offers = [
 ];
 
 const Offers = () => {
-    
+
     // Copy the coupon code to the user's clipboard and notify them!
     const handleCopy = (code) => {
         navigator.clipboard.writeText(code);
@@ -58,8 +58,8 @@ const Offers = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {offers.map((offer) => (
-                        <div 
-                            key={offer.id} 
+                        <div
+                            key={offer.id}
                             className="relative group bg-white rounded-3xl shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-indigo-200/50 transition-all duration-300 transform hover:-translate-y-2 overflow-hidden flex flex-col"
                         >
                             {/* Top Color Banner */}
@@ -69,20 +69,20 @@ const Offers = () => {
                                 </div>
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
                             </div>
-                            
+
                             {/* Card Content */}
                             <div className="p-6 flex-grow flex flex-col justify-between">
                                 <div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-2">{offer.title}</h3>
                                     <p className="text-gray-600 font-medium mb-6">{offer.description}</p>
                                 </div>
-                                
+
                                 <div className="mt-auto">
                                     <div className="flex items-center justify-between p-1 pl-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl group-hover:border-indigo-400 transition-colors">
                                         <span className="font-mono font-black text-lg text-gray-900 tracking-wider">
                                             {offer.code}
                                         </span>
-                                        <button 
+                                        <button
                                             onClick={() => handleCopy(offer.code)}
                                             className="p-2 bg-white hover:bg-indigo-50 text-indigo-600 rounded-lg shadow-sm transition-colors border border-gray-100 flex items-center gap-2"
                                             title="Copy Code"
