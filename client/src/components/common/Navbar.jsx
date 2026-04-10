@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings, House } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
@@ -13,6 +13,7 @@ const Navbar = () => {
     const user = useAppSelector(selectUser);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleLogout = () => {
         dispatch(logout());
@@ -45,7 +46,12 @@ const Navbar = () => {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className="text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors"
+                                className={clsx(
+                                    "text-sm font-bold transition-colors",
+                                    location.pathname === link.path
+                                        ? "text-indigo-600"
+                                        : "text-gray-600 hover:text-indigo-600"
+                                )}
                             >
                                 {link.name}
                             </Link>
@@ -114,13 +120,23 @@ const Navbar = () => {
                             <div className="flex items-center gap-3">
                                 <Link
                                     to="/auth/login"
-                                    className="text-sm font-bold text-gray-600 hover:text-indigo-600 px-4 py-2"
+                                    className={clsx(
+                                        "text-sm font-bold px-4 py-2 rounded-xl transition-all",
+                                        location.pathname === "/auth/login"
+                                            ? "bg-indigo-50 text-indigo-600"
+                                            : "text-gray-600 hover:text-indigo-600 hover:bg-gray-50"
+                                    )}
                                 >
                                     Login
                                 </Link>
                                 <Link
                                     to="/auth/register"
-                                    className="text-sm font-bold bg-gray-900 text-white px-6 py-2.5 rounded-xl hover:bg-black transition-all shadow-lg shadow-gray-200"
+                                    className={clsx(
+                                        "text-sm font-bold px-6 py-2.5 rounded-xl transition-all",
+                                        location.pathname === "/auth/register"
+                                            ? "bg-indigo-600 text-white shadow-lg  "
+                                            : "text-gray-600 hover:bg-gray-50 hover:text-indigo-600"
+                                    )}
                                 >
                                     Register
                                 </Link>
@@ -159,7 +175,12 @@ const Navbar = () => {
                             key={link.name}
                             to={link.path}
                             onClick={() => setIsOpen(false)}
-                            className="block px-4 py-3 text-base font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-colors"
+                            className={clsx(
+                                "block px-4 py-3 text-base font-bold rounded-xl transition-colors",
+                                location.pathname === link.path
+                                    ? "bg-indigo-50 text-indigo-600"
+                                    : "text-gray-600 hover:bg-indigo-50 hover:text-indigo-600"
+                            )}
                         >
                             {link.name}
                         </Link>
@@ -169,14 +190,24 @@ const Navbar = () => {
                             <Link
                                 to="/auth/login"
                                 onClick={() => setIsOpen(false)}
-                                className="flex items-center justify-center px-4 py-3 text-sm font-bold text-gray-600 border border-gray-200 rounded-xl"
+                                className={clsx(
+                                    "flex items-center justify-center px-4 py-3 text-sm font-bold border rounded-xl transition-colors",
+                                    location.pathname === "/auth/login"
+                                        ? "border-indigo-200 bg-indigo-50 text-indigo-600"
+                                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                                )}
                             >
                                 Login
                             </Link>
                             <Link
                                 to="/auth/register"
                                 onClick={() => setIsOpen(false)}
-                                className="flex items-center justify-center px-4 py-3 text-sm font-bold bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100"
+                                className={clsx(
+                                    "flex items-center justify-center px-4 py-3 text-sm font-bold rounded-xl transition-colors",
+                                    location.pathname === "/auth/register"
+                                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100"
+                                        : "text-gray-600 border border-transparent hover:border-gray-200 hover:bg-gray-50"
+                                )}
                             >
                                 Register
                             </Link>
