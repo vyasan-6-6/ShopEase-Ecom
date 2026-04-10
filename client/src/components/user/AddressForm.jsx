@@ -1,5 +1,6 @@
-import { addAddress } from "../../redux/features/auth/authSlice";
+import { addAddress, editAddress } from "../../redux/features/auth/authSlice";
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addressSchema } from "../../utils/authSchema";
 import { useAppDispatch } from "../../redux/hooks";
@@ -14,21 +15,38 @@ const labelOptions = [
     { value: "other", label: "Other", icon: Tag },
 ];
 
-const AddressForm = ({ onCloseModal }) => {
+const AddressForm = ({ onCloseModal, addressToEdit = null }) => {
     const {
         register,
-        handleSubmit,//usecase: to handle the form submission
-        reset,//usecase: to reset the form after submission
-        watch,//usecase: to keep track of the selected label
-        setValue,//usecase: to set the value of the selected label
-        formState: { errors, isSubmitting },//issubmitting is used for disabling the button during submission
-    } = useForm({ defaultValues: { label: "home" }, resolver: yupResolver(addressSchema) });
+        handleSubmit,
+        reset,
+        watch,
+        setValue,
+        formState: { errors, isSubmitting },
+    } = useForm({ 
+        defaultValues: addressToEdit || { label: "home", isDefault: false },
+        resolver: yupResolver(addressSchema) 
+    });
+    
+    // Safety sync: if addressToEdit changes remotely while modal is open, force a reset
+    useEffect(() => {
+        if (addressToEdit) {
+            reset(addressToEdit);//this is used to reset the form with the new values of the address to edit
+        } else {
+            reset({ label: "home", isDefault: false });
+        }
+    }, [addressToEdit, reset]);
+
     const dispatch = useAppDispatch();
     const selectedLabel = watch("label");
     const isDefaultChecked = watch("isDefault");
 
     const onSubmit = async (data) => {
-        await dispatch(addAddress(data));
+        if (addressToEdit) {
+            await dispatch(editAddress({ addressId: addressToEdit.id, data }));
+        } else {
+            await dispatch(addAddress(data));
+        }
         reset();
         onCloseModal();
     };

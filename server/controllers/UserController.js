@@ -27,6 +27,21 @@ class UserController extends BaseController {
         BaseController.sendSuccess(res, "Set default address successfully", result.user);
     });
 
+    static deleteAddress = BaseController.asyncHandler(async (req, res) => {
+        const { addressId } = req.params;
+        const result = await UserService.deleteAddress(req.user.id, addressId);
+        BaseController.logAction("DELETE_ADDRESS", result.user);
+        BaseController.sendSuccess(res, "Address deleted successfully", result.user);
+    });
+
+    static editAddress = BaseController.asyncHandler(async (req, res) => {
+        const { addressId } = req.params;
+        const validatedData = BaseController.validateRequest(addressValidation, req.body);
+        const result = await UserService.editAddress(req.user.id, addressId, validatedData);
+        BaseController.logAction("EDIT_ADDRESS", result.user);
+        BaseController.sendSuccess(res, "Address updated successfully", result.user);
+    });
+
     static uploadAvatar = BaseController.asyncHandler(async (req, res) => {
         const result = await UserService.uploadAvatar(req.user.id, req.file?.path);
         BaseController.logAction("AVATAR_UPLOAD", result.user);

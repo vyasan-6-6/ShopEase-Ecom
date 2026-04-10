@@ -4,7 +4,7 @@ export const userApi = {
     updateProfile: (data) => {
         return makeRequest(userClient, {
             url: "/user/profile",
-            method: "PATCH",
+            method: "PUT",
             data: data,
         });
     }, 
@@ -17,9 +17,22 @@ return makeRequest(userClient,{
     },
     setDefaultAddress:(addressId)=>{
         return makeRequest(userClient,{
-            url:`user/addresses/${addressId}/default`,
+            url:`/user/addresses/${addressId}/default`,
             method:'PATCH'
         })
+    },
+    deleteAddress: (addressId) => {
+        return makeRequest(userClient, {
+            url: `/user/addresses/${addressId}`,
+            method: "DELETE",
+        });
+    },
+    editAddress: (addressId, addressData) => {
+        return makeRequest(userClient, {
+            url: `/user/addresses/${addressId}`,
+            method: "PUT",
+            data: addressData,
+        });
     },
     uploadAvatar:(formData)=>{
         return makeRequest(userClient,{

@@ -10,6 +10,19 @@ import { Plus, MapPin } from "lucide-react";
 const AddressBook = () => {
     const user = useAppSelector(selectUser);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingAddress, setEditingAddress] = useState(null);
+    console.log('editingAddress',editingAddress);
+    
+
+    const openNewAddressModal = () => {
+        setEditingAddress(null);
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (address) => {
+        setEditingAddress(address);
+        setIsModalOpen(true);
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500"> 
@@ -22,7 +35,7 @@ const AddressBook = () => {
                     <p className="text-gray-500 font-medium mt-1">Manage your shipping and billing addresses</p>
                 </div>
                 <Button 
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={openNewAddressModal}
                     className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-black transition-all shadow-lg active:scale-95 text-sm"
                 >
                     <Plus className="w-5 h-5" />
@@ -33,7 +46,7 @@ const AddressBook = () => {
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                 {user?.addresses?.length > 0 ? (
                     user.addresses.map((addr, index) => (
-                        <AddressCard key={index} address={addr}/>
+                        <AddressCard key={index} address={addr} onEdit={() => openEditModal(addr)} />
                     ))
                 ) : (
                     <div className="md:col-span-2 text-center py-20 bg-white rounded-[2.5rem] border border-dashed border-gray-200">
@@ -49,9 +62,9 @@ const AddressBook = () => {
             <Modal 
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} 
-                title="Add New Address"
+                title={editingAddress ? "Edit Address" : "Add New Address"}
             >
-                <AddressForm onCloseModal={() => setIsModalOpen(false)}/>
+                <AddressForm onCloseModal={() => setIsModalOpen(false)} addressToEdit={editingAddress} />
             </Modal>
         </div>
     );

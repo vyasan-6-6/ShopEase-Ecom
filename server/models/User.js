@@ -179,5 +179,34 @@ userSchema.methods.setDefaultAddress = async function (addressId) {
 
     return this.save();
 };
+ 
+userSchema.methods.deleteAddress = async function (addressId) {
+    const address = this.addresses.id(addressId);
+    if (!address) throw new Error("Address not found");
+
+    const wasDefault = address.isDefault;
+    this.addresses.pull(addressId); // Remove from array
+
+    // If they deleted their default address, and they have other addresses left, arbitrarily make the first remaining address the default
+    if (wasDefault && this.addresses.length > 0) {
+        this.addresses[0].isDefault = true;
+    }
+
+    return this.save();
+};
+userSchema.methods.editAddress = async function (addressId, updatedData) {
+    const address = this.addresses.id(addressId);
+    if (!address) throw new Error("Address not found");
+
+    // If they are setting this address as default during the edit, wipe others
+    if (updatedData.isDefault) {
+        this.addresses.forEach((addr) => (addr.isDefault = false));
+    }
+
+    // Apply the updates using Object.assign
+    Object.assign(address, updatedData);//here object.assign is used to merge the updatedData into the address object .for example address looks like {street:"123 Main St",city:"New York",state:"NY",zipCode:"10001",country:"USA",isDefault:false} and updatedData looks like {street:"456 Elm St",city:"New York",state:"NY",zipCode:"10001",country:"USA",isDefault:true} then after object.assign(address, updatedData) address will be {street:"456 Elm St",city:"New York",state:"NY",zipCode:"10001",country:"USA",isDefault:true} 
+
+    return this.save();
+};
 
 module.exports = mongoose.model("User", userSchema);

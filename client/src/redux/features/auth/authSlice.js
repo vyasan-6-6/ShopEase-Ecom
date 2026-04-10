@@ -103,6 +103,24 @@ export const setDefaultAddress = createAsyncThunk("user/setDefaultAddress", asyn
     }
 });
 
+export const deleteAddress = createAsyncThunk("user/deleteAddress", async (addressId, { rejectWithValue }) => {
+    try {
+        const res = await userApi.deleteAddress(addressId);
+        return res.data; 
+    } catch (error) {
+        return rejectWithValue(error.message);
+    }
+});
+
+export const editAddress = createAsyncThunk("user/editAddress", async ({ addressId, data }, { rejectWithValue }) => {
+    try {
+        const res = await userApi.editAddress(addressId, data);
+        return res.data; 
+    } catch (error) {
+        return rejectWithValue(error.message);
+    }
+});
+
 export const uploadAvatar = createAsyncThunk("user/uploadAvatar", async (formData, { rejectWithValue }) => {
     try {
         const res = await userApi.uploadAvatar(formData);
@@ -317,6 +335,28 @@ export const authSlice = createSlice({
                 state.user = action.payload; // Saves the fresh addresses to state
             })
             .addCase(setDefaultAddress.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(deleteAddress.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(deleteAddress.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload; 
+            })
+            .addCase(deleteAddress.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(editAddress.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(editAddress.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload; 
+            })
+            .addCase(editAddress.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

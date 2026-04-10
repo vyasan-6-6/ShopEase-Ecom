@@ -44,6 +44,22 @@ class UserService {
         return { user };
     }
 
+    static async deleteAddress(userId, addressId) {
+        const user = await User.findById(userId);
+        if (!user) throw ErrorFactory.notFound("User not found");
+
+        await user.deleteAddress(addressId);
+        return { user };
+    }
+
+    static async editAddress(userId, addressId, addressData) {
+        const user = await User.findById(userId);
+        if (!user) throw ErrorFactory.notFound("User not found");
+
+        await user.editAddress(addressId, addressData);
+        return { user };
+    }
+
     static async uploadAvatar(userId, localFilePath) {
         if (!localFilePath) {
             throw ErrorFactory.validation("No image file provided");
