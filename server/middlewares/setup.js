@@ -12,6 +12,15 @@ const setupMiddleware = (app) => {
         }),
     );
 
+    const corsOptions = {
+        origin:config.CORS.ORIGIN,
+        credential:config.CORS.CREDENTIALS,
+        allowedHeaders:config.CORS.ALLOWED_HEADERS,
+        method:config.CORS.METHODS,
+        optionsSuccessStatus:200
+    }
+    app.use(cors(corsOptions));
+
     const limiter = rateLimit({
         windowMs: config.RATE_LIMIT.WINDOW_MS,
         max: config.RATE_LIMIT.MAX_REQUESTS,
@@ -22,18 +31,7 @@ const setupMiddleware = (app) => {
         standardHeaders: true,
         legacyHeaders: false,
     });
-
     app.use(limiter);
-
-    const corsOptions = {
-        origin:config.CORS.ORIGIN,
-        credential:config.CORS.CREDENTIALS,
-        allowedHeaders:config.CORS.ALLOWED_HEADERS,
-        method:config.CORS.METHODS,
-        optionsSuccessStatus:200
-    }
-
-    app.use(cors(corsOptions));
 
     app.use(express.json({limit:"10mb"}));//API's
     app.use(express.urlencoded({extended:true}));//form data
