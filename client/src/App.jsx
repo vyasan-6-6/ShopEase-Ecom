@@ -9,7 +9,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
 import { getProfile } from "./redux/features/auth/authSlice";
 import { useAppDispatch } from "./redux/hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AUTH_CONFIG } from "./config/app";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
@@ -20,13 +20,36 @@ import MainLayout from "./components/layout/MainLayout";
 
 function App() {
     const dispatch = useAppDispatch();
+    const [isVerifyingAuth, setIsVerifyingAuth] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem(AUTH_CONFIG.tokenKey);
-        if (token) {
-            dispatch(getProfile());
-        }
+        const verifyAuth = async () => {
+            const token = localStorage.getItem(AUTH_CONFIG.tokenKey);
+            const adminToken = localStorage.getItem(AUTH_CONFIG.adminKey);
+
+            // If we have any tokens, wait for the backend verify them.
+            // (You could also add admin getProfile here if needed!)
+            if (token) {
+                await dispatch(getProfile());
+            }
+
+            // Once finished checking, let the router boot up.
+            setIsVerifyingAuth(false);
+        };
+
+        verifyAuth();//we call this function to verify the authentication of the user and if the user is authenticated then it will redirect to the dashboard and if not then it will redirect to the login page 
     }, [dispatch]);
+
+    if (isVerifyingAuth) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-gray-50">
+                <div className="flex flex-col items-center space-y-4">
+                    <span className="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-gray-500 font-medium">Verifying session...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <BrowserRouter>

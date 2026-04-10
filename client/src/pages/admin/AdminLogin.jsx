@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form"
+import { toast } from "react-toastify";
 import { useAppDispatch } from "../../redux/hooks";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAdminLoading, selectAdminUser } from "../../redux/features/admin/adminSelector";
@@ -14,9 +15,33 @@ const dispatch  = useAppDispatch();
 const navigate = useNavigate()
 const loading = useSelector(selectAdminLoading);
 const admin = useSelector(selectAdminUser);
-    const {register,handleSubmit,formState:{errors}} = useForm();
-const onSubmit = (data)=>{
-    dispatch(loginAdmin(data));
+    const {register,handleSubmit,setError,formState:{errors}} = useForm();
+
+const onSubmit = async (data) => {
+    const actionResult = await dispatch(loginAdmin(data));
+
+    if (loginAdmin.rejected.match(actionResult)) {
+        const errorMsg = actionResult.payload;
+        const lowerMsg = (errorMsg || "").toLowerCase();
+        
+        // Let's see which fields we need to flag
+        let errorSet = false;
+        
+        if (lowerMsg.includes("email") || lowerMsg.includes("user") || lowerMsg.includes("not found")) {
+            setError("email", { type: "server", message: errorMsg });
+            errorSet = true;
+        } 
+        
+        if (lowerMsg.includes("password") || lowerMsg.includes("credential")) {
+            setError("password", { type: "server", message: errorMsg });
+            errorSet = true;
+        } 
+        
+        // Fallback to toast if no fields were matched
+        if (!errorSet) {
+            toast.error(errorMsg || "Admin Login failed. Please try again.");
+        }
+    }
 }
 
 useEffect(()=>{

@@ -1,5 +1,6 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Input from "../common/Input";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,7 +16,9 @@ const LoginForm = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const loading = useAppSelector(selectAuthLoading);
-    const [formError, setFormError] = useState("");
+
+
+    const [serverErrors, setServerErrors] = useState({});
 
     const {
         register,
@@ -25,56 +28,80 @@ const LoginForm = () => {
         resolver: yupResolver(loginSchema),
         mode: "onChange",
     });
-    //yup → defines rules
-    //resolver → connects yup to react-hook-form
-    //react-hook-form → manages form state
 
     const onSubmit = useCallback(
-        async (data) => {
-            setFormError(""); // clear previous error
-            const actionResult = await dispatch(loginUser(data));
+        async (data, e) => {
+            console.log("LOGIN SUBMITTED", data);
+            if (e) e.preventDefault();
+            
+            // Clear any previous server errors before submitting
+            setServerErrors({});
+            
+            try {
+                const actionResult = await dispatch(loginUser(data));
 
-            if (loginUser.rejected.match(actionResult)) {
-                const errorMsg = actionResult.payload;
+                if (loginUser.rejected.match(actionResult)) {
+                    const errorMsg = actionResult.payload;
 
-                if (errorMsg === UNVERIFIED_MSG) {
-                    // Unverified account → resend OTP and redirect to OTP screen
-                    dispatch(setVerificationFlow(data.email));
-                    dispatch(resendOtp(data.email));
-                    navigate("/auth/register");
-                } else {
-                    // Wrong password or any other login error → show inline in form
-                    setFormError(errorMsg || "Login failed. Please try again.");
+                    if (errorMsg === UNVERIFIED_MSG) {
+                        dispatch(setVerificationFlow(data.email));
+                        dispatch(resendOtp(data.email));
+                        navigate("/auth/register");
+                    } else {
+                        const lowerMsg = (errorMsg || "").toLowerCase();
+                        
+                        // Pass errors exactly where they belong natively 
+                        const newErrors = {};//usecase of newErrors is to store the errors in the form of key-value pairs so that we can display them in the form of error messages
+                        
+                        if (lowerMsg.includes("email") || lowerMsg.includes("user") || lowerMsg.includes("not found")) {
+                            newErrors.email = errorMsg;
+                        }
+                        
+                        if (lowerMsg.includes("password") || lowerMsg.includes("credential")) {
+                            newErrors.password = errorMsg;
+                        }
+
+                        // If the backend sent a generic "Invalid email or password", both fields will be populated!
+                        if (Object.keys(newErrors).length > 0) {
+                            setServerErrors(newErrors);
+                        } else {
+                            toast.error(errorMsg || "Login failed. Please try again.");
+                        }
+                    }
                 }
-            }
-        },
-        [dispatch, navigate]
-    );
+        } catch (err) {
+            console.error("Unhandled error in onSubmit:", err);
+        }
+    },
+    [dispatch, navigate]
+);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
                 label="Email"
                 type="email"
-                {...register("email")}
-                error={errors.email?.message}
+                {...register("email", {
+                    onChange: () => {
+                        if (serverErrors.email) setServerErrors(prev => ({ ...prev, email: "" }));//onchange event is triggered when the value of the input field changes.so when the user starts typing the email, the error message will be cleared.
+                    }
+                })}
+                error={errors.email?.message || serverErrors.email}
                 placeholder="Enter your email"
             />
             <Input
                 label="Password"
                 type="password"
-                {...register("password")}
-                error={errors.password?.message}
+                {...register("password", {
+                    onChange: () => {
+                        if (serverErrors.password) setServerErrors(prev => ({ ...prev, password: "" }));
+                    }
+                })}
+                error={errors.password?.message || serverErrors.password}
                 placeholder="Enter your password"
             />
 
-            {/* Inline server error — shown only when login fails */}
-            {formError && (
-                <div className="flex items-start gap-3 px-4 py-3.5 bg-red-50 border border-red-100 rounded-2xl">
-                    <span className="text-red-500 mt-0.5">⚠</span>
-                    <p className="text-sm font-medium text-red-600">{formError}</p>
-                </div>
-            )}
+
 
             <Button type="submit" loading={loading} fullWidth>
                 Login

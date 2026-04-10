@@ -45,8 +45,18 @@ const createApiClient = (getToken) => {
         (res) => res,
         (error) => {
             const status = error.response?.status;
-            // Only trigger the hard redirect if they aren't ALREADY on the login or register page!
-            if (!window.location.href.includes("/auth/")) {
+            const isAuthApi = error.config?.url?.includes("/auth/") || error.config?.url?.includes("/admin/");
+            const isAuthPage = window.location.pathname.startsWith("/auth/") || window.location.pathname.startsWith("/admin/");
+
+            // Only redirect to login if it's a 401 (Unauthorized) 
+            // and we aren't currently doing an auth request or on an auth page.
+            console.log("INTERCEPTOR CAUGHT 401. URL:", error.config?.url, "PATH:", window.location.pathname, "isAuthApi:", isAuthApi, "isAuthPage:", isAuthPage);
+            
+            if (status === 401 && !isAuthApi && !isAuthPage) {
+                console.warn("Unauthorized access detected. Redirecting to login...", {
+                    url: error.config?.url,
+                    path: window.location.pathname
+                });
                 window.location.href = "/auth/login";
             }
             // Handle forbidden
@@ -70,11 +80,19 @@ export const adminClient = createApiClient(tokenService.getAdminToken);
 export const makeRequest = async (client, config) => {
     try {
         const response = await client(config);
-        console.log("response data:", response.data);
         return response.data;
     } catch (error) {
-        const message =
-            error.response?.data?.error?.message || error.response?.data?.error?.message || error.message || "Something went Wrong.";
+        let message =
+        error.response?.data?.error?.message || error.message || "Something went Wrong.";
+            
+        // If the backend hands us an array of specific field validation errors (like Joi length constraints)
+        // unpack the foremost detail so the frontend gets the exact specific string!
+        const payload = error.response?.data?.error;
+        if (payload?.code === "VALIDATION_ERROR" && payload.details?.length > 0) {
+            const rawDetail = payload.details[0].message;
+            message = rawDetail.replace(/['"]/g, ""); // "Password" -> Password
+        }
+            
         throw new Error(message);
     }
 };

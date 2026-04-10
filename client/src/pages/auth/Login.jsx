@@ -9,7 +9,7 @@ const Login = memo(() => {
     const navigate = useNavigate();
     const user = useAppSelector(selectUser);
 
-    useEffect(() => {
+    useEffect(() => { 
         if (user) {
             navigate("/user/dashboard");
         }
