@@ -8,8 +8,11 @@ import { useAppSelector } from "../redux/hooks";
 const GuestRoute = () => {
     const user = useAppSelector(selectUser);
 
-    // Already logged in → kick them to the dashboard
+    // Already logged in → kick them to their respective dashboard
     if (user) {
+        if (user.role === 'admin') {
+            return <Navigate to="/admin/dashboard" replace />;
+        }
         return <Navigate to="/user/dashboard" replace />;
     }
 

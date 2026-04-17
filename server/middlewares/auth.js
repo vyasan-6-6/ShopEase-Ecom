@@ -24,7 +24,7 @@ const authHeader = req.headers.authorization;
 }
 
 const authenticateAdmin=(req,res,next)=>{
-  const authHeader = req.headers.Authorization;
+  const authHeader = req.get('Authorization');
    if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return next(ErrorFactory.authentication('Access token required'));
   }

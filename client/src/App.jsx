@@ -7,7 +7,7 @@ import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
-import { getProfile } from "./redux/features/auth/authSlice";
+import { getProfile, getAdminProfile } from "./redux/features/auth/authSlice"; 
 import { useAppDispatch } from "./redux/hooks";
 import { useEffect, useState } from "react";
 import { AUTH_CONFIG } from "./config/app";
@@ -24,13 +24,16 @@ function App() {
 
     useEffect(() => {
         const verifyAuth = async () => {
+            // Identify both possible tokens
             const token = localStorage.getItem(AUTH_CONFIG.tokenKey);
             const adminToken = localStorage.getItem(AUTH_CONFIG.adminKey);
 
-            // If we have any tokens, wait for the backend verify them.
-            // (You could also add admin getProfile here if needed!)
+            // Fetch either (or both) profiles if tokens exist
             if (token) {
                 await dispatch(getProfile());
+            }
+            if (adminToken) {
+                await dispatch(getAdminProfile());
             }
 
             // Once finished checking, let the router boot up.
@@ -52,8 +55,8 @@ function App() {
     }
 
     return (
-        <BrowserRouter>
-            <Routes>
+            <BrowserRouter>
+                <Routes>
                 {/* Public + Guest-only routes inside MainLayout */}
                 <Route element={<MainLayout />}>
                     <Route index element={<Home />} />
@@ -67,7 +70,9 @@ function App() {
                 </Route>
 
                 {/* Admin login — no MainLayout */}
-                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route element={<GuestRoute />}>
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                </Route>
 
                 {/* User protected routes */}
                 <Route element={<MainLayout />}>

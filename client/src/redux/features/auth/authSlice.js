@@ -1,5 +1,6 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { authAPI, userApi } from "../../../services";
+import { authAPI, userApi, adminApi } from "../../../services";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 export const registerUser = createAsyncThunk("auth/registerUser", async (data, { rejectWithValue }) => {
     try {
@@ -61,6 +62,25 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ ema
         return true;
     } catch (error) {
         return rejectWithValue(error.message);
+    }
+});
+
+// ADMINS
+export const loginAdmin = createAsyncThunk('auth/loginAdmin', async (data, { rejectWithValue }) => {
+    try {
+        const res = await adminApi.loginAdmin(data);
+        return res.data.admin; 
+    } catch (error) {
+        return rejectWithValue(error?.message);
+    }
+});
+
+export const getAdminProfile = createAsyncThunk("auth/getAdminProfile", async (_, { rejectWithValue }) => {
+    try {
+        const res = await adminApi.getProfile();
+        return res.data.admin; 
+    } catch (error) {
+        return rejectWithValue(error?.message);
     }
 });
 
@@ -359,9 +379,38 @@ export const authSlice = createSlice({
             .addCase(editAddress.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            // Unified Admin Reducers
+            .addCase(loginAdmin.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(loginAdmin.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload;
+            })
+            .addCase(loginAdmin.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(getAdminProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getAdminProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload;
+            })
+            .addCase(getAdminProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                state.isAuthenticated = false;
             });
     },
 });
+
 
 export const {
     clearError,

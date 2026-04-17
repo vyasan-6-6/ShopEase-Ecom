@@ -1,38 +1,46 @@
-import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../../redux/features/admin/adminSlice";
+import { NavLink, useNavigate } from "react-router-dom";
+import { logout } from "../../redux/features/auth/authSlice";
+import { tokenService } from "../../utils/apiClient";
 import { useAppDispatch } from "../../redux/hooks";
 import { AUTH_CONFIG } from "../../config/app";
 import { memo } from "react";
+import clsx from "clsx";
 
 const AdminSidebar = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const handleLogout = () => {
-        localStorage.removeItem(AUTH_CONFIG.adminKey);
+        tokenService.clearAll();
         dispatch(logout());
         navigate("/admin/login", { replace: true });
     };
+
+    const linkClasses = ({ isActive }) =>
+        clsx(
+            "px-4 py-3 rounded-xl transition font-medium",
+            isActive ? "bg-gray-800 text-white shadow-inner" : "text-gray-400 hover:bg-gray-800/50 hover:text-white"
+        );
     return (
-        <div className="w-64 bg-black text-white flex flex-col p-6 shadow-xl">
+        <div className="w-64 bg-black text-white flex flex-col p-6 shadow-xl h-screen  sticky top-0">
             <h2 className="text-2xl font-bold tracking-wider mb-10 text-center">
                 ShopEase
                 <br />
                 <span className="text-sm text-gray-400 font-normal">ADMIN PORTAL</span>
             </h2>
 
-            <nav className="flex flex-col gap-4 font-medium flex-1">
-                <Link to="/admin/dashboard" className="px-4 py-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition">
+            <nav className="flex flex-col gap-2 flex-1">
+                <NavLink to="/admin/dashboard" end className={linkClasses}>
                     📊 Overview
-                </Link>
-                <Link to="/admin/dashboard/profile" className="px-4 py-3 rounded-xl hover:bg-gray-800 transition">
+                </NavLink>
+                <NavLink to="/admin/dashboard/profile" className={linkClasses}>
                     👤 My Profile
-                </Link>
-                <Link to="/admin/dashboard/users" className="px-4 py-3 rounded-xl hover:bg-gray-800 transition">
+                </NavLink>
+                <NavLink to="/admin/dashboard/users" className={linkClasses}>
                     👥 Manage Users
-                </Link>
-                <Link to="/admin/dashboard/products" className="px-4 py-3 rounded-xl hover:bg-gray-800 transition">
+                </NavLink>
+                <NavLink to="/admin/dashboard/products" className={linkClasses}>
                     📦 Products
-                </Link>
+                </NavLink>
             </nav>
 
             <div className="mt-auto pt-6 border-t border-gray-800">
