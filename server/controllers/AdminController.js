@@ -15,6 +15,12 @@ class AdminController extends BaseController {
         BaseController.logAction('GET_PROFILE',adminData.admin)
         BaseController.sendSuccess(res, 'Admin profile fetched successfully', adminData);
     })
+
+    static updateProfile = BaseController.asyncHandler(async (req,res)=>{
+        const adminData = await AdminService.updateProfile(req.admin.id, req.body);
+        BaseController.logAction('UPDATE_PROFILE',adminData.admin)
+        BaseController.sendSuccess(res, 'Admin profile updated successfully', adminData);
+    })
 }
 
 module.exports=AdminController;

@@ -84,6 +84,15 @@ export const getAdminProfile = createAsyncThunk("auth/getAdminProfile", async (_
     }
 });
 
+export const updateAdminProfile = createAsyncThunk("auth/updateAdminProfile", async (data, { rejectWithValue }) => {
+    try {
+        const res = await adminApi.updateProfile(data);
+        return res.data.admin;
+    } catch (error) {
+        return rejectWithValue(error?.message);
+    }
+});
+
 //USERS
 
 export const getProfile = createAsyncThunk("user/getProfile", async (_, { rejectWithValue }) => {
@@ -408,6 +417,19 @@ export const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
                 state.isAuthenticated = false;
+            })
+            // UPDATE ADMIN
+            .addCase(updateAdminProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateAdminProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+            })
+            .addCase(updateAdminProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
     },
 });

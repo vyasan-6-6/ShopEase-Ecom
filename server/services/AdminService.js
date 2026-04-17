@@ -41,6 +41,23 @@ class AdminService {
         }
         return { admin };
     }
+
+    static async updateProfile(adminId, updateData) {
+        const { name } = updateData;
+        const admin = await Admin.findByIdAndUpdate(
+            adminId,
+            { name },
+            { new: true, runValidators: true }
+        );
+
+        if (!admin) {
+            logger.error("Admin not found for update", adminId);
+            throw ErrorFactory.notFound("Admin not found");
+        }
+
+        logger.info(`Admin profile updated: ${adminId}`);
+        return { admin };
+    }
 }
 
 module.exports = AdminService;

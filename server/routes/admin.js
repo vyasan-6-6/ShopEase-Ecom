@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/login",AdminController.login);
 router.get("/getProfile",authenticateAdmin,AdminController.getProfile);
+router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
 // router.get("/users/:id");
 // router.put("/users/:id");
 // router.post("/users/:id/ban");

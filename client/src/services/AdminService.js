@@ -20,6 +20,14 @@ export const adminApi = {
             tokenService.setAdminToken(res?.data?.token);
         }
         return res;
+    },
+
+    updateProfile: async (data) => {
+        return makeRequest(adminClient, {
+            url: "/admin/updateProfile",
+            method: 'PUT',
+            data: data,
+        });
     }
 }
  
