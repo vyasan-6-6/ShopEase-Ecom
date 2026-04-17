@@ -84,10 +84,10 @@ const Navbar = () => {
                                             <User className="w-5 h-5" />
                                         )}
                                     </div>
-                                    <span className="text-sm font-bold text-gray-700">
+                                    <span className="text-sm font-bold text-gray-700 flex items-center gap-1.5 whitespace-nowrap">
                                         {user?.name?.split(" ")[0]}
                                         {user?.role === "admin" && (
-                                            <span className="ml-2 px-1.5 py-0.5 bg-indigo-600 text-[10px] text-white rounded-md uppercase tracking-wider">
+                                            <span className="px-1.5 py-0.5 bg-indigo-600 text-[9px] text-white rounded-md uppercase tracking-wider flex-shrink-0">
                                                 Admin
                                             </span>
                                         )}

@@ -222,6 +222,7 @@ export const authSlice = createSlice({
             })
             .addCase(verifyOtp.fulfilled, (state, action) => {
                 state.loading = false;
+                state.isAuthenticated = true;
                 state.user = action.payload.user;
             })
             .addCase(verifyOtp.rejected, (state, action) => {

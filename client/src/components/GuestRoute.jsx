@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { selectUser } from "../redux/features/auth/authSelectors";
+import { selectIsAuthenticated, selectUser } from "../redux/features/auth/authSelectors";
 import { useAppSelector } from "../redux/hooks";
 
 // Blocks logged-in users from accessing auth pages (login, register, forgot-password)
@@ -7,9 +7,10 @@ import { useAppSelector } from "../redux/hooks";
 // If not authenticated → show the page (Outlet)
 const GuestRoute = () => {
     const user = useAppSelector(selectUser);
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
     // Already logged in → kick them to their respective dashboard
-    if (user) {
+    if (isAuthenticated && user) {
         if (user.role === 'admin') {
             return <Navigate to="/admin/dashboard" replace />;
         }

@@ -2,11 +2,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../../redux/features/auth/authSlice";
 import { tokenService } from "../../utils/apiClient";
 import { useAppDispatch } from "../../redux/hooks";
-import { AUTH_CONFIG } from "../../config/app";
 import { memo } from "react";
+import { X, House } from "lucide-react";
 import clsx from "clsx";
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const handleLogout = () => {
@@ -21,37 +21,67 @@ const AdminSidebar = () => {
             isActive ? "bg-gray-800 text-white shadow-inner" : "text-gray-400 hover:bg-gray-800/50 hover:text-white"
         );
     return (
-        <div className="w-64 bg-black text-white flex flex-col p-6 shadow-xl h-screen  sticky top-0">
-            <h2 className="text-2xl font-bold tracking-wider mb-10 text-center">
-                ShopEase
-                <br />
-                <span className="text-sm text-gray-400 font-normal">ADMIN PORTAL</span>
-            </h2>
+        <>
+            {/* Mobile Overlay */}
+            <div 
+                className={clsx(
+                    "fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300",
+                    isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                )}
+                onClick={onClose}
+            />
 
-            <nav className="flex flex-col gap-2 flex-1">
-                <NavLink to="/admin/dashboard" end className={linkClasses}>
+            {/* Main Sidebar */}
+            <div className={clsx(
+                "w-64 bg-black text-white flex flex-col p-6 shadow-2xl h-screen fixed inset-y-0 left-0 z-50 transition-transform duration-300 lg:sticky lg:translate-x-0 border-r border-gray-800",
+                isOpen ? "translate-x-0" : "-translate-x-full"
+            )}>
+                <div className="flex items-center justify-between mb-10">
+                    <h2 className="text-2xl font-black tracking-tighter">
+                        Shop<span className="text-indigo-500">Ease</span>
+                        <br />
+                        <span className="text-[10px] bg-gray-800 px-2 py-0.5 rounded text-gray-400 font-black uppercase tracking-[0.2em]">ADMIN PORTAL</span>
+                    </h2>
+                    {/* Close button - Mobile only */}
+                    <button 
+                        onClick={onClose}
+                        className="lg:hidden p-2 text-gray-400 hover:text-white"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+            <nav className="flex flex-col gap-2 flex-1 pt-4">
+                <NavLink to="/admin/dashboard" end className={linkClasses} onClick={onClose}>
                     📊 Overview
                 </NavLink>
-                <NavLink to="/admin/dashboard/profile" className={linkClasses}>
+                <NavLink to="/admin/dashboard/profile" className={linkClasses} onClick={onClose}>
                     👤 My Profile
                 </NavLink>
-                <NavLink to="/admin/dashboard/users" className={linkClasses}>
+                <NavLink to="/admin/dashboard/users" className={linkClasses} onClick={onClose}>
                     👥 Manage Users
                 </NavLink>
-                <NavLink to="/admin/dashboard/products" className={linkClasses}>
+                <NavLink to="/admin/dashboard/products" className={linkClasses} onClick={onClose}>
                     📦 Products
+                </NavLink>
+
+                {/* Return to Storefront */}
+                <div className="my-4 border-t border-gray-800/50" />
+                <NavLink to="/" className={linkClasses} onClick={onClose}>
+                    <House className="w-4 h-4" /> View Store
                 </NavLink>
             </nav>
 
-            <div className="mt-auto pt-6 border-t border-gray-800">
-                <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-red-400 bg-red-950/30 rounded-xl hover:bg-red-900/50 hover:text-red-300 transition font-bold"
-                >
-                    🚪 Log Out
-                </button>
+                <div className="mt-auto pt-6 border-t border-gray-900">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-red-400 bg-red-950/20 rounded-xl hover:bg-red-600 hover:text-white transition-all font-bold group"
+                    >
+                        <span className="group-hover:translate-x-1 transition-transform">🚪 Log Out</span>
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
