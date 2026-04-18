@@ -1,6 +1,8 @@
 import { Gift } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CTABanner = () => {
+    const navigate = useNavigate();
     return (
         <section className="py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
             <div className="max-w-7xl mx-auto">
@@ -25,7 +27,7 @@ const CTABanner = () => {
                             faster shipping, and 24/7 support.
                         </p>
 
-                        <button className="px-10 py-5 bg-white text-indigo-600 font-extrabold text-lg rounded-2xl hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 shadow-xl">
+                        <button className="px-10 py-5 bg-white text-indigo-600 font-extrabold text-lg rounded-2xl hover:bg-gray-100 transition-all hover:scale-105 active:scale-95 shadow-xl" onClick={() => navigate("/auth/register")}>
                             Create Free Account
                         </button>
                     </div>

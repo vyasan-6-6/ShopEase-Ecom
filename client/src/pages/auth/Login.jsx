@@ -11,7 +11,7 @@ const Login = memo(() => {
 
     useEffect(() => { 
         if (user) {
-            navigate("/user/dashboard");
+            navigate("/");
         }
     }, [navigate, user]);
 

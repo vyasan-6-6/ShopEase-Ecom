@@ -18,6 +18,7 @@ import AddressBook from "./pages/user/AddressBook";
 import AdminProfile from "./pages/admin/AdminProfile";
 import AdminOverview from "./pages/admin/AdminOverview";
 import MainLayout from "./components/layout/MainLayout";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 function App() {
     const dispatch = useAppDispatch();
@@ -56,7 +57,8 @@ function App() {
     }
 
     return (
-            <BrowserRouter>
+            <BrowserRouter> 
+                <ScrollToTop />
                 <Routes>
                 {/* Public + Guest-only routes inside MainLayout */}
                 <Route element={<MainLayout />}>
