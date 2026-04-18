@@ -16,6 +16,7 @@ import UserDashboard from "./pages/user/UserDashboard";
 import UserProfile from "./pages/user/UserProfile";
 import AddressBook from "./pages/user/AddressBook";
 import AdminProfile from "./pages/admin/AdminProfile";
+import AdminOverview from "./pages/admin/AdminOverview";
 import MainLayout from "./components/layout/MainLayout";
 
 function App() {
@@ -79,7 +80,6 @@ function App() {
                     <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
                         <Route path="/user/dashboard" element={<UserDashboard />}>
                             <Route index element={<UserProfile />} />
-                            <Route path="profile" element={<UserProfile />} />
                             <Route path="addresses" element={<AddressBook />} />
                         </Route>
                     </Route>
@@ -88,7 +88,7 @@ function App() {
                 {/* Admin protected routes */}
                 <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
                     <Route path="/admin/dashboard" element={<AdminDashboard />}>
-                        <Route index element={<AdminProfile />} />
+                        <Route index element={<AdminOverview />} />
                         <Route path="profile" element={<AdminProfile />} />
                     </Route>
                 </Route>
