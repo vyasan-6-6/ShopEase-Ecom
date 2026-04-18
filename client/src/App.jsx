@@ -17,6 +17,7 @@ import UserProfile from "./pages/user/UserProfile";
 import AddressBook from "./pages/user/AddressBook";
 import AdminProfile from "./pages/admin/AdminProfile";
 import AdminOverview from "./pages/admin/AdminOverview";
+import NotFound from "./pages/public/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 import ScrollToTop from "./components/common/ScrollToTop";
 
@@ -94,6 +95,9 @@ function App() {
                         <Route path="profile" element={<AdminProfile />} />
                     </Route>
                 </Route>
+
+                {/* Catch-all route for undefined paths */}
+                <Route path="*" element={<NotFound />} />
             </Routes>
             <ToastContainer position="top-right" autoClose={3000} />
         </BrowserRouter>
