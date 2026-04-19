@@ -7,7 +7,7 @@ import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
-import { getProfile, getAdminProfile } from "./redux/features/auth/authSlice"; 
+import { getProfile, getAdminProfile } from "./redux/features/auth/authSlice";
 import { useAppDispatch } from "./redux/hooks";
 import { useEffect, useState } from "react";
 import { AUTH_CONFIG } from "./config/app";
@@ -58,9 +58,9 @@ function App() {
     }
 
     return (
-            <BrowserRouter> 
-                <ScrollToTop />
-                <Routes>
+        <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
                 {/* Public + Guest-only routes inside MainLayout */}
                 <Route element={<MainLayout />}>
                     <Route index element={<Home />} />

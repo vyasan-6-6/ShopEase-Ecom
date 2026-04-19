@@ -14,7 +14,7 @@ const GuestRoute = () => {
         if (user.role === 'admin') {
             return <Navigate to="/admin/dashboard" replace />;
         }
-        return <Navigate to="/user/dashboard" replace />;
+        return <Navigate to="/" replace />;
     }
 
     // Not logged in → let them through

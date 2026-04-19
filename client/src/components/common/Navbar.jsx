@@ -1,6 +1,6 @@
-import { memo, useState } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings, House } from "lucide-react";
+import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import { logout } from "../../redux/features/auth/authSlice";
@@ -15,7 +15,31 @@ const Navbar = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    const profileRef = useRef(null);
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => { 
+            if (profileRef.current && !profileRef.current.contains(event.target)) {
+                setIsProfileOpen(false);
+            }
+        };
+
+        // Bind the event listener
+        document.addEventListener("mousedown", handleClickOutside);//mousedown means when the mouse button is pressed 
+        // the handlclickoutside , addeventlistener pass event or e to handleclickoutside function
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+        
+    }, [profileRef]);
+ 
+    // Close menus whenever the URL changes (navigation)
+    useEffect(() => {
+        setIsProfileOpen(false);
+        setIsOpen(false);
+    }, [location.pathname]);
+
+
+    
     const handleLogout = () => {
         tokenService.clearAll();
         dispatch(logout());
@@ -72,7 +96,7 @@ const Navbar = () => {
 
                         {/* Auth */}
                         {isAuthenticated ? (
-                            <div className="relative">
+                            <div className="relative" ref={profileRef}>
                                 <button
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                                     className="flex items-center gap-2 p-1 pr-3 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors border border-gray-100"

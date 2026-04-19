@@ -9,9 +9,13 @@ const Login = memo(() => {
     const navigate = useNavigate();
     const user = useAppSelector(selectUser);
 
-    useEffect(() => { 
+    useEffect(() => {
         if (user) {
-            navigate("/");
+            if (user.role === 'admin') {
+                navigate("/admin/dashboard", { replace: true });
+            } else {
+                navigate("/", { replace: true });
+            }
         }
     }, [navigate, user]);
 
