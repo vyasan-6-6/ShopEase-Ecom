@@ -52,7 +52,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 </div>
 
             <nav className="flex flex-col gap-2 flex-1 pt-4">
-                <NavLink to="/admin/dashboard" end className={linkClasses} onClick={onClose}>
+                <NavLink to="/admin/dashboard" end className={linkClasses} onClick={onClose}>{/* use navlink for navigate and active state handling */}
                     📊 Overview
                 </NavLink>
                 <NavLink to="/admin/dashboard/profile" className={linkClasses} onClick={onClose}>

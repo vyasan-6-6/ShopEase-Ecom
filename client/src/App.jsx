@@ -84,6 +84,7 @@ function App() {
                         <Route path="/user/dashboard" element={<UserDashboard />}>
                             <Route index element={<UserProfile />} />
                             <Route path="addresses" element={<AddressBook />} />
+                            <Route path="*" element={<NotFound />} />
                         </Route>
                     </Route>
                 </Route>
@@ -93,6 +94,7 @@ function App() {
                     <Route path="/admin/dashboard" element={<AdminDashboard />}>
                         <Route index element={<AdminOverview />} />
                         <Route path="profile" element={<AdminProfile />} />
+                        <Route path="*" element={<NotFound />} />
                     </Route>
                 </Route>
 
