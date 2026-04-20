@@ -30,7 +30,6 @@ export const authAPI = {
         });
         if (res?.data?.token) {
             tokenService.setAuthToken(res?.data?.token);
-            console.log("authToken set in apiclient:",res.data.token);
         }
         return res;
     },

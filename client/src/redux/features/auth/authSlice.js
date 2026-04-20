@@ -327,7 +327,8 @@ export const authSlice = createSlice({
             })
             .addCase(updateProfile.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
+                // Resiliently extract user if backend wraps it in { user } or sends it direct
+                state.user = action.payload?.user || action.payload;
             })
             .addCase(updateProfile.rejected, (state, action) => {
                 state.loading = false;
@@ -339,7 +340,7 @@ export const authSlice = createSlice({
             })
             .addCase(addAddress.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
+                state.user = action.payload?.user || action.payload;
             })
             .addCase(addAddress.rejected, (state, action) => {
                 state.loading = false;
@@ -351,7 +352,7 @@ export const authSlice = createSlice({
             })
             .addCase(uploadAvatar.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload; // Immediately replace the user with the new one carrying the avatar URL!
+                state.user = action.payload?.user || action.payload; // Extract user regardless of wrap
             })
             .addCase(uploadAvatar.rejected, (state, action) => {
                 state.loading = false;
@@ -362,7 +363,7 @@ export const authSlice = createSlice({
             })
             .addCase(setDefaultAddress.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload; // Saves the fresh addresses to state
+                state.user = action.payload?.user || action.payload; // Saves the fresh addresses to state
             })
             .addCase(setDefaultAddress.rejected, (state, action) => {
                 state.loading = false;
@@ -373,7 +374,7 @@ export const authSlice = createSlice({
             })
             .addCase(deleteAddress.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload; 
+                state.user = action.payload?.user || action.payload; 
             })
             .addCase(deleteAddress.rejected, (state, action) => {
                 state.loading = false;
@@ -384,7 +385,7 @@ export const authSlice = createSlice({
             })
             .addCase(editAddress.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload; 
+                state.user = action.payload?.user || action.payload; 
             })
             .addCase(editAddress.rejected, (state, action) => {
                 state.loading = false;

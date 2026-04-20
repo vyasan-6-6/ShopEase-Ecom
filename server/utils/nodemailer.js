@@ -12,16 +12,29 @@ const transporter = nodemailer.createTransport({
   },pool:true,
   tls:{rejectUnauthorized:false}//for dev only
 });
-const sendOtpEmail = async (email, otp) => {
+const sendOtpEmail = async (email, otp, type = "verification") => {
+  const isReset = type === "reset";
+  const subject = isReset ? "Reset Your Password - ShopEase" : "Verify Your Account - ShopEase";
+  const title = isReset ? "Password Reset Request" : "Account Verification";
+  const message = isReset 
+    ? "You requested to reset your password. Use the following code to proceed:" 
+    : "Thank you for joining ShopEase! Please use the following code to verify your account:";
+
   await transporter.sendMail({
     from: `"ShopEase" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: 'Your OTP Code',
+    subject: subject,
     html: `
-      <h2>Your OTP Code</h2>
-      <p>Your verification code is:</p>
-      <h1>${otp}</h1>
-      <p>This code will expire in 10 minutes.</p>
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #4f46e5;">${title}</h2>
+        <p style="color: #374151; font-size: 16px;">${message}</p>
+        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+          <h1 style="letter-spacing: 5px; font-size: 32px; margin: 0; color: #111827;">${otp}</h1>
+        </div>
+        <p style="color: #6b7280; font-size: 14px;">This code is valid for 10 minutes. If you did not request this email, please ignore it.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center;">&copy; 2026 ShopEase E-commerce. Premium Shopping Experience.</p>
+      </div>
     `
   });
 };

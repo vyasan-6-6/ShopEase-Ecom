@@ -15,8 +15,10 @@ class AuthService {
                 throw ErrorFactory.conflict("An account with this email already exists. Please log in.");
             }
 
-            //   Exists but never verified → resend OTP so they can complete registration
+            //   Exists but never verified → update details and resend OTP so they can complete registration
             const otp = generateOTP();
+            existingUser.password = userData.password; // Update to the latest password provided
+            existingUser.name = userData.name;         // Update to the latest name provided
             existingUser.otp = {
                 code: hashOTP(otp),
                 expiresAt: Date.now() + 10 * 60 * 1000,
@@ -25,7 +27,7 @@ class AuthService {
             };
             await existingUser.save();
             setImmediate(() => {
-                sendOtpEmail(existingUser.email, otp).catch((err) => {
+                sendOtpEmail(existingUser.email, otp,"verification").catch((err) => {
                     logger.error("OTP resend email failed:", err);
                 });
             });
@@ -38,8 +40,11 @@ class AuthService {
 
         //  Brand new user → create and send OTP
         const otp = generateOTP();
+        const { name, email, password } = userData;
         const user = await User.create({
-            ...userData,
+            name,
+            email,
+            password,
             otp: {
                 code: hashOTP(otp),
                 expiresAt: Date.now() + 10 * 60 * 1000,
@@ -48,7 +53,7 @@ class AuthService {
             },
         });
         setImmediate(() => {
-            sendOtpEmail(user.email, otp).catch((err) => {
+            sendOtpEmail(user.email, otp,"verification").catch((err) => {
                 logger.error("OTP email failed:", err);
             });
         });
@@ -81,7 +86,7 @@ class AuthService {
         await user.save();
 
         const token = generateUserToken({
-            id: user.id,
+            id: user._id,
             email: user.email,
             role: user.role,
         });
@@ -136,8 +141,11 @@ class AuthService {
 
     static async resendOtp(email) {
         const user = await User.findOne({ email });
+        // Return same message regardless of user existence to prevent email enumeration
+        const successMessage = { message: "If an account exists with this email, a new OTP has been sent." };
+        
         if (!user) {
-            throw ErrorFactory.notFound("OTP sent if email exists"); //prevents email enumeration attacks
+            return successMessage;
         }
         if (user.isVerified) {
             throw ErrorFactory.conflict("User already verified");
@@ -155,7 +163,7 @@ class AuthService {
         };
         await user.save();
         setImmediate(() => {
-            sendOtpEmail(user.email, otp).catch((err) => {
+            sendOtpEmail(user.email, otp,"verification").catch((err) => {
                 logger.error("OTP email failed:", err);
             });
         });
@@ -166,8 +174,11 @@ class AuthService {
 
     static async forgotPassword(email) {
         const user = await User.findOne({ email });
+        // Always return success message to prevent email enumeration
+        const successMessage = { message: "If an account exists with this email, an OTP has been sent." };
+
         if (!user) {
-            throw ErrorFactory.notFound("User not found");
+            return successMessage;
         }
 
         const otp = generateOTP();
@@ -178,7 +189,7 @@ class AuthService {
             lastSendAt: Date.now(),
         };
         await user.save();
-        await sendOtpEmail(email, otp);
+        await sendOtpEmail(email, otp, "reset");
         return { message: "OTP sent to email" };
     }
 

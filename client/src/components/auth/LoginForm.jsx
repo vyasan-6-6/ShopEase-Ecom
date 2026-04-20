@@ -38,7 +38,11 @@ const LoginForm = () => {
             setServerErrors({});
             
             try {
-                const actionResult = await dispatch(loginUser(data));
+                const trimmedData = {
+                    email: data.email?.trim(),
+                    password: data.password?.trim(),
+                };
+                const actionResult = await dispatch(loginUser(trimmedData));
 
                 if (loginUser.rejected.match(actionResult)) {
                     const errorMsg = actionResult.payload;

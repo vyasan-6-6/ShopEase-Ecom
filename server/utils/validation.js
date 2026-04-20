@@ -3,7 +3,7 @@ const Joi = require("joi");
 const commonPatterns = {
     name: Joi.string().label("Name").min(2).max(100).trim().required(),
     email: Joi.string().label("Email").email().lowercase().trim().required(),
-    password: Joi.string().label("Password").min(8).max(128).required(),
+    password: Joi.string().label("Password").trim().min(8).max(128).required(),
     objectId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
     status: Joi.string().valid("active", "banned", "inactive"), //this is enum validation
     role: Joi.string().valid("admin", "user"),

@@ -39,8 +39,19 @@ const RegisterForm = () => {
     const onSubmit = useCallback(
         async (data) => {
             setServerErrors({});
+            const trimmedData = {
+                firstName: data.firstName?.trim(),
+                lastName: data.lastName?.trim(),
+                email: data.email?.trim(),
+                password: data.password // Passwords are trimmed by backend validation, but let's be explicit if desired
+            };
+
             const result = await dispatch(
-                registerUser({ name: `${data.firstName} ${data.lastName}`, email: data.email, password: data.password }),
+                registerUser({ 
+                    name: `${trimmedData.firstName} ${trimmedData.lastName}`, 
+                    email: trimmedData.email, 
+                    password: data.password?.trim() // Trimming password on frontend too
+                }),
             );
             
             if (registerUser.rejected.match(result)) { 
@@ -83,10 +94,17 @@ const RegisterForm = () => {
             navigate("/auth/login");
         } else if (verifyOtp.rejected.match(result)) {
             const errorMsg = result.payload || "OTP verification failed";
-            // Map OTP errors directly to the OTP input component for a premium feel
-            if (errorMsg.includes("Invalid") || errorMsg.includes("NO OTP found") || errorMsg.includes("expired")) {
-                setOtpError(errorMsg);
-            } else {
+            
+            // Clear input and show error briefly for a better UX
+            setOtp("");
+            setOtpError(errorMsg);
+            
+            setTimeout(() => {
+                setOtpError("");
+            }, 3000);
+
+            // If it's a critical error not related to the code itself, show a toast
+            if (!errorMsg.includes("Invalid") && !errorMsg.includes("OTP")) {
                 toast.error(errorMsg);
             }
         }
