@@ -58,6 +58,9 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 <NavLink to="/admin/dashboard/profile" className={linkClasses} onClick={onClose}>
                     👤 Admin Profile
                 </NavLink>
+                <NavLink to="/admin/dashboard/categories" className={linkClasses} onClick={onClose}>
+                    🏷️ Categories
+                </NavLink>
                 <NavLink to="/admin/dashboard/users" className={linkClasses} onClick={onClose}>
                     👥 Manage Users
                 </NavLink>

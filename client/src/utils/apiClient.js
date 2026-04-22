@@ -84,7 +84,6 @@ export const makeRequest = async (client, config) => {
     } catch (error) {
         let message =
         error.response?.data?.error?.message || error.message || "Something went Wrong.";
-            
         // If the backend hands us an array of specific field validation errors (like Joi length constraints)
         // unpack the foremost detail so the frontend gets the exact specific string!
         const payload = error.response?.data?.error;
