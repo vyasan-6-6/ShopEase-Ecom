@@ -14,6 +14,8 @@ import {
     selectCategoryLoading, 
     selectCategorySubmitting 
 } from "../../redux/features/category/categorySelectors";
+import Button from "../../components/common/Button";
+import Input from "../../components/common/Input";
 
 const ManageCategories = () => {
     const dispatch = useAppDispatch();
@@ -23,23 +25,23 @@ const ManageCategories = () => {
     
     const [searchQuery, setSearchQuery] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
-    const [editingCategory, setEditingCategory] = useState(null);//note : we are not using 
+    const [editingCategory, setEditingCategory] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
     useEffect(() => {
-        dispatch(fetchCategories());
+        // dispatch(fetchCategories());
     }, [dispatch]);
 
     // Create or Update
     const handleSubmit = async (formData) => {
         try {
             if (editingCategory) {
-                await dispatch(updateCategory({ id: editingCategory.id, data: formData })).unwrap();//unwrap is used to get action payload from the thunk
+                await dispatch(updateCategory({ id: editingCategory.id, data: formData })).unwrap();
                 toast.success("Category updated successfully");
             } else {
                 await dispatch(createCategory(formData)).unwrap();
                 toast.success("Category created successfully");
-                dispatch(fetchCategories()); // Refresh list to get new IDs/dates
+                dispatch(fetchCategories());
             }
             setModalOpen(false);
             setEditingCategory(null);
@@ -62,19 +64,16 @@ const ManageCategories = () => {
         }
     };
 
-    // Open modal in edit mode
     const openEdit = (cat) => {
         setEditingCategory(cat);
         setModalOpen(true);
     };
 
-    // Open modal in create mode
     const openCreate = () => {
         setEditingCategory(null);
         setModalOpen(true);
     };
 
-    // Filtered list
     const filteredCategories = categories.filter((cat) =>
         cat.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -89,23 +88,18 @@ const ManageCategories = () => {
                         Manage product categories for your storefront.
                     </p>
                 </div>
-                <button
-                    onClick={openCreate}
-                    className="px-5 py-2.5 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-black/10 flex items-center gap-2 self-start md:self-auto"
-                >
+                <Button onClick={openCreate} className="gap-2">
                     <Plus className="w-4 h-4" /> Add Category
-                </button>
+                </Button>
             </div>
 
             {/* Search Bar */}
-            <div className="relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                    type="text"
+            <div className="max-w-md">
+                <Input
+                    leftIcon={Search}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search categories..."
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition shadow-sm"
                 />
             </div>
 
@@ -129,37 +123,23 @@ const ManageCategories = () => {
                     </div>
                 ) : (
                     <>
-                        {/* Desktop Table */}
                         <div className="hidden md:block overflow-x-auto">
                             <table className="w-full">
                                 <thead>
                                     <tr className="bg-gray-50/80 border-b border-gray-100">
-                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">
-                                            Name
-                                        </th>
-                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">
-                                            Slug
-                                        </th>
-                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">
-                                            Status
-                                        </th>
-                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">
-                                            Created
-                                        </th>
-                                        <th className="text-right px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">
-                                            Actions
-                                        </th>
+                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">Name</th>
+                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">Slug</th>
+                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">Status</th>
+                                        <th className="text-left px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">Created</th>
+                                        <th className="text-right px-6 py-4 text-xs font-black uppercase tracking-wider text-gray-500">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredCategories.map((cat, idx) => (
                                         <tr
                                             key={cat.id}
-                                            className={`hover:bg-gray-50 transition-colors ${
-                                                idx !== filteredCategories.length - 1
-                                                    ? "border-b border-gray-50"
-                                                    : ""
-                                            }`}
+                                            className={`hover:bg-gray-50 transition-colors ${idx !== filteredCategories.length - 1 ? "border-b border-gray-50" : "border-b-0"
+                                                }`}
                                         >
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
@@ -167,9 +147,7 @@ const ManageCategories = () => {
                                                         {cat.name.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-gray-900">
-                                                            {cat.name}
-                                                        </p>
+                                                        <p className="font-bold text-gray-900">{cat.name}</p>
                                                         {cat.description && (
                                                             <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[200px]">
                                                                 {cat.description}
@@ -199,25 +177,25 @@ const ManageCategories = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
                                                         onClick={() => openEdit(cat)}
-                                                        className="p-2 rounded-xl hover:bg-indigo-50 text-gray-400 hover:text-indigo-600 transition"
+                                                        className="px-2 py-2"
                                                         title="Edit"
                                                     >
                                                         <Pencil className="w-4 h-4" />
-                                                    </button>
-                                                    <button
+                                                    </Button>
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
                                                         onClick={() => handleDelete(cat.id)}
-                                                        disabled={deletingId === cat.id}
-                                                        className="p-2 rounded-xl hover:bg-rose-50 text-gray-400 hover:text-rose-600 transition disabled:opacity-50"
+                                                        loading={deletingId === cat.id}
+                                                        className="px-2 py-2"
                                                         title="Delete"
                                                     >
-                                                        {deletingId === cat.id ? (
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                                        ) : (
-                                                            <Trash2 className="w-4 h-4" />
-                                                        )}
-                                                    </button>
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -239,9 +217,7 @@ const ManageCategories = () => {
                                             <div className="flex items-center gap-2 mt-1">
                                                 <span
                                                     className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                                                        cat.status === "active"
-                                                            ? "bg-emerald-50 text-emerald-600"
-                                                            : "bg-gray-100 text-gray-500"
+                                                        cat.status === "active" ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-500"
                                                     }`}
                                                 >
                                                     {cat.status}
@@ -252,24 +228,24 @@ const ManageCategories = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1 flex-shrink-0">
-                                        <button
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
                                             onClick={() => openEdit(cat)}
-                                            className="p-2 rounded-xl hover:bg-indigo-50 text-gray-400 hover:text-indigo-600 transition"
+                                            className="px-2 py-2"
                                         >
                                             <Pencil className="w-4 h-4" />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
                                             onClick={() => handleDelete(cat.id)}
-                                            disabled={deletingId === cat.id}
-                                            className="p-2 rounded-xl hover:bg-rose-50 text-gray-400 hover:text-rose-600 transition disabled:opacity-50"
+                                            loading={deletingId === cat.id}
+                                            className="px-2 py-2"
                                         >
-                                            {deletingId === cat.id ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : (
-                                                <Trash2 className="w-4 h-4" />
-                                            )}
-                                        </button>
+                                            {!deletingId && <Trash2 className="w-4 h-4" />}
+                                        </Button>
                                     </div>
                                 </div>
                             ))}
@@ -280,24 +256,11 @@ const ManageCategories = () => {
 
             {/* Category Summary */}
             <div className="flex items-center gap-6 text-sm text-gray-500 font-medium">
-                <span>
-                    Total: <strong className="text-gray-900">{categories.length}</strong>
-                </span>
-                <span>
-                    Active:{" "}
-                    <strong className="text-emerald-600">
-                        {categories.filter((c) => c.status === "active").length}
-                    </strong>
-                </span>
-                <span>
-                    Inactive:{" "}
-                    <strong className="text-gray-500">
-                        {categories.filter((c) => c.status === "inactive").length}
-                    </strong>
-                </span>
+                <span>Total: <strong className="text-gray-900">{categories.length}</strong></span>
+                <span>Active: <strong className="text-emerald-600">{categories.filter((c) => c.status === "active").length}</strong></span>
+                <span>Inactive: <strong className="text-gray-500">{categories.filter((c) => c.status === "inactive").length}</strong></span>
             </div>
 
-            {/* Modal */}
             <CategoryFormModal
                 isOpen={modalOpen}
                 onClose={() => {
@@ -313,3 +276,4 @@ const ManageCategories = () => {
 };
 
 export default memo(ManageCategories);
+

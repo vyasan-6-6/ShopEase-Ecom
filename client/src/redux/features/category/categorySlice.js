@@ -50,10 +50,51 @@ export const deleteCategory = createAsyncThunk(
 );
 
 const initialState = {
-    items: [],//slice name = category, stored as items, so if we want to access the items, we use state.category.items
-    isLoading: false,//if fetch is loading
-    isSubmitting: false,//if create, update or delete is loading
-    error: null, //any error while fetching or creating or updating or deleting
+    items: [
+        {
+            id: "cat_1",
+            name: "Electronics",
+            description: "Latest gadgets, smartphones, and computers.",
+            slug: "electronics",
+            status: "active",
+            createdAt: new Date("2024-01-15").toISOString(),
+        },
+        {
+            id: "cat_2",
+            name: "Fashion",
+            description: "Trendy clothing and accessories for men and women.",
+            slug: "fashion",
+            status: "active",
+            createdAt: new Date("2024-02-10").toISOString(),
+        },
+        {
+            id: "cat_3",
+            name: "Home & Kitchen",
+            description: "Essential appliances and decor for your home.",
+            slug: "home-kitchen",
+            status: "active",
+            createdAt: new Date("2024-03-05").toISOString(),
+        },
+        {
+            id: "cat_4",
+            name: "Books",
+            description: "A wide collection of fiction and non-fiction books.",
+            slug: "books",
+            status: "inactive",
+            createdAt: new Date("2024-03-20").toISOString(),
+        },
+        {
+            id: "cat_5",
+            name: "Beauty & Health",
+            description: "Skincare, makeup, and wellness products.",
+            slug: "beauty-health",
+            status: "active",
+            createdAt: new Date("2024-04-12").toISOString(),
+        },
+    ],
+    isLoading: false,
+    isSubmitting: false,
+    error: null,
 };
 
 const categorySlice = createSlice({
