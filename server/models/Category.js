@@ -31,12 +31,11 @@ const categorySchema = new mongoose.Schema(
 );
 
 // Auto-generate slug before saving if it doesn't exist or name is modified
-categorySchema.pre("save", function (next) {
+categorySchema.pre("save", function () {
     if (!this.isModified("name")) {
-        return next();
+        return;
     }
     this.slug = slugify(this.name, { lower: true, strict: true });
-    next();
 });
 
 categorySchema.set("toJSON", {
