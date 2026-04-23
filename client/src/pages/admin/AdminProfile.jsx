@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form"; 
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Input from "../../components/common/Input";
@@ -5,15 +6,18 @@ import Button from "../../components/common/Button";
 import { selectUser, selectAuthLoading } from "../../redux/features/auth/authSelectors";
 import { updateAdminProfile } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
+import clsx from "clsx";
 
 const AdminProfile = () => {
     const dispatch = useAppDispatch();
     const admin = useAppSelector(selectUser);
     const isLoading = useAppSelector(selectAuthLoading);
+    const [isEditing, setIsEditing] = useState(false);
 
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors, isDirty },
     } = useForm({
         defaultValues: {
@@ -26,6 +30,8 @@ const AdminProfile = () => {
         try {
             await dispatch(updateAdminProfile({ name: data.name })).unwrap();
             toast.success("Profile updated successfully!");
+            reset({ name: data.name, email: admin?.email });
+            setIsEditing(false);
         } catch (error) {
             toast.error(error || "Failed to update profile");
         }
@@ -50,12 +56,16 @@ const AdminProfile = () => {
                     <Input
                         label="Admin Display Name"
                         name="name"
+                        disabled={!isEditing}
                         {...register("name", { 
                             required: "Name is required",
                             minLength: { value: 3, message: "Name must be at least 3 characters" }
                         })}
                         error={errors.name?.message}
-                        className="font-bold text-gray-800"
+                        className={clsx(
+                            "font-bold transition-colors",
+                            isEditing ? "bg-white border-gray-200 text-gray-800" : "bg-gray-50/50 text-gray-500 border-transparent cursor-not-allowed"
+                        )}
                         placeholder="Enter your name"
                     />
                     
@@ -83,14 +93,33 @@ const AdminProfile = () => {
                     </div>
                 </div>
 
-                <div className="pt-4 flex justify-end">
+                <div className="pt-4 flex justify-end gap-3">
+                    {isEditing && (
+                        <Button 
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                                reset();
+                                setIsEditing(false);
+                            }}
+                            className="px-6 py-3 font-bold rounded-xl"
+                        >
+                            Cancel
+                        </Button>
+                    )}
                     <Button 
-                        type="submit" 
-                        disabled={!isDirty || isLoading}
+                        type={isEditing ? "submit" : "button"}
+                        onClick={!isEditing ? (e) => { e.preventDefault(); setIsEditing(true); } : undefined}
+                        disabled={isLoading || (isEditing && !isDirty)}
                         loading={isLoading}
-                        className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 disabled:bg-gray-200"
+                        className={clsx(
+                            "px-8 py-3 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95",
+                            isEditing 
+                                ? (isDirty ? "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100" : "bg-gray-300 shadow-none cursor-not-allowed")
+                                : "bg-gray-900 hover:bg-black"
+                        )}
                     >
-                        {isLoading ? "Saving Changes..." : "Update Display Name"}
+                        {isEditing ? "Save Changes" : "Edit Profile"}
                     </Button>
                 </div>
             </form>

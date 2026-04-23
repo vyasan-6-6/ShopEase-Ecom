@@ -27,7 +27,7 @@ return makeRequest(userClient,{
             method: "DELETE",
         });
     },
-    editAddress: (addressId, addressData) => {
+    editAddress: (addressId, addressData) => { 
         return makeRequest(userClient, {
             url: `/user/addresses/${addressId}`,
             method: "PUT",

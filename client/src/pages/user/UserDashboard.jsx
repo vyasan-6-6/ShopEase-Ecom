@@ -17,7 +17,7 @@ const UserDashboard = () => {
     }
 
     const navLinks = [
-        { icon: User, name: "User Dashboard", path: "/user/dashboard" },
+        { icon: User, name: "User profile", path: "/user/dashboard" },
         { icon: MapPin, name: "Address Book", path: "/user/dashboard/addresses" },
     ];
 

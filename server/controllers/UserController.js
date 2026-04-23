@@ -36,7 +36,10 @@ class UserController extends BaseController {
 
     static editAddress = BaseController.asyncHandler(async (req, res) => {
         const { addressId } = req.params;
+        console.log('reqbody',req.body);
+        
         const validatedData = BaseController.validateRequest(addressValidation, req.body);
+         
         const result = await UserService.editAddress(req.user.id, addressId, validatedData);
         BaseController.logAction("EDIT_ADDRESS", result.user);
         BaseController.sendSuccess(res, "Address updated successfully", result.user);

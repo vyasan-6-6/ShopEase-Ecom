@@ -9,10 +9,11 @@ const handleSetDefault = () => {
     dispatch(setDefaultAddress(address.id));
 };
 const handleDelete = () => {
-    dispatch(deleteAddress(address.id));
+    if(!window.confirm("Are you sure you want to delete this address?")) return;
+    dispatch(deleteAddress(address.id)); 
 };
     return (
-        <div className="border border-gray-200 rounded-xl p-5 bg-white shadow-sm hover:shadow-md transition">
+        <div className="border border-gray-200 rounded-xl   p-5 bg-white shadow-sm hover:shadow-md transition">
             {/* Display the Label (Home, Work) and a "Default" badge if true */}
             <div className="flex justify-between items-center mb-3">
                 <span className="font-bold text-gray-800 uppercase text-sm">{address?.label}</span>

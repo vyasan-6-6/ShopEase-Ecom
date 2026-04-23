@@ -50,48 +50,7 @@ export const deleteCategory = createAsyncThunk(
 );
 
 const initialState = {
-    items: [
-        {
-            id: "cat_1",
-            name: "Electronics",
-            description: "Latest gadgets, smartphones, and computers.",
-            slug: "electronics",
-            status: "active",
-            createdAt: new Date("2024-01-15").toISOString(),
-        },
-        {
-            id: "cat_2",
-            name: "Fashion",
-            description: "Trendy clothing and accessories for men and women.",
-            slug: "fashion",
-            status: "active",
-            createdAt: new Date("2024-02-10").toISOString(),
-        },
-        {
-            id: "cat_3",
-            name: "Home & Kitchen",
-            description: "Essential appliances and decor for your home.",
-            slug: "home-kitchen",
-            status: "active",
-            createdAt: new Date("2024-03-05").toISOString(),
-        },
-        {
-            id: "cat_4",
-            name: "Books",
-            description: "A wide collection of fiction and non-fiction books.",
-            slug: "books",
-            status: "inactive",
-            createdAt: new Date("2024-03-20").toISOString(),
-        },
-        {
-            id: "cat_5",
-            name: "Beauty & Health",
-            description: "Skincare, makeup, and wellness products.",
-            slug: "beauty-health",
-            status: "active",
-            createdAt: new Date("2024-04-12").toISOString(),
-        },
-    ],
+    items: [],
     isLoading: false,
     isSubmitting: false,
     error: null,

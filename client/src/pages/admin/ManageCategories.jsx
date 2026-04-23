@@ -29,7 +29,7 @@ const ManageCategories = () => {
     const [deletingId, setDeletingId] = useState(null);
 
     useEffect(() => {
-        // dispatch(fetchCategories());
+        dispatch(fetchCategories());
     }, [dispatch]);
 
     // Create or Update

@@ -10,8 +10,7 @@ import { Plus, MapPin } from "lucide-react";
 const AddressBook = () => {
     const user = useAppSelector(selectUser);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingAddress, setEditingAddress] = useState(null);
-    console.log('editingAddress',editingAddress);
+    const [editingAddress, setEditingAddress] = useState(null); 
     
 
     const openNewAddressModal = () => {
