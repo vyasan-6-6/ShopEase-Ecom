@@ -1,10 +1,10 @@
 import { adminClient, makeRequest } from "../utils/apiClient";
 
 export const categoryApi = {
-    getAllCategories: async () => 
+    getAllCategories: async () =>
         makeRequest(adminClient, { method: "GET", url: "/admin/categories" }),
-    
-    createCategory: async (data) => 
+
+    createCategory: async (data) =>
         makeRequest(adminClient, { method: "POST", url: "/admin/categories", data }),
     
     updateCategory: async (id, data) => 

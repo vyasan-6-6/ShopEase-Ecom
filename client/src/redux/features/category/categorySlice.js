@@ -8,7 +8,7 @@ export const fetchCategories = createAsyncThunk(
             const res = await categoryApi.getAllCategories();
             return res.data?.categories || [];
         } catch (err) {
-            return rejectWithValue(err.message);
+            return rejectWithValue(err.response?.data?.message || err.message);
         }
     }
 );
@@ -20,7 +20,7 @@ export const createCategory = createAsyncThunk(
             const res = await categoryApi.createCategory(data);
             return res.data?.category;  //?is added just in case the response doesn't have category
         } catch (err) {
-            return rejectWithValue(err.message);
+            return rejectWithValue(err.response?.data?.message || err.message);
         }
     }
 );
@@ -30,9 +30,9 @@ export const updateCategory = createAsyncThunk(
     async ({ id, data }, { rejectWithValue }) => {
         try {
             const res = await categoryApi.updateCategory(id, data);
-            return res.data?.category;  //?is added just in case the response doesn't have category
+            return res.data?.category;
         } catch (err) {
-            return rejectWithValue(err.message);
+            return rejectWithValue(err.response?.data?.message || err.message);
         }
     }
 );
@@ -44,7 +44,7 @@ export const deleteCategory = createAsyncThunk(
             await categoryApi.deleteCategory(id);
             return id;
         } catch (err) {
-            return rejectWithValue(err.message);
+            return rejectWithValue(err.response?.data?.message || err.message);
         }
     }
 );
@@ -83,8 +83,11 @@ const categorySlice = createSlice({
             .addCase(createCategory.pending, (state) => {
                 state.isSubmitting = true;
             })
-            .addCase(createCategory.fulfilled, (state) => {
+            .addCase(createCategory.fulfilled, (state, action) => {
                 state.isSubmitting = false;
+                if (action.payload) {
+                    state.items.unshift(action.payload);
+                }
             })
             .addCase(createCategory.rejected, (state, action) => {
                 state.isSubmitting = false;
@@ -94,8 +97,12 @@ const categorySlice = createSlice({
             .addCase(updateCategory.pending, (state) => {
                 state.isSubmitting = true;
             })
-            .addCase(updateCategory.fulfilled, (state) => {
+            .addCase(updateCategory.fulfilled, (state, action) => {
                 state.isSubmitting = false;
+                const index = state.items.findIndex(item => item.id === action.payload.id);
+                if (index !== -1) {//it means the updated category is present in the list ,-1 means not present
+                    state.items[index] = action.payload    //replace the old value with the updated one
+                }
             })
             .addCase(updateCategory.rejected, (state, action) => {
                 state.isSubmitting = false;
@@ -108,6 +115,7 @@ const categorySlice = createSlice({
             })
             .addCase(deleteCategory.fulfilled, (state, action) => {
                 state.isSubmitting = false;
+                state.items = state.items.filter(item => item.id !== action.payload);
             })
             .addCase(deleteCategory.rejected, (state, action) => {
                 state.isSubmitting = false;

@@ -28,10 +28,9 @@ const ManageCategories = () => {
     const [editingCategory, setEditingCategory] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
-    useEffect(() => {
+    useEffect(()=>{
         dispatch(fetchCategories());
-    }, [dispatch]);
-
+    },[dispatch]);
     // Create or Update
     const handleSubmit = async (formData) => {
         try {
@@ -41,7 +40,6 @@ const ManageCategories = () => {
             } else {
                 await dispatch(createCategory(formData)).unwrap();
                 toast.success("Category created successfully");
-                dispatch(fetchCategories());
             }
             setModalOpen(false);
             setEditingCategory(null);
