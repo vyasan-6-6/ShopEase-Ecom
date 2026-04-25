@@ -1,10 +1,12 @@
 const { ProductService } = require("../services");
 const BaseController = require("./BaseController");
+const { productValidation } = require("../utils/validation");
 
 class ProductController extends BaseController {
     // POST /api/admin/products
     static create = BaseController.asyncHandler(async (req, res) => {
-        const product = await ProductService.createProduct(req.body);
+        const validatedData = BaseController.validateRequest(productValidation, req.body);
+        const product = await ProductService.createProduct(validatedData);
         BaseController.logAction("PRODUCT_CREATE", req.admin, { productId: product.id });
         BaseController.sendSuccess(res, "Product created successfully", { product }, 201);
     });
@@ -40,7 +42,8 @@ class ProductController extends BaseController {
 
     // PUT /api/admin/products/:id
     static update = BaseController.asyncHandler(async (req, res) => {
-        const product = await ProductService.updateProduct(req.params.id, req.body);
+        const validatedData = BaseController.validateRequest(productValidation, req.body);
+        const product = await ProductService.updateProduct(req.params.id, validatedData);
         BaseController.logAction("PRODUCT_UPDATE", req.admin, { productId: product.id });
         BaseController.sendSuccess(res, "Product updated successfully", { product });
     });

@@ -1,11 +1,12 @@
 const { CategoryService } = require("../services");
 const BaseController = require("./BaseController");
+const { categoryValidation } = require("../utils/validation");
 
 class CategoryController extends BaseController {
     // POST /api/admin/categories
     static create = BaseController.asyncHandler(async (req, res) => {
-        const { name, description, status } = req.body;
-        const category = await CategoryService.createCategory({ name, description, status });
+        const validatedData = BaseController.validateRequest(categoryValidation, req.body);
+        const category = await CategoryService.createCategory(validatedData);
         BaseController.logAction("CATEGORY_CREATE", req.admin, { categoryId: category.id });
         BaseController.sendSuccess(res, "Category created successfully", { category }, 201);
     });
@@ -18,9 +19,9 @@ class CategoryController extends BaseController {
 
     // PUT /api/admin/categories/:id
     static update = BaseController.asyncHandler(async (req, res) => {
-        const { name, description, status } = req.body;
-        const category = await CategoryService.updateCategory(req.params.id, { name, description, status });
-        BaseController.logAction("CATEGORY_UPDATE", req.admin, { categoryId: category.id });
+        const validatedData = BaseController.validateRequest(categoryValidation, req.body);
+        const category = await CategoryService.updateCategory(req.params.id, validatedData);
+        BaseController.logAction("CATEGORY_UPDATE", req.admin, { categoryId:category.id });
         BaseController.sendSuccess(res, "Category updated successfully", { category });
     });
 

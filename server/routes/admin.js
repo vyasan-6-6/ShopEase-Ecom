@@ -12,6 +12,7 @@ router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
 
 // Category CRUD — /api/admin/categories
 router.use("/categories", categoryRoutes);//used to mount the category routes
+// Product CRUD — /api/admin/products
 router.use("/products", productRoutes);
 // router.get("/users/:id");
 // router.put("/users/:id");

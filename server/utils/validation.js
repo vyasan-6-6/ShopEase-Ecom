@@ -4,7 +4,7 @@ const commonPatterns = {
     name: Joi.string().label("Name").min(2).max(100).trim().required(),
     email: Joi.string().label("Email").email().lowercase().trim().required(),
     password: Joi.string().label("Password").trim().min(8).max(128).required(),
-    objectId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
+    objectId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),//regular expression for validating mongoDB ObjectIds
     status: Joi.string().valid("active", "banned", "inactive"), //this is enum validation
     role: Joi.string().valid("admin", "user"),
 };
@@ -90,6 +90,23 @@ const addressValidation = Joi.object({
     isDefault: Joi.boolean().optional()
 }).required();
 
+const categoryValidation = Joi.object({
+    name: commonPatterns.name.messages(customMessages),
+    description: Joi.string().max(500).optional().allow(""),//allow means empty string is also valid
+    status: Joi.string().valid("active", "inactive").optional(),
+});
+
+const productValidation = Joi.object({
+    name: Joi.string().label("Name").min(2).max(100).trim().required().messages(customMessages),
+    description: Joi.string().max(2000).required().messages(customMessages),
+    price: Joi.number().min(0).required().messages(customMessages),
+    compareAtPrice: Joi.number().min(0).optional().allow(null),
+    category: commonPatterns.objectId.required().messages(customMessages),
+    stock: Joi.number().min(0).required().messages(customMessages),
+    images: Joi.array().items(Joi.string()).optional(),//this means array of strings
+    status: Joi.string().valid("active", "inactive", "draft").optional(),
+});
+
 module.exports = {
     registerValidation,
     loginValidation,
@@ -97,5 +114,7 @@ module.exports = {
     resetPasswordValidation,
     passwordChangeValidation,
     adminLoginValidation,
-    addressValidation
+    addressValidation,
+    categoryValidation,
+    productValidation
 };
