@@ -2,5 +2,6 @@ module.exports={
     AuthService:require("./AuthService"),
     AdminService:require("./AdminService"),
     UserService:require("./UserService"),
-    CategoryService:require("./CategoryService")
+    CategoryService:require("./CategoryService"),
+   ProductService:require("./ProductService")
 }
