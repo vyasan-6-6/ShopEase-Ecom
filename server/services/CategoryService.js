@@ -23,7 +23,7 @@ class CategoryService {
         const category = await Category.findByIdAndUpdate(
             id,
             { $set: data },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
         if (!category) {
             ErrorFactory.notFound("Category not found");

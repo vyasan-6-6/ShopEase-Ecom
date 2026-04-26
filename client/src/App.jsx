@@ -18,6 +18,7 @@ import AddressBook from "./pages/user/AddressBook";
 import AdminProfile from "./pages/admin/AdminProfile";
 import AdminOverview from "./pages/admin/AdminOverview";
 import ManageCategories from "./pages/admin/ManageCategories";
+import ManageProducts from "./pages/admin/ManageProducts";
 import NotFound from "./pages/public/NotFound";
 import MainLayout from "./components/layout/MainLayout";
 import ScrollToTop from "./components/common/ScrollToTop";
@@ -96,6 +97,7 @@ function App() {
                         <Route index element={<AdminOverview />} />
                         <Route path="profile" element={<AdminProfile />} />
                         <Route path="categories" element={<ManageCategories />} />
+                        <Route path="products" element={<ManageProducts />} />
                         <Route path="*" element={<NotFound />} />
                     </Route>
                 </Route>
@@ -103,7 +105,7 @@ function App() {
                 {/* Catch-all route for undefined paths */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
-            <ToastContainer position="top-right" autoClose={3000} />
+            <ToastContainer position="top-right" autoClose={1000} />
         </BrowserRouter>
     );
 }

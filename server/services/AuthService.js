@@ -244,11 +244,11 @@ class AuthService {
     }
 
     static async updateProfile(userId, updateData) {
-        delete updateData.password;
-        delete updateData.role;
-        delete updateData.status;
+        delete updateData.password;//for security reasons
+        delete updateData.role;//for security reasons
+        delete updateData.status;//for security reasons
         const user = await User.findByIdAndUpdate(userId, updateData, {
-            new: true, //Return updated document,default:false
+            returnDocument: 'after', //Return updated document,default:false
             runValidators: true, //Apply schema validation on update,default:false
         });
         if (!user) {

@@ -1,7 +1,7 @@
  
 import { adminClient, makeRequest, tokenService } from "../utils/apiClient"
 
-export const adminApi = {
+const adminApi = {
     getProfile :async ()=>{
         return  makeRequest(adminClient,{
             url:"/admin/getProfile",
@@ -30,4 +30,6 @@ export const adminApi = {
         });
     }
 }
+
+export default adminApi;
  

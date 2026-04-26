@@ -1,6 +1,6 @@
 import { makeRequest, tokenService, userClient } from "../utils/apiClient";
 
-export const userApi = {
+const userApi = {
     updateProfile: (data) => {
         return makeRequest(userClient, {
             url: "/user/profile",
@@ -46,3 +46,5 @@ return makeRequest(userClient,{
     }
 
 };
+
+export default userApi;

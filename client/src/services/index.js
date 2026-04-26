@@ -1,4 +1,5 @@
-export * from "./AuthService"
-export * from "./AdminService";
-export * from "./UserService";
-export * from "./CategoryService";
+export { default as authAPI } from "./AuthService";
+export { default as adminApi } from "./AdminService";
+export { default as userApi } from "./UserService";
+export { default as categoryApi } from "./CategoryService";
+export { default as productApi } from "./ProductService";

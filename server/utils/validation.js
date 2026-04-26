@@ -97,7 +97,7 @@ const categoryValidation = Joi.object({
 });
 
 const productValidation = Joi.object({
-    name: Joi.string().label("Name").min(2).max(100).trim().required().messages(customMessages),
+    name: commonPatterns.name.messages(customMessages),
     description: Joi.string().max(2000).required().messages(customMessages),
     price: Joi.number().min(0).required().messages(customMessages),
     compareAtPrice: Joi.number().min(0).optional().allow(null),

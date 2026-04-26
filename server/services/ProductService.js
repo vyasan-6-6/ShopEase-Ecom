@@ -33,7 +33,7 @@ class ProductService {
         const product = await Product.findByIdAndUpdate(
             id,
             { $set: data },//$set operator is used to update the fields of the document.only update fields which are sent in the request body
-            { new: true, runValidators: true }//$new:true returns updated document and $runValidators:true validates the updated document
+            { returnDocument: 'after', runValidators: true }//returnDocument: 'after' returns updated document and runValidators:true validates the updated document
         ).populate("category", "name slug");
 
         if (!product) {

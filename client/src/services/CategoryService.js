@@ -1,6 +1,6 @@
 import { adminClient, makeRequest } from "../utils/apiClient";
 
-export const categoryApi = {
+const categoryApi = {
     getAllCategories: async () =>
         makeRequest(adminClient, { method: "GET", url: "/admin/categories" }),
 
@@ -13,3 +13,5 @@ export const categoryApi = {
     deleteCategory: async (id) => 
         makeRequest(adminClient, { method: "DELETE", url: `/admin/categories/${id}` }),
 };
+
+export default categoryApi;
