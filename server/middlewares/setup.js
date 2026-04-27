@@ -31,7 +31,11 @@ const setupMiddleware = (app) => {
         standardHeaders: true,
         legacyHeaders: false,
     });
-    app.use(limiter);
+    
+    // Only apply global rate limiting in production to avoid dev lockouts
+    if (config.NODE_ENV === "production") {
+        app.use(limiter);
+    }
 
     app.use(express.json({limit:"10mb"}));//API's
     app.use(express.urlencoded({extended:true}));//form data

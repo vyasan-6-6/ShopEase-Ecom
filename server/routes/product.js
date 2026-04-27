@@ -1,12 +1,12 @@
 const express = require("express");
 const ProductController = require("../controllers/ProductController");
-const { authenticateAdmin } = require("../middlewares/auth");
+const { authenticateAdmin, authenticateAdminOptional } = require("../middlewares/auth");
 const upload = require("../middlewares/uploadMiddleware");
 
 const router = express.Router();
 
 // Public Routes
-router.get("/", ProductController.getAll);
+router.get("/", authenticateAdminOptional, ProductController.getAll);
 router.get("/:id", ProductController.getById);
 router.get("/slug/:slug", ProductController.getBySlug);
 

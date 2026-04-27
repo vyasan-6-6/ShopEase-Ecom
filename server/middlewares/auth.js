@@ -52,8 +52,28 @@ const requireAdmin = (req, res, next) => {
 
   next();
 };
+const authenticateAdminOptional = (req, res, next) => {
+  const authHeader = req.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = verifyAdminToken(token);
+    req.admin = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
+    };
+  } catch (error) {
+    // Ignore error, just proceed without req.admin
+  }
+  next();
+};
+
 module.exports = {
   authenticateAdmin,
-    authenticateUser,
-    requireAdmin
+  authenticateAdminOptional,
+  authenticateUser,
+  requireAdmin
 }
