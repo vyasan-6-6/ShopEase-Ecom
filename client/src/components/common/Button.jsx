@@ -9,7 +9,7 @@ const Button = memo(({ children,
   loading = false,
   onClick,
   className = "",
-  ...props})=>{
+  ...props }, ref) => {
   const baseStyles =
     "inline-flex items-center justify-center font-medium rounded-2xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
 
@@ -30,14 +30,14 @@ const Button = memo(({ children,
     lg: "px-6 py-3 text-lg",
   };
 
-return (
+  return (
     <button
-    
-    type={type}
+
+      type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={clsx(baseStyles,variants[variant],sizes[size],fullWidth && "w-full",(disabled || loading) && "opacity-60 cursor-not-allowed",className)}>
- {loading ? (
+      className={clsx(baseStyles, variants[variant], sizes[size], fullWidth && "w-full", (disabled || loading) && "opacity-60 cursor-not-allowed", className)} {...props}>
+      {loading ? (
         <span className="flex items-center gap-2">
           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           Loading...
@@ -46,6 +46,6 @@ return (
         children
       )}
     </button>
-)
+  )
 });
-export default Button;
+export default Button; 

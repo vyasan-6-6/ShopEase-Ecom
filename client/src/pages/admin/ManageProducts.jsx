@@ -255,15 +255,15 @@ const ManageProducts = () => {
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-                                        <span className={`text-sm font-bold ${prod.stock > 10 ? 'text-gray-500' : 'text-red-500'}`}>
+                                        <span className={`text-sm font-bold ${prod.stock > 10 ? 'text-gray-500' : prod.stock > 0 ? 'text-amber-500' : 'text-red-500'}`}>
                                             Stock: {prod.stock}
                                         </span>
                                         <div className="flex gap-2">
                                             <Button variant="outline" size="sm" onClick={() => openEdit(prod)} className="px-3">
-                                                Edit
+                                                <Pencil className="w-4 h-4" />
                                             </Button>
                                             <Button variant="danger" size="sm" onClick={() => handleDelete(prod.id || prod._id)} loading={deletingId === (prod.id || prod._id)} className="px-3">
-                                                Delete
+                                                <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
                                     </div>

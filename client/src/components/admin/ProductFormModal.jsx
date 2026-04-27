@@ -1,34 +1,32 @@
 import { useState, useEffect } from "react";
-import { X, Image as ImageIcon, Loader2, UploadCloud, XCircle } from "lucide-react";
+import { X, UploadCloud, XCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
 import Button from "../common/Button";
 import Input from "../common/Input";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { uploadProductImages } from "../../redux/features/product/productSlice";
 import { selectAllCategories } from "../../redux/features/category/categorySelectors";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { productSchema } from "../../utils/productSchema";
 
 const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) => {
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectAllCategories);
-    
-    const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        price: "",
-        compareAtPrice: "",
-        category: "",
-        stock: "",
-        status: "active",
-        images: [],
+
+    const { register, handleSubmit, reset, formState: { errors } } = useForm({
+        resolver: yupResolver(productSchema),
+        mode: "onChange"
     });
 
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
+    const [existingImages, setExistingImages] = useState([]);
     const [isUploadingImages, setIsUploadingImages] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             if (initialData) {
-                setFormData({
+                reset({
                     name: initialData.name || "",
                     description: initialData.description || "",
                     price: initialData.price || "",
@@ -36,11 +34,11 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                     category: initialData.category?._id || initialData.category?.id || initialData.category || "",
                     stock: initialData.stock || "",
                     status: initialData.status || "active",
-                    images: initialData.images || [],
                 });
+                setExistingImages(initialData.images || []);
                 setPreviewUrls(initialData.images || []);
             } else {
-                setFormData({
+                reset({
                     name: "",
                     description: "",
                     price: "",
@@ -48,18 +46,13 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                     category: categories.length > 0 ? categories[0].id : "",
                     stock: "",
                     status: "active",
-                    images: [],
                 });
+                setExistingImages([]);
                 setPreviewUrls([]);
             }
             setSelectedFiles([]);
         }
-    }, [isOpen, initialData, categories]);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+    }, [isOpen, initialData, categories, reset]);
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
@@ -73,23 +66,18 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
 
     const removeImage = (index) => {
         setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-        if (index < formData.images.length) {
+        if (index < existingImages.length) {
             // It's an already uploaded image
-            setFormData((prev) => ({
-                ...prev,
-                images: prev.images.filter((_, i) => i !== index)
-            }));
+            setExistingImages((prev) => prev.filter((_, i) => i !== index));
         } else {
             // It's a newly selected file
-            const fileIndex = index - formData.images.length;
+            const fileIndex = index - existingImages.length;
             setSelectedFiles((prev) => prev.filter((_, i) => i !== fileIndex));
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        let finalImages = [...formData.images];
+    const handleFormSubmit = async (data) => {
+        let finalImages = [...existingImages];
 
         // If there are new files to upload
         if (selectedFiles.length > 0) {
@@ -110,10 +98,10 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
         }
 
         const submitData = {
-            ...formData,
-            price: Number(formData.price),
-            stock: Number(formData.stock),
-            compareAtPrice: formData.compareAtPrice ? Number(formData.compareAtPrice) : null,
+            ...data,
+            price: Number(data.price),
+            stock: Number(data.stock),
+            compareAtPrice: data.compareAtPrice ? Number(data.compareAtPrice) : null,
             images: finalImages,
         };
 
@@ -142,26 +130,21 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                 </div>
 
                 <div className="p-6 overflow-y-auto">
-                    <form id="productForm" onSubmit={handleSubmit} className="space-y-5">
+                    <form id="productForm" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <Input
                                 label="Product Name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
+                                {...register("name")}
+                                error={errors.name?.message}
                                 placeholder="e.g. MacBook Pro M3"
-                                required
                             />
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">
                                     Category
                                 </label>
                                 <select
-                                    name="category"
-                                    value={formData.category}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white focus:ring-0 rounded-2xl transition-colors font-medium text-gray-900 shadow-sm"
-                                    required
+                                    {...register("category")}
+                                    className={`w-full px-4 py-3 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white focus:ring-0 rounded-2xl transition-colors font-medium text-gray-900 shadow-sm ${errors.category ? "border-red-500 ring-1 ring-red-500" : ""}`}
                                 >
                                     <option value="" disabled>Select a category</option>
                                     {categories.map((cat) => (
@@ -170,6 +153,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                                         </option>
                                     ))}
                                 </select>
+                                {errors.category && <span className="text-xs text-red-500 font-medium ml-1">{errors.category.message}</span>}
                             </div>
                         </div>
 
@@ -178,47 +162,40 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                                 Description
                             </label>
                             <textarea
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
+                                {...register("description")}
                                 rows={3}
-                                className="w-full px-4 py-3 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white focus:ring-0 rounded-2xl transition-colors font-medium text-gray-900 shadow-sm resize-none"
+                                className={`w-full px-4 py-3 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white focus:ring-0 rounded-2xl transition-colors font-medium text-gray-900 shadow-sm resize-none ${errors.description ? "border-red-500 ring-1 ring-red-500" : ""}`}
                                 placeholder="Write a detailed description..."
-                                required
                             />
+                            {errors.description && <span className="text-xs text-red-500 font-medium ml-1">{errors.description.message}</span>}
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                             <Input
                                 type="number"
                                 label="Price ($)"
-                                name="price"
                                 min="0"
                                 step="0.01"
-                                value={formData.price}
-                                onChange={handleChange}
+                                {...register("price")}
+                                error={errors.price?.message}
                                 placeholder="0.00"
-                                required
                             />
                             <Input
                                 type="number"
                                 label="Compare At Price ($)"
-                                name="compareAtPrice"
                                 min="0"
                                 step="0.01"
-                                value={formData.compareAtPrice}
-                                onChange={handleChange}
+                                {...register("compareAtPrice")}
+                                error={errors.compareAtPrice?.message}
                                 placeholder="0.00"
                             />
                             <Input
                                 type="number"
                                 label="Stock"
-                                name="stock"
                                 min="0"
-                                value={formData.stock}
-                                onChange={handleChange}
+                                {...register("stock")}
+                                error={errors.stock?.message}
                                 placeholder="0"
-                                required
                             />
                         </div>
 
@@ -227,9 +204,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                                 Status
                             </label>
                             <select
-                                name="status"
-                                value={formData.status}
-                                onChange={handleChange}
+                                {...register("status")}
                                 className="w-full px-4 py-3 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white focus:ring-0 rounded-2xl transition-colors font-medium text-gray-900 shadow-sm"
                             >
                                 <option value="active">Active</option>
@@ -243,7 +218,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                             <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">
                                 Product Images
                             </label>
-                            
+
                             <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-2xl hover:bg-gray-50 transition-colors relative">
                                 <div className="space-y-1 text-center">
                                     <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
@@ -297,12 +272,12 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                     <Button variant="outline" onClick={onClose} disabled={isLoading || isUploadingImages}>
                         Cancel
                     </Button>
-                    <Button 
-                        type="submit" 
-                        form="productForm" 
+                    <Button
+                        type="submit"
+                        form="productForm"
                         loading={isLoading || isUploadingImages}
                         className="min-w-[120px]"
-                    >
+                    > 
                         {isUploadingImages ? "Uploading..." : initialData ? "Save Changes" : "Create Product"}
                     </Button>
                 </div>
