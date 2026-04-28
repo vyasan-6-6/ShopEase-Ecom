@@ -18,10 +18,10 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
         mode: "onChange"
     });
 
-    const [selectedFiles, setSelectedFiles] = useState([]);
-    const [previewUrls, setPreviewUrls] = useState([]);
-    const [existingImages, setExistingImages] = useState([]);
-    const [isUploadingImages, setIsUploadingImages] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState([]); //stores newly selected files
+    const [previewUrls, setPreviewUrls] = useState([]); //stores both uploaded and newly selected images
+    const [existingImages, setExistingImages] = useState([]); //storing uploaded images url
+    const [isUploadingImages, setIsUploadingImages] = useState(false); //flag for uploading images
 
     useEffect(() => {
         if (isOpen) {
@@ -66,7 +66,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
 
     const removeImage = (index) => {
         setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-        if (index < existingImages.length) {
+        if (index < existingImages.length){
             // It's an already uploaded image
             setExistingImages((prev) => prev.filter((_, i) => i !== index));
         } else {
@@ -79,7 +79,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
     const handleFormSubmit = async (data) => {
         let finalImages = [...existingImages];
 
-        // If there are new files to upload
+        // If there are new files to upload to cloudinary
         if (selectedFiles.length > 0) {
             setIsUploadingImages(true);
             const uploadData = new FormData();
