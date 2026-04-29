@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import GuestRoute from "../components/GuestRoute";
 import Home from "../pages/public/Home";
+import Shop from "../pages/public/Shop";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -12,6 +13,7 @@ const PublicRoutes = () => {
         <Routes>
             <Route element={<MainLayout />}>
                 <Route index element={<Home />} />
+                <Route path="shop" element={<Shop />} />
                 
                 {/* Guest-only: logged-in users are redirected to dashboard */}
                 <Route element={<GuestRoute />}>

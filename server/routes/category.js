@@ -4,13 +4,13 @@ const { authenticateAdmin } = require("../middlewares/auth");
 
 const router = express.Router();
 
-// All category routes are admin-protected
-router.use(authenticateAdmin);
-
-router.post("/", CategoryController.create);
+// Public Routes
 router.get("/", CategoryController.getAll);
-router.put("/:id", CategoryController.update);
-router.delete("/:id", CategoryController.delete);
+
+// Admin-Protected Routes
+router.post("/", authenticateAdmin, CategoryController.create);
+router.put("/:id", authenticateAdmin, CategoryController.update);
+router.delete("/:id", authenticateAdmin, CategoryController.delete);
 
 module.exports = router;
 

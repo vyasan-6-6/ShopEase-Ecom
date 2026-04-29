@@ -15,6 +15,7 @@ const Navbar = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    
     const profileRef = useRef(null);
 
     // Close dropdown when clicking outside
@@ -48,8 +49,7 @@ const Navbar = () => {
 
     const navLinks = [
         { name: "Home", path: "/" },
-        { name: "Products", path: "/products" },
-        { name: "Categories", path: "/categories" },
+        { name: "Shop", path: "/shop" },
     ];
 
     return (

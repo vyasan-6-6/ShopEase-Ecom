@@ -13,6 +13,21 @@ export const fetchAdminProducts = createAsyncThunk(
     }
 );
 
+export const fetchPublicProducts = createAsyncThunk(
+    "product/fetchPublic",
+    async (params, { rejectWithValue }) => {
+        try {
+            const res = await productApi.getAllProducts(params);
+            return {
+                products: res.data?.products || [],
+                pagination: res.data?.pagination || null
+            };
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || err.message);
+        }
+    }
+);
+
 export const createProduct = createAsyncThunk(
     "product/create",
     async (data, { rejectWithValue }) => {
@@ -62,7 +77,9 @@ export const uploadProductImages = createAsyncThunk(
 );
 
 const initialState = {
-    items: [],
+    adminItems: [],
+    publicItems: [],
+    pagination: null,
     isLoading: false,
     isSubmitting: false,
     error: null,
@@ -78,16 +95,31 @@ const productSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Fetch Products
+            // Fetch Admin Products
             .addCase(fetchAdminProducts.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
             .addCase(fetchAdminProducts.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.items = action.payload;
+                state.adminItems = action.payload;
             })
             .addCase(fetchAdminProducts.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+
+            // Fetch Public Products
+            .addCase(fetchPublicProducts.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchPublicProducts.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.publicItems = action.payload.products;
+                state.pagination = action.payload.pagination;
+            })
+            .addCase(fetchPublicProducts.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             })
@@ -100,7 +132,7 @@ const productSlice = createSlice({
             .addCase(createProduct.fulfilled, (state, action) => {
                 state.isSubmitting = false;
                 if (action.payload) {
-                    state.items.unshift(action.payload);
+                    state.adminItems.unshift(action.payload);
                 }
             })
             .addCase(createProduct.rejected, (state, action) => {
@@ -116,9 +148,9 @@ const productSlice = createSlice({
             .addCase(updateProduct.fulfilled, (state, action) => {
                 state.isSubmitting = false;
                 if (action.payload) {
-                    const index = state.items.findIndex((p) => p.id === action.payload.id);
+                    const index = state.adminItems.findIndex((p) => p.id === action.payload.id);
                     if (index !== -1) {
-                        state.items[index] = action.payload;
+                        state.adminItems[index] = action.payload;
                     }
                 }
             })
@@ -134,7 +166,7 @@ const productSlice = createSlice({
             })
             .addCase(deleteProduct.fulfilled, (state, action) => {
                 state.isSubmitting = false;
-                state.items = state.items.filter((p) => p.id !== action.payload);
+                state.adminItems = state.adminItems.filter((p) => p.id !== action.payload);
             })
             .addCase(deleteProduct.rejected, (state, action) => {
                 state.isSubmitting = false;

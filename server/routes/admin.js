@@ -1,8 +1,6 @@
 const express = require('express');
 const AdminController = require('../controllers/AdminController');
 const { authenticateAdmin } = require('../middlewares/auth');
-const categoryRoutes = require('./category');
-const productRoutes = require('./product');
 
 const router = express.Router();
 
@@ -10,10 +8,8 @@ router.post("/login",AdminController.login);
 router.get("/getProfile", authenticateAdmin, AdminController.getProfile);
 router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
 
-// Category CRUD — /api/admin/categories
-router.use("/categories", categoryRoutes);//used to mount the category routes
-// Product CRUD — /api/admin/products
-router.use("/products", productRoutes);
+// router.use("/categories", categoryRoutes);
+// router.use("/products", productRoutes);
 // router.get("/users/:id");
 // router.put("/users/:id");
 // router.post("/users/:id/ban");

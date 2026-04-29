@@ -32,7 +32,7 @@ class ProductController extends BaseController {
         BaseController.sendSuccess(res, "Product created successfully", { product }, 201);
     });
 
-    // GET /api/admin/products OR /api/user/products
+    // GET /api/products
     static getAll = BaseController.asyncHandler(async (req, res) => {
         const query = {};//create empty filter object for mongodb
 
@@ -45,8 +45,21 @@ class ProductController extends BaseController {
             query.category = req.query.category;
         }
 
-        const products = await ProductService.getProducts(query);
-        BaseController.sendSuccess(res, "Products fetched successfully", { products });
+        const page = parseInt(req.query.page) || 1;    //get page number from query parameter or default to 1
+        const limit = parseInt(req.query.limit) || 10; //get limit from query parameter or default to 10
+        const skip = (page - 1) * limit;           //calculate skip value
+
+        const { products, total } = await ProductService.getProducts(query, skip, limit);
+        
+        BaseController.sendSuccess(res, "Products fetched successfully", { 
+            products,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        });
     });
 
     // GET /api/admin/products/:id OR /api/user/products/:id

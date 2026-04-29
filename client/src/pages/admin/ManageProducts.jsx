@@ -10,7 +10,7 @@ import {
     deleteProduct 
 } from "../../redux/features/product/productSlice";
 import { 
-    selectAllProducts, 
+    selectAdminProducts, 
     selectProductLoading, 
     selectProductSubmitting 
 } from "../../redux/features/product/productSelectors";
@@ -23,7 +23,7 @@ const ManageProducts = () => {
     const dispatch = useAppDispatch();
     
     // Selectors
-    const products = useAppSelector(selectAllProducts);
+    const products = useAppSelector(selectAdminProducts);
     const isLoading = useAppSelector(selectProductLoading);
     const isSubmitting = useAppSelector(selectProductSubmitting);
     const categories = useAppSelector(selectAllCategories);

@@ -7,10 +7,15 @@ class ProductService {
         return product.save();//product.save() saves the document and returns the saved product.
     }
 
-    static async getProducts(query = {}) {
-        return Product.find(query)
-            .populate("category", "name slug")//.populate() is used to replace the category _id with actual category document.
-            .sort({ createdAt: -1 });//sort by newest first
+    static async getProducts(query = {}, skip = 0, limit = 0) {
+        const products = await Product.find(query)
+            .populate("category", "name slug")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+            
+        const total = await Product.countDocuments(query);
+        return { products, total };
     }
 
     static async getProductById(id) {
