@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
+import { selectCartTotalCount } from "../../redux/features/cart/cartSelectors";
 import { logout } from "../../redux/features/auth/authSlice";
 import { tokenService } from "../../utils/apiClient";
 import clsx from "clsx";
@@ -12,6 +13,7 @@ const Navbar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);//profile dropdown
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const user = useAppSelector(selectUser);
+    const cartCount = useAppSelector(selectCartTotalCount);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
@@ -89,9 +91,11 @@ const Navbar = () => {
                         {/* Cart */}
                         <Link to="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
                             <ShoppingCart className="w-6 h-6" />
-                            <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
-                                3
-                            </span>
+                            {cartCount > 0 && (
+                                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
+                                    {cartCount}
+                                </span>
+                            )}
                         </Link>
 
                         {/* Auth */}
@@ -183,9 +187,11 @@ const Navbar = () => {
                     <div className="md:hidden flex items-center gap-4">
                         <Link to="/cart" className="relative p-2 text-gray-600">
                             <ShoppingCart className="w-6 h-6" />
-                            <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
-                                3
-                            </span>
+                            {cartCount > 0 && (
+                                <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
+                                    {cartCount}
+                                </span>
+                            )}
                         </Link>
                         <button
                             onClick={() => setIsOpen(!isOpen)}

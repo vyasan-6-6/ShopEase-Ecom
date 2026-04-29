@@ -3,6 +3,7 @@ import MainLayout from "../components/layout/MainLayout";
 import GuestRoute from "../components/GuestRoute";
 import Home from "../pages/public/Home";
 import Shop from "../pages/public/Shop";
+import SingleProduct from "../pages/public/SingleProduct";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -14,6 +15,7 @@ const PublicRoutes = () => {
             <Route element={<MainLayout />}>
                 <Route index element={<Home />} />
                 <Route path="shop" element={<Shop />} />
+                <Route path="product/:id" element={<SingleProduct />} />
                 
                 {/* Guest-only: logged-in users are redirected to dashboard */}
                 <Route element={<GuestRoute />}>

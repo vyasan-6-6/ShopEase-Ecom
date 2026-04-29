@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { fetchPublicProducts } from "../../redux/features/product/productSlice";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
+import { selectPublicProducts, selectProductPagination, selectProductLoading } from "../../redux/features/product/productSelectors";
+import { selectAllCategories, selectCategoryLoading } from "../../redux/features/category/categorySelectors";
 import Button from "../../components/common/Button";
 
 const Shop = () => {
     const dispatch = useDispatch();
-    const { publicItems: products, pagination, isLoading: productsLoading } = useSelector((state) => state.product);
-    const { items: categories, isLoading: categoriesLoading } = useSelector((state) => state.category);
+    const products = useSelector(selectPublicProducts);
+    const pagination = useSelector(selectProductPagination);
+    const productsLoading = useSelector(selectProductLoading);
+    
+    const categories = useSelector(selectAllCategories);
+    const categoriesLoading = useSelector(selectCategoryLoading);
 
     const [selectedCategory, setSelectedCategory] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -88,9 +95,13 @@ const Shop = () => {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                                 {products.map((product) => (
-                                    <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
+                                    <Link 
+                                        to={`/product/${product.id || product._id}`}
+                                        key={product.id || product._id} 
+                                        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group flex flex-col hover:-translate-y-1"
+                                    >
                                         <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
                                             {product.images && product.images.length > 0 ? (
                                                 <img 
@@ -116,10 +127,16 @@ const Shop = () => {
                                                     )}
                                                     <span className="text-xl font-extrabold text-gray-900">${product.price.toFixed(2)}</span>
                                                 </div>
-                                                <Button size="sm" variant="primary">Add to Cart</Button>
+                                                <Button size="sm" variant="primary" onClick={(e) => {
+                                                    // Prevent navigation when clicking the quick add to cart button
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    // Quick add to cart logic (could dispatch addToCart directly here)
+                                                    // For now just redirect to product page
+                                                }}>View Details</Button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
 

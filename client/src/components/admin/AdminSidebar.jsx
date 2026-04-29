@@ -70,7 +70,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
                 {/* Return to Storefront */}
                 <div className="my-4 border-t border-gray-800/50" />
-                <NavLink to="/" className={linkClasses} onClick={onClose}>
+                <NavLink to="/shop" className={linkClasses} onClick={onClose}>
                     <House className="w-4 h-4" /> View Store
                 </NavLink>
             </nav>
