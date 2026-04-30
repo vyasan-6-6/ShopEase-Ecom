@@ -8,6 +8,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import NotFound from "../pages/public/NotFound";
+import ServerError from "../pages/public/ServerError";
 
 const PublicRoutes = () => {
     return (
@@ -16,6 +17,7 @@ const PublicRoutes = () => {
                 <Route index element={<Home />} />
                 <Route path="shop" element={<Shop />} />
                 <Route path="product/:id" element={<SingleProduct />} />
+                <Route path="500" element={<ServerError />} />
                 
                 {/* Guest-only: logged-in users are redirected to dashboard */}
                 <Route element={<GuestRoute />}>

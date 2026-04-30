@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { productApi } from "../../services";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { fetchProductById, clearSelectedProduct } from "../../redux/features/product/productSlice";
+import { selectSelectedProduct, selectProductLoading, selectProductError } from "../../redux/features/product/productSelectors";
 import { addToCart } from "../../redux/features/cart/cartSlice";
 import Button from "../../components/common/Button";
 import { ArrowLeft, ShoppingCart, Loader2 } from "lucide-react";
@@ -10,87 +11,88 @@ import { toast } from "react-toastify";
 const SingleProduct = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const dispatch = useAppDispatch();
+
+    const product = useAppSelector(selectSelectedProduct);
+    const loading = useAppSelector(selectProductLoading);
+    const error = useAppSelector(selectProductError);
+
     const [quantity, setQuantity] = useState(1);
     const [mainImage, setMainImage] = useState("");
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                setLoading(true);
-                const res = await productApi.getProductById(id);
-                setProduct(res.data.product);
-                if (res.data.product.images?.length > 0) {
-                    setMainImage(res.data.product.images[0]);
-                }
-            } catch (err) {
-                setError(err.message || "Failed to fetch product");
-            } finally {
-                setLoading(false);
-            }
-        };
-
         if (id) {
-            fetchProduct();
+            dispatch(fetchProductById(id));
         }
-    }, [id]);
+        return () => {
+            dispatch(clearSelectedProduct());
+        };
+    }, [id, dispatch]);
+
+    // Update mainImage when product loads
+    useEffect(() => {
+
+        if (product?.images?.length > 0) {
+            setMainImage(product.images[0]);
+        }
+    }, [product]);
 
     const handleAddToCart = () => {
         if (!product) return;
-        
         dispatch(addToCart({
             productId: product.id || product._id,
             name: product.name,
             price: product.price,
             quantity: quantity,
-            image: product.images?.[0] || ""
+            image: product.images?.[0]
         }));
-        
-        toast.success(`Added ${quantity} ${product.name} to cart!`);
+        toast.success(`${product.name} added to cart!`);
     };
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-[60vh]">
-                <Loader2 className="w-12 h-12 text-indigo-600 animate-spin" />
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
             </div>
         );
     }
 
     if (error || !product) {
         return (
-            <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
-                <p className="text-gray-500 mb-8">{error || "The product you're looking for doesn't exist or has been removed."}</p>
-                <Button onClick={() => navigate("/shop")}>Back to Shop</Button>
+            <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-4">
+                    <ArrowLeft className="w-10 h-10" />
+                </div>
+                <h2 className="text-2xl font-black text-gray-900 mb-2">Product Not Found</h2>
+                <p className="text-gray-500 mb-8 max-w-md">{error || "The product you are looking for does not exist or has been removed."}</p>
+                <Button onClick={() => navigate("/shop")} variant="primary">
+                    Back to Shop
+                </Button>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <button 
-                onClick={() => navigate(-1)} 
-                className="flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors mb-8"
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            {/* Breadcrumbs / Back */}
+            <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors mb-8 group"
             >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                Back to Results
             </button>
 
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                    
+            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2">
+
                     {/* Images Section */}
                     <div className="p-8 bg-gray-50/50 flex flex-col items-center border-b md:border-b-0 md:border-r border-gray-100">
                         <div className="w-full aspect-square rounded-2xl bg-white border border-gray-100 overflow-hidden mb-4 relative shadow-sm">
                             {mainImage ? (
-                                <img 
-                                    src={mainImage} 
-                                    alt={product.name} 
+                                <img
+                                    src={mainImage}
+                                    alt={product.name}
                                     className="w-full h-full object-contain p-4"
                                 />
                             ) : (
@@ -99,18 +101,17 @@ const SingleProduct = () => {
                                 </div>
                             )}
                         </div>
-                        
+
                         {product.images?.length > 1 && (
                             <div className="flex gap-4 overflow-x-auto py-2 w-full justify-center">
                                 {product.images.map((img, idx) => (
-                                    <button 
+                                    <button
                                         key={idx}
                                         onClick={() => setMainImage(img)}
-                                        className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
-                                            mainImage === img ? "border-indigo-600 shadow-md" : "border-transparent hover:border-gray-300"
-                                        }`}
+                                        className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${mainImage === img ? "border-indigo-600 shadow-md" : "border-transparent hover:border-gray-300"
+                                            }`}
                                     >
-                                        <img src={img} alt={`${product.name} ${idx+1}`} className="w-full h-full object-cover bg-white" />
+                                        <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover bg-white" />
                                     </button>
                                 ))}
                             </div>
@@ -124,11 +125,11 @@ const SingleProduct = () => {
                                 {product.category?.name || "Uncategorized"}
                             </span>
                         </div>
-                        
+
                         <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 tracking-tight leading-tight">
                             {product.name}
                         </h1>
-                        
+
                         <div className="flex items-center gap-4 mb-8">
                             <span className="text-4xl font-extrabold text-gray-900">
                                 ${product.price.toFixed(2)}
@@ -150,14 +151,14 @@ const SingleProduct = () => {
                             <div className="flex items-center gap-6 mb-6">
                                 <span className="text-sm font-bold text-gray-700">Quantity</span>
                                 <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl">
-                                    <button 
+                                    <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                         className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors font-medium"
                                     >
                                         -
                                     </button>
                                     <span className="w-12 text-center font-bold text-gray-900">{quantity}</span>
-                                    <button 
+                                    <button
                                         onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                                         className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors font-medium"
                                         disabled={quantity >= product.stock}
@@ -170,8 +171,8 @@ const SingleProduct = () => {
                                 </span>
                             </div>
 
-                            <Button 
-                                className="w-full py-4 text-lg" 
+                            <Button
+                                className="w-full py-4 text-lg"
                                 onClick={handleAddToCart}
                                 disabled={product.stock === 0}
                             >

@@ -76,9 +76,22 @@ export const uploadProductImages = createAsyncThunk(
     }
 );
 
+export const fetchProductById = createAsyncThunk(
+    "product/fetchById",
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await productApi.getProductById(id);
+            return res.data?.product;
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || err.message);
+        }
+    }
+);
+
 const initialState = {
     adminItems: [],
     publicItems: [],
+    selectedProduct: null, 
     pagination: null,
     isLoading: false,
     isSubmitting: false,
@@ -92,6 +105,9 @@ const productSlice = createSlice({
         clearProductError: (state) => {
             state.error = null;
         },
+        clearSelectedProduct: (state) => {
+            state.selectedProduct = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -120,6 +136,20 @@ const productSlice = createSlice({
                 state.pagination = action.payload.pagination;
             })
             .addCase(fetchPublicProducts.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+
+            // Fetch Product By ID
+            .addCase(fetchProductById.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchProductById.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.selectedProduct = action.payload;
+            })
+            .addCase(fetchProductById.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             })
@@ -179,8 +209,7 @@ const productSlice = createSlice({
                 state.error = null;
             })
             .addCase(uploadProductImages.fulfilled, (state) => {
-                state.isSubmitting = false;
-                //
+                state.isSubmitting = false; 
             })
             .addCase(uploadProductImages.rejected, (state, action) => {
                 state.isSubmitting = false;
@@ -189,5 +218,5 @@ const productSlice = createSlice({
     },
 });
 
-export const { clearProductError } = productSlice.actions;
+export const { clearProductError, clearSelectedProduct } = productSlice.actions;
 export default productSlice.reducer;

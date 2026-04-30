@@ -1,9 +1,11 @@
 import { memo, useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings } from "lucide-react";
+import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings, ChevronDown } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import { selectCartTotalCount } from "../../redux/features/cart/cartSelectors";
+import { fetchCategories } from "../../redux/features/category/categorySlice";
+import { selectAllCategories } from "../../redux/features/category/categorySelectors";
 import { logout } from "../../redux/features/auth/authSlice";
 import { tokenService } from "../../utils/apiClient";
 import clsx from "clsx";
@@ -11,14 +13,24 @@ import clsx from "clsx";
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);//mobile nav
     const [isProfileOpen, setIsProfileOpen] = useState(false);//profile dropdown
+    const [isCatOpen, setIsCatOpen] = useState(false);
+    
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const user = useAppSelector(selectUser);
     const cartCount = useAppSelector(selectCartTotalCount);
+    const categories = useAppSelector(selectAllCategories);
+    
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     
     const profileRef = useRef(null);
+    const catRef = useRef(null);
+
+    // Fetch categories on mount
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -26,23 +38,22 @@ const Navbar = () => {
             if (profileRef.current && !profileRef.current.contains(event.target)) {
                 setIsProfileOpen(false);
             }
+            if (catRef.current && !catRef.current.contains(event.target)) {
+                setIsCatOpen(false);
+            }
         };
 
-        // Bind the event listener
-        document.addEventListener("mousedown", handleClickOutside);//mousedown means when the mouse button is pressed 
-        // the handlclickoutside , addeventlistener pass event or e to handleclickoutside function
+        document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-        
-    }, [profileRef]);
+    }, []);//one time mount and unmount means no dependencies for closing the dropdown
  
     // Close menus whenever the URL changes (navigation)
     useEffect(() => {
         setIsProfileOpen(false);
         setIsOpen(false);
+        setIsCatOpen(false);
     }, [location.pathname]);
 
-
-    
     const handleLogout = () => {
         tokenService.clearAll();
         dispatch(logout());
@@ -84,6 +95,38 @@ const Navbar = () => {
                                 {link.name}
                             </Link>
                         ))}
+                        
+                        {/* Categories Dropdown */}
+                        <div className="relative" ref={catRef}>
+                            <button 
+                                onClick={() => setIsCatOpen(!isCatOpen)}
+                                className={clsx(
+                                    "flex items-center gap-1 text-sm font-bold transition-colors",
+                                    isCatOpen ? "text-indigo-600" : "text-gray-600 hover:text-indigo-600"
+                                )}
+                            >
+                                Categories
+                                <ChevronDown className={clsx("w-4 h-4 transition-transform", isCatOpen && "rotate-180")} />
+                            </button>
+                            
+                            {isCatOpen && (
+                                <div className="absolute left-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    {categories.length > 0 ? (
+                                        categories.map((cat) => (
+                                            <Link
+                                                key={cat._id}
+                                                to={`/shop?category=${cat._id}`}
+                                                className="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                            >
+                                                {cat.name}
+                                            </Link>
+                                        ))
+                                    ) : (
+                                        <p className="px-4 py-2 text-xs text-gray-400">No categories found</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Actions */}
@@ -207,10 +250,10 @@ const Navbar = () => {
             <div
                 className={clsx(
                     "md:hidden absolute w-full bg-white border-b border-gray-100 overflow-hidden transition-all duration-300",
-                    isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                    isOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
                 )}
             >
-                <div className="px-4 pt-4 pb-6 space-y-2">
+                <div className="px-4 pt-4 pb-6 space-y-2 overflow-y-auto max-h-[90vh]">
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}
@@ -226,6 +269,22 @@ const Navbar = () => {
                             {link.name}
                         </Link>
                     ))}
+                    
+                    {/* Mobile Categories */}
+                    <div className="pt-4 pb-2">
+                        <p className="px-4 text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Categories</p>
+                        {categories.map((cat) => (
+                            <Link
+                                key={cat._id}
+                                to={`/shop?category=${cat._id}`}
+                                onClick={() => setIsOpen(false)}
+                                className="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors"
+                            >
+                                {cat.name}
+                            </Link>
+                        ))}
+                    </div>
+
                     {!isAuthenticated && (
                         <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-50">
                             <Link
