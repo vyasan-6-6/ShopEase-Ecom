@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { fetchPublicProducts } from "../../redux/features/product/productSlice";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
 import { selectPublicProducts, selectProductPagination, selectProductLoading } from "../../redux/features/product/productSelectors";
@@ -12,11 +12,14 @@ const Shop = () => {
     const products = useSelector(selectPublicProducts);
     const pagination = useSelector(selectProductPagination);
     const productsLoading = useSelector(selectProductLoading);
-    
+
     const categories = useSelector(selectAllCategories);
     const categoriesLoading = useSelector(selectCategoryLoading);
 
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const category = searchParams.get("category");
+
+    const [selectedCategory, setSelectedCategory] = useState(category || "");
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
@@ -27,7 +30,13 @@ const Shop = () => {
         dispatch(fetchPublicProducts({ page: currentPage, limit: 10, category: selectedCategory }));
     }, [dispatch, currentPage, selectedCategory]);
 
+    useEffect(() => { 
+        setSelectedCategory(category || ""); 
+        setCurrentPage(1);
+    }, [category]);
+
     const handleCategoryClick = (categoryId) => {
+        setSearchParams({ category:categoryId });// this for url change 
         setSelectedCategory(categoryId);
         setCurrentPage(1); // Reset to first page when category changes
     };
@@ -55,11 +64,10 @@ const Shop = () => {
                                 <li>
                                     <button
                                         onClick={() => handleCategoryClick("")}
-                                        className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                            selectedCategory === "" 
-                                            ? "bg-indigo-50 text-indigo-700" 
-                                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                        }`}
+                                        className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === ""
+                                                ? "bg-indigo-50 text-indigo-700"
+                                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                            }`}
                                     >
                                         All Products
                                     </button>
@@ -68,11 +76,10 @@ const Shop = () => {
                                     <li key={cat.id}>
                                         <button
                                             onClick={() => handleCategoryClick(cat.id)}
-                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                                selectedCategory === cat.id 
-                                                ? "bg-indigo-50 text-indigo-700" 
-                                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                            }`}
+                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === cat.id
+                                                    ? "bg-indigo-50 text-indigo-700"
+                                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                                }`}
                                         >
                                             {cat.name}
                                         </button>
@@ -95,17 +102,17 @@ const Shop = () => {
                         </div>
                     ) : (
                         <>
-                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                                 {products.map((product) => (
-                                    <Link 
+                                    <Link
                                         to={`/product/${product.id || product._id}`}
-                                        key={product.id || product._id} 
+                                        key={product.id || product._id}
                                         className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group flex flex-col hover:-translate-y-1"
                                     >
                                         <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
                                             {product.images && product.images.length > 0 ? (
-                                                <img 
-                                                    src={product.images[0]} 
+                                                <img
+                                                    src={product.images[0]}
                                                     alt={product.name}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                 />
@@ -119,7 +126,7 @@ const Shop = () => {
                                             </div>
                                             <h3 className="text-lg font-bold text-gray-900 mb-1 leading-tight">{product.name}</h3>
                                             <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">{product.description}</p>
-                                            
+
                                             <div className="flex items-center justify-between mt-auto">
                                                 <div className="flex flex-col">
                                                     {product.compareAtPrice > product.price && (
@@ -131,6 +138,7 @@ const Shop = () => {
                                                     // Prevent navigation when clicking the quick add to cart button
                                                     e.preventDefault();
                                                     e.stopPropagation();
+
                                                     // Quick add to cart logic (could dispatch addToCart directly here)
                                                     // For now just redirect to product page
                                                 }}>View Details</Button>
@@ -143,15 +151,15 @@ const Shop = () => {
                             {/* Pagination */}
                             {pagination && pagination.totalPages > 1 && (
                                 <div className="flex items-center justify-center gap-2">
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm" 
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         disabled={currentPage === 1}
                                     >
                                         Previous
                                     </Button>
-                                    
+
                                     <div className="flex gap-1">
                                         {[...Array(pagination.totalPages)].map((_, idx) => {
                                             const page = idx + 1;
@@ -159,11 +167,10 @@ const Shop = () => {
                                                 <button
                                                     key={page}
                                                     onClick={() => handlePageChange(page)}
-                                                    className={`w-10 h-10 rounded-xl font-medium transition-colors ${
-                                                        currentPage === page 
-                                                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" 
-                                                        : "bg-white text-gray-600 border border-gray-200 hover:border-indigo-600 hover:text-indigo-600"
-                                                    }`}
+                                                    className={`w-10 h-10 rounded-xl font-medium transition-colors ${currentPage === page
+                                                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+                                                            : "bg-white text-gray-600 border border-gray-200 hover:border-indigo-600 hover:text-indigo-600"
+                                                        }`}
                                                 >
                                                     {page}
                                                 </button>
@@ -171,9 +178,9 @@ const Shop = () => {
                                         })}
                                     </div>
 
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm" 
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === pagination.totalPages}
                                     >

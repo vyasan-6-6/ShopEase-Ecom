@@ -114,8 +114,8 @@ const Navbar = () => {
                                     {categories.length > 0 ? (
                                         categories.map((cat) => (
                                             <Link
-                                                key={cat._id}
-                                                to={`/shop?category=${cat._id}`}
+                                                key={cat.id}
+                                                to={`/shop?category=${cat.id}`}
                                                 className="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                                             >
                                                 {cat.name}
@@ -275,8 +275,8 @@ const Navbar = () => {
                         <p className="px-4 text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Categories</p>
                         {categories.map((cat) => (
                             <Link
-                                key={cat._id}
-                                to={`/shop?category=${cat._id}`}
+                                key={cat.id}
+                                to={`/shop?category=${cat.id}`}
                                 onClick={() => setIsOpen(false)}
                                 className="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors"
                             >
