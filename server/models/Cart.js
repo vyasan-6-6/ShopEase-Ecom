@@ -12,7 +12,7 @@ const cartItemSchema = new mongoose.Schema({//for populating the cart items with
         min: [1, "Quantity cannot be less than 1"],
         default: 1,
     },
-});
+}, { _id: false });//why { _id: false }? because if we don't add this then each item in the cart will have its own id and we don't need that
 
 const cartSchema = new mongoose.Schema(
     {
@@ -26,13 +26,17 @@ const cartSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true },
     }
 );
 
-// Virtual for total price calculation could be added here if needed
-// but usually it's better to calculate it in the service or on the fly
-// since product prices can change.
+cartSchema.set("toJSON", {
+    virtuals: true,
+    transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+    },
+});
 
 module.exports = mongoose.model("Cart", cartSchema);

@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { fetchPublicProducts } from "../../redux/features/product/productSlice";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
 import { selectPublicProducts, selectProductPagination, selectProductLoading } from "../../redux/features/product/productSelectors";
 import { selectAllCategories, selectCategoryLoading } from "../../redux/features/category/categorySelectors";
+import { addItemToCart, addToCartLocal } from "../../redux/features/cart/cartSlice";
+import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
+import { ShoppingCart } from "lucide-react";
+import { toast } from "react-toastify";
 import Button from "../../components/common/Button";
 
 const Shop = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const products = useSelector(selectPublicProducts);
     const pagination = useSelector(selectProductPagination);
     const productsLoading = useSelector(selectProductLoading);
+    const isAuthenticated = useSelector(selectIsAuthenticated);
 
     const categories = useSelector(selectAllCategories);
     const categoriesLoading = useSelector(selectCategoryLoading);
@@ -134,14 +140,46 @@ const Shop = () => {
                                                     )}
                                                     <span className="text-xl font-extrabold text-gray-900">${product.price.toFixed(2)}</span>
                                                 </div>
-                                                <Button size="sm" variant="primary" onClick={(e) => {
-                                                    // Prevent navigation when clicking the quick add to cart button
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-
-                                                    // Quick add to cart logic (could dispatch addToCart directly here)
-                                                    // For now just redirect to product page
-                                                }}>View Details</Button>
+                                                <div className="flex gap-2">
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant="outline"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            navigate(`/product/${product.id || product._id}`);
+                                                        }}
+                                                    >
+                                                        Details
+                                                    </Button>
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant="primary" 
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            
+                                                            const productId = product.id || product._id;
+                                                            if (isAuthenticated) {
+                                                                dispatch(addItemToCart({ productId, quantity: 1 }));
+                                                            } else {
+                                                                dispatch(addToCartLocal({ 
+                                                                    productId, 
+                                                                    product: {
+                                                                        id: productId,
+                                                                        name: product.name,
+                                                                        price: product.price,
+                                                                        images: product.images
+                                                                    }, 
+                                                                    quantity: 1 
+                                                                }));
+                                                            }
+                                                            toast.success("Added to cart!");
+                                                        }}
+                                                    >
+                                                        <ShoppingCart className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                     </Link>

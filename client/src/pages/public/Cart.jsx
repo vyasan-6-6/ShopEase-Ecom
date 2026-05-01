@@ -1,0 +1,225 @@
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { 
+    fetchCart,  
+    removeItemFromCart, 
+    updateCartItemQuantity, 
+    clearUserCart,
+    updateQuantityLocal,
+    removeFromCartLocal,
+    clearCartLocal
+} from "../../redux/features/cart/cartSlice";
+import { 
+    selectCartItems, 
+    selectCartTotal, 
+    selectCartLoading 
+} from "../../redux/features/cart/cartSelectors";
+import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
+import Button from "../../components/common/Button";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2 } from "lucide-react";
+
+const Cart = () => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    
+    const items = useAppSelector(selectCartItems);  
+    const total = useAppSelector(selectCartTotal);
+    const loading = useAppSelector(selectCartLoading);
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            dispatch(fetchCart());
+        }
+    }, [dispatch, isAuthenticated]);
+
+    const handleQuantityChange = (productId, newQuantity) => {
+        if (newQuantity < 1) return;
+        
+        if (isAuthenticated) {
+            dispatch(updateCartItemQuantity({ productId, quantity: newQuantity }));
+        } else {
+            dispatch(updateQuantityLocal({ productId, quantity: newQuantity }));
+        }
+    };
+
+    const handleRemove = (productId) => {
+        if (isAuthenticated) {
+            dispatch(removeItemFromCart(productId));
+        } else {
+            dispatch(removeFromCartLocal(productId));
+        }
+    };
+
+    const handleClear = () => {
+        if (isAuthenticated) {
+            dispatch(clearUserCart());
+        } else {
+            dispatch(clearCartLocal());
+        }
+    };
+
+    const handleCheckout = () => {
+        if (isAuthenticated) {
+            navigate("/checkout");
+        } else {
+            // Redirect to login but save the intent to come back here
+            navigate("/auth/login?redirect=/cart");
+        }
+    };
+
+    // Filter out invalid items (where product might be null due to deletion or old data)
+    const validItems = items.filter(item => item && item.product);
+
+    if (loading && validItems.length === 0) {
+        return (
+            <div className="min-h-[60vh] flex flex-col items-center justify-center">
+                <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
+                <p className="text-gray-500 font-medium">Loading your cart...</p>
+            </div>
+        );
+    }
+
+    if (validItems.length === 0) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+                <div className="bg-gray-50 rounded-[3rem] p-12 inline-block mb-8">
+                    <ShoppingBag className="w-20 h-20 text-gray-300 mx-auto" />
+                </div>
+                <h2 className="text-3xl font-black text-gray-900 mb-4">Your cart is empty</h2>
+                <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                    Looks like you haven't added anything to your cart yet. 
+                    Explore our amazing products and find something you love!
+                </p>
+                <Button onClick={() => navigate("/shop")} className="px-8 py-4 text-lg">
+                    Start Shopping
+                </Button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 className="text-4xl font-black text-gray-900 mb-10 tracking-tight">Shopping Cart</h1>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                {/* Cart Items List */}
+                <div className="lg:col-span-2 space-y-6">
+                    {validItems.map((item) => {
+                        const productId = item.product.id || item.product._id;
+                        const productPrice = item.product.price || 0;
+                        const productImage = item.product.images?.[0] || "/placeholder-product.png";
+
+                        return (
+                            <div 
+                                key={productId} 
+                                className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-6 items-center"
+                            >
+                                {/* Product Image */}
+                                <div className="w-32 h-32 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0">
+                                    <img 
+                                        src={productImage} 
+                                        alt={item.product.name} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+
+                                {/* Product Details */}
+                                <div className="flex-grow text-center sm:text-left">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-1">{item.product.name}</h3>
+                                    <p className="text-indigo-600 font-black text-lg mb-4">
+                                        ${productPrice.toFixed(2)}
+                                    </p>
+
+                                    {/* Quantity Controls */}
+                                    <div className="flex items-center justify-center sm:justify-start gap-4">
+                                        <div className="flex items-center bg-gray-50 rounded-xl border border-gray-100">
+                                            <button 
+                                                onClick={() => handleQuantityChange(productId, item.quantity - 1)}
+                                                className="p-2 hover:text-indigo-600 transition-colors"
+                                            >
+                                                <Minus className="w-4 h-4" />
+                                            </button>
+                                            <span className="w-8 text-center font-bold text-gray-900">{item.quantity}</span>
+                                            <button 
+                                                onClick={() => handleQuantityChange(productId, item.quantity + 1)}
+                                                className="p-2 hover:text-indigo-600 transition-colors"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleRemove(productId)}
+                                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Item Total */}
+                                <div className="text-right flex-shrink-0">
+                                    <p className="text-xl font-black text-gray-900">
+                                        ${(productPrice * item.quantity).toFixed(2)}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    <div className="flex justify-between items-center pt-4">
+                        <Button 
+                            variant="outline" 
+                            onClick={handleClear}
+                            className="text-red-500 hover:bg-red-50 border-red-100"
+                        >
+                            Clear Cart
+                        </Button>
+                        <Link to="/shop" className="text-indigo-600 font-bold hover:underline">
+                            Continue Shopping
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Summary Sidebar */}
+                <div className="lg:col-span-1">
+                    <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-100/50 sticky top-24">
+                        <h2 className="text-2xl font-black text-gray-900 mb-6">Order Summary</h2>
+                        
+                        <div className="space-y-4 mb-8">
+                            <div className="flex justify-between text-gray-500">
+                                <span>Subtotal</span>
+                                <span className="font-bold text-gray-900">${total.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-500">
+                                <span>Shipping</span>
+                                <span className="text-green-600 font-bold font-mono">FREE</span>
+                            </div>
+                            <div className="border-t border-dashed border-gray-200 pt-4 mt-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-lg font-bold text-gray-900">Total</span>
+                                    <span className="text-3xl font-black text-indigo-600">${total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <Button 
+                            onClick={handleCheckout}
+                            className="w-full py-4 text-lg flex items-center justify-center gap-2 group"
+                        >
+                            Checkout 
+                            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                        </Button>
+
+                        <p className="text-center text-xs text-gray-400 mt-6">
+                            Tax included. Shipping calculated at checkout.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Cart;

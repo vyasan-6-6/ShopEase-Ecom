@@ -1,19 +1,20 @@
 const Cart = require("../models/Cart");
+const Product = require("../models/Product");
 const { ErrorFactory } = require("../utils/errors");
+
 class CartService {
     /**
      * Get user cart or create one if it doesn't exist
      */
     static async getCart(userId) {
         let cart = await Cart.findOne({ user: userId }).populate({
-            path: "items.product",
-            select: "name price images stock category",
+            path: "items.product", select: "name price images stock category"
         });
 
         if (!cart) {
             cart = await Cart.create({ user: userId, items: [] });
         }
-
+ 
         return cart;
     }
 
@@ -21,12 +22,18 @@ class CartService {
      * Add item to cart
      */
     static async addItem(userId, productId, quantity) {
+        // Check if product exists first
+        const product = await Product.findById(productId);
+        if (!product) {
+            throw ErrorFactory.notFound("Product not found");
+        }
+
         let cart = await Cart.findOne({ user: userId });
 
         if (!cart) {
             cart = await Cart.create({
                 user: userId,
-                items: [{ product: productId, quantity }],//only need product id and it will find product collection from the db 
+                items: [{ product: productId, quantity }],
             });
         } else {
             // Check if product already exists in cart

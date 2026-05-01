@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { fetchProductById, clearSelectedProduct } from "../../redux/features/product/productSlice";
 import { selectSelectedProduct, selectProductLoading, selectProductError } from "../../redux/features/product/productSelectors";
-import { addToCart } from "../../redux/features/cart/cartSlice";
+import { addItemToCart, addToCartLocal } from "../../redux/features/cart/cartSlice";
+import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import Button from "../../components/common/Button";
 import { ArrowLeft, ShoppingCart, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -16,6 +17,7 @@ const SingleProduct = () => {
     const product = useAppSelector(selectSelectedProduct);
     const loading = useAppSelector(selectProductLoading);
     const error = useAppSelector(selectProductError);
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
     const [quantity, setQuantity] = useState(1);
     const [mainImage, setMainImage] = useState("");
@@ -39,14 +41,25 @@ const SingleProduct = () => {
 
     const handleAddToCart = () => {
         if (!product) return;
-        dispatch(addToCart({
-            productId: product.id || product._id,
-            name: product.name,
-            price: product.price,
-            quantity: quantity,
-            image: product.images?.[0]
-        }));
-        toast.success(`${product.name} added to cart!`);
+
+        const productId = product.id || product._id;
+
+        if (isAuthenticated) {
+            dispatch(addItemToCart({ productId, quantity }));
+        } else {
+            dispatch(addToCartLocal({ 
+                productId, 
+                product: {
+                    id: productId,
+                    name: product.name,
+                    price: product.price,
+                    images: product.images
+                }, 
+                quantity 
+            }));
+        }
+        
+        toast.success("Added to cart!");
     };
 
     if (loading) {

@@ -4,6 +4,7 @@ import GuestRoute from "../components/GuestRoute";
 import Home from "../pages/public/Home";
 import Shop from "../pages/public/Shop";
 import SingleProduct from "../pages/public/SingleProduct";
+import Cart from "../pages/public/Cart";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -17,6 +18,7 @@ const PublicRoutes = () => {
                 <Route index element={<Home />} />
                 <Route path="shop" element={<Shop />} />
                 <Route path="product/:id" element={<SingleProduct />} />
+                <Route path="cart" element={<Cart />} />
                 <Route path="500" element={<ServerError />} />
                 
                 {/* Guest-only: logged-in users are redirected to dashboard */}

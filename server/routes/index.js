@@ -12,7 +12,7 @@ const setupRoutes = (app) => {
     const authLimiter = createAuthLimiter();
     const shouldAuthLimiter = config.NODE_ENV === "production";
 
-    app.use("/api/auth", ...(shouldAuthLimiter ? [authLimiter] : []), authRoutes);
+    app.use("/api/auth", ...(shouldAuthLimiter ? [authLimiter] : []),   authRoutes);
     app.use("/api/admin", adminRoutes);
     app.use("/api/user", userRoutes);
     app.use("/api/products", productRoutes);

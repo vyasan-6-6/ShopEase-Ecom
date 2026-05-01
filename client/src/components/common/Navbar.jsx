@@ -132,7 +132,13 @@ const Navbar = () => {
                     {/* Actions */}
                     <div className="hidden md:flex items-center gap-5">
                         {/* Cart */}
-                        <Link to="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600 transition-colors">
+                        <Link 
+                            to="/cart" 
+                            className={clsx(
+                                "relative p-2 transition-colors",
+                                location.pathname === "/cart" ? "text-indigo-600 bg-indigo-100 rounded" : "text-gray-600 hover:text-indigo-600"
+                            )}
+                        >
                             <ShoppingCart className="w-6 h-6" />
                             {cartCount > 0 && (
                                 <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
@@ -228,7 +234,13 @@ const Navbar = () => {
 
                     {/* Mobile menu button */}
                     <div className="md:hidden flex items-center gap-4">
-                        <Link to="/cart" className="relative p-2 text-gray-600">
+                        <Link 
+                            to="/cart" 
+                            className={clsx(
+                                "relative p-2 transition-colors",
+                                location.pathname === "/cart" ? "text-indigo-600" : "text-gray-600"
+                            )}
+                        >
                             <ShoppingCart className="w-6 h-6" />
                             {cartCount > 0 && (
                                 <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">
