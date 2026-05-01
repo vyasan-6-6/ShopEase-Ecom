@@ -1,5 +1,5 @@
 const Cart = require("../models/Cart");
-const { ErrorFactory } = require("../utils/ErrorFactory");
+const { ErrorFactory } = require("../utils/errors");
 class CartService {
     /**
      * Get user cart or create one if it doesn't exist

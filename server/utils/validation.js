@@ -107,6 +107,22 @@ const productValidation = Joi.object({
     status: Joi.string().valid("active", "inactive", "draft").optional(),
 });
 
+const addToCartValidation = Joi.object({
+    productId: commonPatterns.objectId.required().messages({
+        ...customMessages,
+        "string.pattern.base": "Invalid Product ID format",
+    }),
+    quantity: Joi.number().min(1).default(1).messages(customMessages),
+});
+
+const updateQuantityValidation = Joi.object({
+    productId: commonPatterns.objectId.required().messages({
+        ...customMessages,
+        "string.pattern.base": "Invalid Product ID format",
+    }),
+    quantity: Joi.number().min(1).required().messages(customMessages),
+});
+
 module.exports = {
     registerValidation,
     loginValidation,
@@ -116,5 +132,7 @@ module.exports = {
     adminLoginValidation,
     addressValidation,
     categoryValidation,
-    productValidation
+    productValidation,
+    addToCartValidation,
+    updateQuantityValidation
 };
