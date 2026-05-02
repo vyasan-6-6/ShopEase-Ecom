@@ -180,23 +180,15 @@ const Navbar = () => {
                                         </div>
                                         <Link
                                             to={user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"}
-                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                                         >
                                             <LayoutDashboard className="w-4 h-4" />
-                                            {user.role === "admin" ? "Admin Panel" : "Dashboard"}
+                                            {user.role === "admin" ? "Admin Panel" : "My Account"}
                                         </Link>
-                                        {user.role !== "admin" && (
-                                            <Link
-                                                to="/user/profile"
-                                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                                            >
-                                                <Settings className="w-4 h-4" />
-                                                Settings
-                                            </Link>
-                                        )}
+                                        
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors mt-1 border-t border-gray-50"
+                                            className="w-[calc(100%-1rem)] mx-2 flex items-center gap-3 px-3 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-xl transition-all mt-2 mb-1"
                                         >
                                             <LogOut className="w-4 h-4" />
                                             Logout
@@ -297,7 +289,42 @@ const Navbar = () => {
                         ))}
                     </div>
 
-                    {!isAuthenticated && (
+                    {isAuthenticated ? (
+                        <div className="pt-6 mt-6 border-t border-gray-50 space-y-4">
+                            <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-2xl">
+                                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold overflow-hidden">
+                                    {user?.avatar ? (
+                                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        user?.name?.charAt(0).toUpperCase()
+                                    )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-black text-gray-900 truncate">{user?.name}</p>
+                                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-1">
+                                <Link
+                                    to={user?.role === "admin" ? "/admin/dashboard" : "/user/dashboard"}
+                                    onClick={() => setIsOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3 text-base font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-colors"
+                                >
+                                    <LayoutDashboard className="w-5 h-5" />
+                                    {user?.role === "admin" ? "Admin Panel" : "My Account"}
+                                </Link>
+                                
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center justify-center gap-3 px-4 py-3.5 text-base font-black text-white bg-red-600 rounded-2xl shadow-lg shadow-red-100 active:scale-95 transition-all mt-4"
+                                >
+                                    <LogOut className="w-5 h-5" />
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
                         <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-50">
                             <Link
                                 to="/auth/login"
