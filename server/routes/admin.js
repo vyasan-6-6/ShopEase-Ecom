@@ -4,7 +4,7 @@ const { authenticateAdmin } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.post("/login",AdminController.login);
+router.post("/login", AdminController.login);
 router.get("/getProfile", authenticateAdmin, AdminController.getProfile);
 router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
 

@@ -1,11 +1,11 @@
 const express = require("express");
 const CartController = require("../controllers/CartController");
-const { authenticateUser } = require("../middlewares/auth");
+const { authenticateAnyUser } = require("../middlewares/auth");
 
 const router = express.Router();
 
-// All cart routes require authentication
-router.use(authenticateUser);
+// All cart routes require authentication (works for both User and Admin)
+router.use(authenticateAnyUser);
 
 router.get("/", CartController.getCart);
 router.post("/add", CartController.addToCart);

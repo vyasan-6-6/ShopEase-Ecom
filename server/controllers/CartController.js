@@ -21,8 +21,8 @@ class CartController extends BaseController {
         const validatedData = BaseController.validateRequest(addToCartValidation, req.body);
 
         const cart = await CartService.addItem(
-            userId, 
-            validatedData.productId, 
+            userId,
+            validatedData.productId,
             validatedData.quantity || 1
         );
         return BaseController.sendSuccess(res, "Item added to cart", cart);
@@ -36,8 +36,8 @@ class CartController extends BaseController {
         const validatedData = BaseController.validateRequest(updateQuantityValidation, req.body);
 
         const cart = await CartService.updateQuantity(
-            userId, 
-            validatedData.productId, 
+            userId,
+            validatedData.productId,
             validatedData.quantity
         );
         return BaseController.sendSuccess(res, "Cart updated successfully", cart);

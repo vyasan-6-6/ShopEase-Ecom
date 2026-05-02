@@ -66,14 +66,47 @@ const authenticateAdminOptional = (req, res, next) => {
       role: decoded.role,
     };
   } catch (error) {
-    // Ignore error, just proceed without req.admin
+   
   }
   next();
+};
+
+const authenticateAnyUser = (req, res, next) => {
+  const authHeader = req.headers.authorization || req.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next(ErrorFactory.authentication('Access token required'));
+  }
+  const token = authHeader.split(" ")[1];
+
+  // Try user token first
+  try {
+    const decoded = verifyUserToken(token);
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role
+    };
+    return next();
+  } catch (error) {
+    // If user token fails, try admin token
+    try {
+      const decoded = verifyAdminToken(token);
+      req.user = {
+        id: decoded.id,
+        email: decoded.email,
+        role: decoded.role
+      };
+      return next();
+    } catch (adminError) {
+      next(ErrorFactory.authentication("Invalid or expired token"));
+    }
+  }
 };
 
 module.exports = {
   authenticateAdmin,
   authenticateAdminOptional,
   authenticateUser,
+  authenticateAnyUser,
   requireAdmin
 }
