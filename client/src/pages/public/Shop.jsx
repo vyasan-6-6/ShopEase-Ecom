@@ -24,8 +24,10 @@ const Shop = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const category = searchParams.get("category");
+    const search = searchParams.get("search");
 
     const [selectedCategory, setSelectedCategory] = useState(category || "");
+    const [searchQuery, setSearchQuery] = useState(search || "");
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
@@ -33,13 +35,19 @@ const Shop = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        dispatch(fetchPublicProducts({ page: currentPage, limit: 10, category: selectedCategory }));
-    }, [dispatch, currentPage, selectedCategory]);
+        dispatch(fetchPublicProducts({ 
+            page: currentPage, 
+            limit: 10, 
+            category: selectedCategory,
+            search: searchQuery 
+        }));
+    }, [dispatch, currentPage, selectedCategory, searchQuery]);
 
     useEffect(() => { 
         setSelectedCategory(category || ""); 
+        setSearchQuery(search || "");
         setCurrentPage(1);
-    }, [category]);
+    }, [category, search]);
 
     const handleCategoryClick = (categoryId) => {
         setSearchParams({ category:categoryId });// this for url change 
@@ -60,7 +68,7 @@ const Shop = () => {
 
             <div className="flex flex-col md:flex-row gap-8">
                 {/* Sidebar - Categories */}
-                <aside className="w-full md:w-64 flex-shrink-0">
+                <aside className="w-full md:w-64 shrink-0">
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">Categories</h2>
                         {categoriesLoading ? (
@@ -115,7 +123,7 @@ const Shop = () => {
                                         key={product.id || product._id}
                                         className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group flex flex-col hover:-translate-y-1"
                                     >
-                                        <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+                                        <div className="aspect-4/3 bg-gray-100 relative overflow-hidden">
                                             {product.images && product.images.length > 0 ? (
                                                 <img
                                                     src={product.images[0]}

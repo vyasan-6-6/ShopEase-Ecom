@@ -17,7 +17,7 @@ import {
 } from "../../redux/features/cart/cartSelectors";
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import Button from "../../components/common/Button";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2 } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2, Shield } from "lucide-react";
 
 const Cart = () => {
     const dispatch = useAppDispatch();
@@ -132,7 +132,7 @@ const Cart = () => {
                                         ${productPrice.toFixed(2)}
                                     </p>
 
-                                    {/* Quantity Controls */}
+                                      {/* Quantity Controls */}
                                     <div className="flex items-center justify-center sm:justify-start gap-4">
                                         <div className="flex items-center bg-gray-50 rounded-xl border border-gray-100">
                                             <button 
@@ -215,6 +215,12 @@ const Cart = () => {
                         <p className="text-center text-xs text-gray-400 mt-6">
                             Tax included. Shipping calculated at checkout.
                         </p>
+                    <div className="flex items-center justify-center gap-2 mt-6">
+                        <Shield className="w-4 h-4 text-green-600" />
+                        <span className="text-xs font-bold text-gray-600">
+                            Safe and secure payment gateway
+                        </span>
+                    </div>
                     </div>
                 </div>
             </div>

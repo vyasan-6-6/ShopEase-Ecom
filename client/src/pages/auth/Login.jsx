@@ -4,6 +4,7 @@ import { memo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "../../components/layout/AuthLayout";
 import LoginForm from "../../components/auth/LoginForm";
+import Button from "../../components/common/Button";
 
 const Login = memo(() => {
     const navigate = useNavigate();
@@ -21,6 +22,15 @@ const Login = memo(() => {
 
     return (
         <AuthLayout title="Login" subtitle="Welcome back! Sign in to your account">
+            <div className="mt-10 mb-6">
+                <Button 
+                    variant="outline" 
+                    fullWidth
+                    onClick={() => navigate("/admin/login")}
+                >
+                    Login as Admin
+                </Button>
+            </div>
             <LoginForm />
         </AuthLayout>
     );

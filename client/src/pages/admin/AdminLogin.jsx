@@ -59,6 +59,15 @@ useEffect(()=>{
 },[navigate,admin])
     return (
     <AuthLayout title={`Admin Portal`} subtitle={`Sign in to access the dashboard`}>
+        <div className="mt-10 mb-6">
+            <Button 
+                variant="outline" 
+                fullWidth
+                onClick={() => navigate("/auth/login")}
+            >
+                Back to User Login
+            </Button>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)}>
              <Input
           label="Admin Email" 

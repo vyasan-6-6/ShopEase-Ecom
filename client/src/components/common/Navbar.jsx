@@ -1,6 +1,6 @@
 import { memo, useState, useRef, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings, ChevronDown } from "lucide-react";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings, ChevronDown, Search } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import { selectCartTotalCount } from "../../redux/features/cart/cartSelectors";
@@ -8,6 +8,7 @@ import { fetchCategories } from "../../redux/features/category/categorySlice";
 import { selectAllCategories } from "../../redux/features/category/categorySelectors";
 import { logout } from "../../redux/features/auth/authSlice";
 import { tokenService } from "../../utils/apiClient";
+import { useDebounce } from "../../hooks/useDebounce";
 import clsx from "clsx";
 
 const Navbar = () => {
@@ -23,9 +24,41 @@ const Navbar = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
     
     const profileRef = useRef(null);
     const catRef = useRef(null);
+    const [searchTerm, setSearchTerm] = useState(() => {
+        return new URLSearchParams(window.location.search).get("search") || "";
+    });
+    const debouncedSearch = useDebounce(searchTerm, 500);
+
+    // Sync input with URL search param
+    useEffect(() => {
+        const searchParam = new URLSearchParams(location.search).get("search");
+        setSearchTerm(searchParam || "");
+    }, [location.search]);
+
+    // Live debounced search when on Shop page
+    useEffect(() => {
+        if (location.pathname === "/shop") {
+            const currentSearch = new URLSearchParams(location.search).get("search") || "";
+            const trimmedSearch = debouncedSearch.trim();
+            
+            if (trimmedSearch !== currentSearch) {
+                setSearchParams(prev => {
+                    const params = new URLSearchParams(prev);
+                    if (trimmedSearch) {
+                        params.set("search", trimmedSearch);
+                    } else {
+                        params.delete("search");
+                    }
+                    params.set("page", "1");
+                    return params;
+                });
+            }
+        }
+    }, [debouncedSearch, location.pathname, setSearchParams]);
 
     // Fetch categories on mount
     useEffect(() => {
@@ -60,6 +93,14 @@ const Navbar = () => {
         navigate("/");
     };
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim()) {
+            navigate(`/shop?page=1&search=${(searchTerm.trim())}`); 
+            setIsOpen(false);
+        }
+    };
+
     const navLinks = [
         { name: "Home", path: "/" },
         { name: "Shop", path: "/shop" },
@@ -78,6 +119,29 @@ const Navbar = () => {
                             Shop<span className="text-indigo-600">Ease</span>
                         </span>
                     </Link>
+                    
+                    {/* Search Bar - Desktop */}
+                    <div className="hidden lg:flex flex-1 max-w-md mx-10">
+                        <form onSubmit={handleSearch} className="relative w-full">
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-gray-50 border-transparent rounded-2xl py-2.5 pl-12 pr-10 text-sm focus:bg-white focus:border-indigo-100 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:text-gray-400 font-medium"
+                            />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            {searchTerm && (
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchTerm("")}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </form>
+                    </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
@@ -258,6 +322,29 @@ const Navbar = () => {
                 )}
             >
                 <div className="px-4 pt-4 pb-6 space-y-2 overflow-y-auto max-h-[90vh]">
+                    {/* Mobile Search */}
+                    <div className="pb-4">
+                        <form onSubmit={handleSearch} className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-gray-50 border-transparent rounded-xl py-3 pl-12 pr-10 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600/10 transition-all"
+                            />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            {searchTerm && (
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchTerm("")}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            )}
+                        </form>
+                    </div>
+
                     {navLinks.map((link) => (
                         <Link
                             key={link.name}

@@ -45,6 +45,11 @@ class ProductController extends BaseController {
             query.category = req.query.category;
         }
 
+        // Optional search filtering
+        if (req.query.search) {
+            query.name = { $regex: req.query.search, $options: "i" };
+        }
+
         const page = parseInt(req.query.page) || 1;    //get page number from query parameter or default to 1
         const limit = parseInt(req.query.limit) || 10; //get limit from query parameter or default to 10
         const skip = (page - 1) * limit;           //calculate skip value
