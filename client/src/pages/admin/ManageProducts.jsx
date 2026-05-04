@@ -18,6 +18,7 @@ import { fetchCategories } from "../../redux/features/category/categorySlice";
 import { selectAllCategories } from "../../redux/features/category/categorySelectors";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
+import { confirmDelete } from "../../utils/alerts";
 
 const ManageProducts = () => {
     const dispatch = useAppDispatch();
@@ -59,7 +60,8 @@ const ManageProducts = () => {
 
     // Delete
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this product?")) return;
+        const confirmed = await confirmDelete("Delete Product?", "Are you sure you want to remove this product from your inventory?");
+        if (!confirmed) return;
         try {
             setDeletingId(id);
             await dispatch(deleteProduct(id)).unwrap();

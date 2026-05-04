@@ -16,6 +16,7 @@ import {
 } from "../../redux/features/category/categorySelectors";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
+import { confirmDelete } from "../../utils/alerts";
 
 const ManageCategories = () => {
     const dispatch = useAppDispatch();
@@ -50,7 +51,8 @@ const ManageCategories = () => {
 
     // Delete
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this category?")) return;
+        const confirmed = await confirmDelete("Delete Category?", "Are you sure you want to remove this category? This might affect products linked to it.");
+        if (!confirmed) return;
         try {
             setDeletingId(id);
             await dispatch(deleteCategory(id)).unwrap();

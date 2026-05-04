@@ -18,6 +18,7 @@ import {
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import Button from "../../components/common/Button";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2, Shield } from "lucide-react";
+import { confirmDelete } from "../../utils/alerts";
 
 const Cart = () => {
     const dispatch = useAppDispatch();
@@ -44,7 +45,10 @@ const Cart = () => {
         }
     };
 
-    const handleRemove = (productId) => {
+    const handleRemove = async (productId) => {
+        const confirmed = await confirmDelete("Remove Item?", "Are you sure you want to remove this item from your cart?");
+        if (!confirmed) return;
+        
         if (isAuthenticated) {
             dispatch(removeItemFromCart(productId));
         } else {
@@ -52,7 +56,10 @@ const Cart = () => {
         }
     };
 
-    const handleClear = () => {
+    const handleClear = async () => {
+        const confirmed = await confirmDelete("Clear Cart?", "Are you sure you want to remove all items from your cart?");
+        if (!confirmed) return;
+
         if (isAuthenticated) {
             dispatch(clearUserCart());
         } else {

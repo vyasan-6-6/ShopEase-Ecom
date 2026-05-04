@@ -2,14 +2,16 @@
 import Button from "../common/Button";
 import { setDefaultAddress, deleteAddress } from "../../redux/features/auth/authSlice";
 import { useAppDispatch } from "../../redux/hooks";
+import { confirmDelete } from "../../utils/alerts";
 
 const AddressCard = ({ address, onEdit }) => {
 const dispatch = useAppDispatch();
 const handleSetDefault = () => {
     dispatch(setDefaultAddress(address.id));
 };
-const handleDelete = () => {
-    if(!window.confirm("Are you sure you want to delete this address?")) return;
+const handleDelete = async () => {
+    const confirmed = await confirmDelete("Delete Address?", "Are you sure you want to remove this address?");
+    if(!confirmed) return;
     dispatch(deleteAddress(address.id)); 
 };
     return (
