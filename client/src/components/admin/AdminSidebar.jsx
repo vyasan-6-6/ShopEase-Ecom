@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../../redux/features/auth/authSlice";
+import { adminLogout } from "../../redux/features/auth/adminAuthSlice";
 import { tokenService } from "../../utils/apiClient";
 import { useAppDispatch } from "../../redux/hooks";
 import { memo } from "react";
@@ -12,6 +13,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     const handleLogout = () => {
         tokenService.clearAll();
         dispatch(logout());
+        dispatch(adminLogout());
         navigate("/admin/login", { replace: true });
     };
 

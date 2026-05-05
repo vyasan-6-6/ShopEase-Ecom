@@ -65,35 +65,7 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ ema
     }
 });
 
-// ADMINS
-export const loginAdmin = createAsyncThunk('auth/loginAdmin', async (data, { rejectWithValue }) => {
-    try {
-        const res = await adminApi.loginAdmin(data);
-        return res.data.admin; 
-    } catch (error) {
-        return rejectWithValue(error?.message);
-    }
-});
-
-export const getAdminProfile = createAsyncThunk("auth/getAdminProfile", async (_, { rejectWithValue }) => {
-    try {
-        const res = await adminApi.getProfile();
-        return res.data.admin; 
-    } catch (error) {
-        return rejectWithValue(error?.message);
-    }
-});
-
-export const updateAdminProfile = createAsyncThunk("auth/updateAdminProfile", async (data, { rejectWithValue }) => {
-    try {
-        const res = await adminApi.updateProfile(data);
-        return res.data.admin;
-    } catch (error) {
-        return rejectWithValue(error?.message);
-    }
-});
-
-//USERS
+// USERS
 
 export const getProfile = createAsyncThunk("user/getProfile", async (_, { rejectWithValue }) => {
     try {
@@ -391,48 +363,9 @@ export const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            // Unified Admin Reducers
-            .addCase(loginAdmin.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(loginAdmin.fulfilled, (state, action) => {
-                state.loading = false;
-                state.isAuthenticated = true;
-                state.user = action.payload;
-            })
-            .addCase(loginAdmin.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            })
-            .addCase(getAdminProfile.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(getAdminProfile.fulfilled, (state, action) => {
-                state.loading = false;
-                state.isAuthenticated = true;
-                state.user = action.payload;
-            })
-            .addCase(getAdminProfile.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                state.isAuthenticated = false;
-            })
-            // UPDATE ADMIN
-            .addCase(updateAdminProfile.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(updateAdminProfile.fulfilled, (state, action) => {
-                state.loading = false;
-                state.user = action.payload;
-            })
-            .addCase(updateAdminProfile.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
-    },
+            
+        }
+     
 });
 
 

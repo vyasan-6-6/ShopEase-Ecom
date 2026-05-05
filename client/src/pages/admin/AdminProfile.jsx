@@ -3,15 +3,15 @@ import { useForm } from "react-hook-form";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
-import { selectUser, selectAuthLoading } from "../../redux/features/auth/authSelectors";
-import { updateAdminProfile } from "../../redux/features/auth/authSlice";
+import { selectAdmin, selectAdminLoading } from "../../redux/features/auth/adminAuthSelectors";
+import { updateAdminProfile } from "../../redux/features/auth/adminAuthSlice";
 import { toast } from "react-toastify";
 import clsx from "clsx";
 
 const AdminProfile = () => {
     const dispatch = useAppDispatch();
-    const admin = useAppSelector(selectUser);
-    const isLoading = useAppSelector(selectAuthLoading);
+    const admin = useAppSelector(selectAdmin);
+    const isLoading = useAppSelector(selectAdminLoading);
     const [isEditing, setIsEditing] = useState(false);
 
     const {

@@ -3,10 +3,12 @@ import { Link, useNavigate, useLocation, useSearchParams } from "react-router-do
 import { ShoppingCart, User, Menu, X, LogOut, LayoutDashboard, Settings, ChevronDown, Search } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
+import { selectAdmin, selectIsAdminAuthenticated } from "../../redux/features/auth/adminAuthSelectors";
 import { selectCartTotalCount } from "../../redux/features/cart/cartSelectors";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
 import { selectAllCategories } from "../../redux/features/category/categorySelectors";
 import { logout } from "../../redux/features/auth/authSlice";
+import { adminLogout } from "../../redux/features/auth/adminAuthSlice";
 import { tokenService } from "../../utils/apiClient";
 import { useDebounce } from "../../hooks/useDebounce";
 import clsx from "clsx";
@@ -18,6 +20,9 @@ const Navbar = () => {
     
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const user = useAppSelector(selectUser);
+    const isAdminAuthenticated = useAppSelector(selectIsAdminAuthenticated);
+    const admin = useAppSelector(selectAdmin);
+    
     const cartCount = useAppSelector(selectCartTotalCount);
     const categories = useAppSelector(selectAllCategories);
     
@@ -90,6 +95,7 @@ const Navbar = () => {
     const handleLogout = () => {
         tokenService.clearAll();
         dispatch(logout());
+        dispatch(adminLogout());
         navigate("/");
     };
 
@@ -212,22 +218,22 @@ const Navbar = () => {
                         </Link>
 
                         {/* Auth */}
-                        {isAuthenticated ? (
+                        {(isAuthenticated || isAdminAuthenticated) ? (
                             <div className="relative" ref={profileRef}>
                                 <button
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                                     className="flex items-center gap-2 p-1 pr-3 bg-gray-50 rounded-full hover:bg-gray-100 transition-colors border border-gray-100"
                                 >
                                     <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 overflow-hidden">
-                                        {user?.avatar ? (
-                                            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                                        {(user?.avatar || admin?.avatar) ? (
+                                            <img src={user?.avatar || admin?.avatar} alt={user?.name || admin?.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <User className="w-5 h-5" />
                                         )}
                                     </div>
                                     <span className="text-sm font-bold text-gray-700 flex items-center gap-1.5 whitespace-nowrap">
-                                        {user?.name?.split(" ")[0]}
-                                        {user?.role === "admin" && (
+                                        {(user?.name || admin?.name)?.split(" ")[0]}
+                                        {isAdminAuthenticated && (
                                             <span className="px-1.5 py-0.5 bg-indigo-600 text-[9px] text-white rounded-md uppercase tracking-wider flex-shrink-0">
                                                 Admin
                                             </span>
@@ -239,16 +245,29 @@ const Navbar = () => {
                                 {isProfileOpen && (
                                     <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                                         <div className="px-4 py-3 border-b border-gray-50">
-                                            <p className="text-sm font-black text-gray-900">{user?.name}</p>
-                                            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                            <p className="text-sm font-black text-gray-900">{user?.name || admin?.name}</p>
+                                            <p className="text-xs text-gray-500 truncate">{user?.email || admin?.email}</p>
                                         </div>
-                                        <Link
-                                            to={user.role === "admin" ? "/admin/dashboard" : "/user/dashboard"}
-                                            className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                                        >
-                                            <LayoutDashboard className="w-4 h-4" />
-                                            {user.role === "admin" ? "Admin Panel" : "My Account"}
-                                        </Link>
+                                        
+                                        {isAdminAuthenticated && (
+                                            <Link
+                                                to="/admin/dashboard"
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                            >
+                                                <LayoutDashboard className="w-4 h-4" />
+                                                Admin Panel
+                                            </Link>
+                                        )}
+
+                                        {isAuthenticated && (
+                                            <Link
+                                                to="/user/dashboard"
+                                                className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                            >
+                                                <User className="w-4 h-4" />
+                                                My Account
+                                            </Link>
+                                        )}
                                         
                                         <button
                                             onClick={handleLogout}

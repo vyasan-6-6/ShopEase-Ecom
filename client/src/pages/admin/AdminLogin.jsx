@@ -1,9 +1,8 @@
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify";
-import { useAppDispatch } from "../../redux/hooks";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAuthLoading, selectUser } from "../../redux/features/auth/authSelectors";
-import { loginAdmin } from "../../redux/features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { selectAdminLoading, selectAdmin } from "../../redux/features/auth/adminAuthSelectors";
+import { loginAdmin } from "../../redux/features/auth/adminAuthSlice";
 import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthLayout from "../../components/layout/AuthLayout";
@@ -13,8 +12,8 @@ import Button from "../../components/common/Button";
 const dispatch  = useAppDispatch();
 
 const navigate = useNavigate()
-const loading = useSelector(selectAuthLoading);
-const admin = useSelector(selectUser);
+const loading = useAppSelector(selectAdminLoading);
+const admin = useAppSelector(selectAdmin);
  const [serverErrors, setServerErrors] = useState({});
     const {register,handleSubmit,formState:{errors}} = useForm();
 
@@ -53,7 +52,7 @@ const onSubmit = async (data) => {
 };
 
 useEffect(()=>{
-    if(admin?.role==='admin'){
+    if(admin){
         navigate("/admin/dashboard")
     }
 },[navigate,admin])

@@ -1,6 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { getProfile, getAdminProfile } from "./redux/features/auth/authSlice";
+import { getProfile } from "./redux/features/auth/authSlice";
+import { getAdminProfile } from "./redux/features/auth/adminAuthSlice";
 import { useAppDispatch } from "./redux/hooks";
 import { useEffect, useState } from "react";
 import { AUTH_CONFIG } from "./config/app";
