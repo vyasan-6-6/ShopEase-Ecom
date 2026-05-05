@@ -5,13 +5,13 @@ import Button from "../common/Button";
 import Input from "../common/Input";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { uploadProductImages } from "../../redux/features/product/productSlice";
-import { selectAllCategories } from "../../redux/features/category/categorySelectors";
+import { selectActiveCategories } from "../../redux/features/category/categorySelectors";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { productSchema } from "../../utils/productSchema";
 
 const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) => {
     const dispatch = useAppDispatch();
-    const categories = useAppSelector(selectAllCategories);
+    const categories = useAppSelector(selectActiveCategories);
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(productSchema),

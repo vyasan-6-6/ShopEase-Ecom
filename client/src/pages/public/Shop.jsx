@@ -4,7 +4,7 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { fetchPublicProducts } from "../../redux/features/product/productSlice";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
 import { selectPublicProducts, selectProductPagination, selectProductLoading } from "../../redux/features/product/productSelectors";
-import { selectAllCategories, selectCategoryLoading } from "../../redux/features/category/categorySelectors";
+import { selectActiveCategories, selectCategoryLoading } from "../../redux/features/category/categorySelectors";
 import { addItemToCart, addToCartLocal } from "../../redux/features/cart/cartSlice";
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import { ShoppingCart } from "lucide-react";
@@ -19,7 +19,7 @@ const Shop = () => {
     const productsLoading = useSelector(selectProductLoading);
     const isAuthenticated = useSelector(selectIsAuthenticated);
 
-    const categories = useSelector(selectAllCategories);
+    const categories = useSelector(selectActiveCategories);
     const categoriesLoading = useSelector(selectCategoryLoading);
 
     const [searchParams, setSearchParams] = useSearchParams();

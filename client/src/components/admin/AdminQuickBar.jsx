@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import { LayoutDashboard, PlusCircle, Settings } from "lucide-react";
 import { useAppSelector } from "../../redux/hooks";
-import { selectUser } from "../../redux/features/auth/authSelectors";
+import { selectAdmin } from "../../redux/features/auth/adminAuthSelectors";
 import { memo } from "react";
 
 const AdminQuickBar = () => {
-    const user = useAppSelector(selectUser);
+    const admin = useAppSelector(selectAdmin);
 
-    if (user?.role !== "admin") return null;
+    if (!admin) return null;
 
     return (
         <div className="bg-gray-900 text-white py-2 px-4 shadow-sm relative z-[60] border-b border-gray-800">
@@ -34,7 +34,7 @@ const AdminQuickBar = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                     <span className="text-gray-500 hidden md:inline">Logged in as {user.name}</span>
+                     <span className="text-gray-500 hidden md:inline">Logged in as {admin.name}</span>
                      <Link 
                         to="/admin/dashboard/profile" 
                         className="p-1 hover:text-indigo-400 transition-colors"

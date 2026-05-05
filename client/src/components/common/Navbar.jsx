@@ -6,7 +6,7 @@ import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/aut
 import { selectAdmin, selectIsAdminAuthenticated } from "../../redux/features/auth/adminAuthSelectors";
 import { selectCartTotalCount } from "../../redux/features/cart/cartSelectors";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
-import { selectAllCategories } from "../../redux/features/category/categorySelectors";
+import { selectActiveCategories } from "../../redux/features/category/categorySelectors";
 import { logout } from "../../redux/features/auth/authSlice";
 import { adminLogout } from "../../redux/features/auth/adminAuthSlice";
 import { tokenService } from "../../utils/apiClient";
@@ -24,7 +24,7 @@ const Navbar = () => {
     const admin = useAppSelector(selectAdmin);
     
     const cartCount = useAppSelector(selectCartTotalCount);
-    const categories = useAppSelector(selectAllCategories);
+    const categories = useAppSelector(selectActiveCategories);
     
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
