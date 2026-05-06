@@ -42,8 +42,15 @@ const AddressForm = ({ onCloseModal, addressToEdit = null }) => {
     const isDefaultChecked = watch("isDefault");
 
     const onSubmit = async (data) => {
-        if (addressToEdit) {
-            await dispatch(editAddress({ addressId: addressToEdit.id, data }));
+        if (addressToEdit) {  
+            const dataWithoutId = Object.keys(data).reduce((acc,key)=>{
+                if(key !== 'id') {
+                    acc[key]=data[key];
+                }
+                return acc;
+            }, {});
+
+            await dispatch(editAddress({ addressId:addressToEdit.id, data:dataWithoutId}));
         } else {
             await dispatch(addAddress(data));
         }

@@ -17,7 +17,7 @@ const UserDashboard = () => {
     }
 
     const navLinks = [
-        { icon: User, name: "User Dashboard", path: "/user/dashboard" },
+        { icon: User, name: "User profile", path: "/user/dashboard" },
         { icon: MapPin, name: "Address Book", path: "/user/dashboard/addresses" },
     ];
 
@@ -57,7 +57,7 @@ const UserDashboard = () => {
                             <div className="mt-8 pt-6 border-t border-gray-50">
                                 <button 
                                     onClick={handleLogout} 
-                                    className="w-full flex items-center gap-3 px-5 py-4 text-red-500 bg-red-50/50 rounded-2xl hover:bg-red-50 transition-all font-bold text-sm group"
+                                    className="w-full flex items-center justify-center gap-3 px-5 py-4 text-white bg-red-500 rounded-2xl hover:bg-red-700 transition-all font-black text-sm shadow-lg shadow-red-100 active:scale-95 group"
                                 >
                                     <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                                     Logout
@@ -88,7 +88,7 @@ const UserDashboard = () => {
                         })}
                         <button 
                             onClick={handleLogout}
-                            className="flex-none flex items-center gap-2 px-6 py-3.5 bg-red-50 text-red-500 rounded-2xl font-bold text-sm whitespace-nowrap border border-red-50"
+                            className="flex-none flex items-center gap-2 px-6 py-3.5 bg-red-500 text-white rounded-2xl font-black text-sm whitespace-nowrap shadow-lg shadow-red-100 active:scale-95"
                         >
                             <LogOut className="w-4 h-4" />
                             Logout

@@ -47,7 +47,7 @@ class AdminService {
         const admin = await Admin.findByIdAndUpdate(
             adminId,
             { name },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         if (!admin) {

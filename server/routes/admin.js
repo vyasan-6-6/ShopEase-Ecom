@@ -4,9 +4,12 @@ const { authenticateAdmin } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.post("/login",AdminController.login);
-router.get("/getProfile",authenticateAdmin,AdminController.getProfile);
+router.post("/login", AdminController.login);
+router.get("/getProfile", authenticateAdmin, AdminController.getProfile);
 router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
+
+// router.use("/categories", categoryRoutes);
+// router.use("/products", productRoutes);
 // router.get("/users/:id");
 // router.put("/users/:id");
 // router.post("/users/:id/ban");
@@ -14,4 +17,5 @@ router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
 // router.post("/users/:id/force-logout");
 // router.patch("/users/:id/status");
 // router.get("/stats");
-module.exports=router
+
+module.exports = router;

@@ -4,14 +4,14 @@ const config = require('../config/config');
 
 cloudinary.config(config.CLOUDINARY);
 
-const uploadToCloudinary = async (localFilePath) => {
+const uploadToCloudinary = async (localFilePath, folderName = "shopease_avatars") => {
     try {
         if (!localFilePath) return null;
         
         // Upload to cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: "auto",
-            folder: "shopease_avatars",
+            folder: folderName,
         });
         
         // File uploaded securely to the cloud, remove local temporary copy

@@ -11,8 +11,6 @@ class BaseController {
 
     static validateRequest(schema, data) {
         const { error, value } = schema.validate(data, { abortEarly: false });
-    
-        
         if (error) {
             throw ErrorFactory.validation("Validation fails.", error.details);
         }

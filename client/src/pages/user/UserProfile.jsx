@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../../redux/hooks";
 import { selectUser } from "../../redux/features/auth/authSelectors";
@@ -12,6 +13,7 @@ import { toast } from "react-toastify";
 const UserProfile = () => {
     const dispatch = useAppDispatch();
     const user = useSelector(selectUser);
+    const [isEditing, setIsEditing] = useState(false);
 
     const {
         register,
@@ -35,6 +37,7 @@ const UserProfile = () => {
             toast.success("Profile updated successfully!");
             // Reset the form with the newly saved values so it is no longer 'dirty'
             reset(data);
+            setIsEditing(false); // Turn off edit mode
         } else {
             toast.error(result.payload || "Failed to update profile");
         }
@@ -103,9 +106,13 @@ const UserProfile = () => {
                                     required: "Name is required",
                                     minLength: { value: 2, message: "Name must be at least 2 characters" },
                                 })}
+                                disabled={!isEditing}
                                 placeholder="Your full name"
                                 error={errors.name?.message}
-                                className="w-full px-5 py-4 rounded-2xl border-gray-100 hover:border-indigo-200 transition-colors bg-white font-medium"
+                                className={clsx(
+                                    "w-full px-5 py-4 rounded-2xl transition-colors font-medium",
+                                    isEditing ? "bg-white border-gray-100 hover:border-indigo-200" : "bg-gray-50/50 border-transparent text-gray-500 cursor-not-allowed"
+                                )}
                             />
                         </div>
 
@@ -116,6 +123,7 @@ const UserProfile = () => {
                             </label>
                             <Input
                                 name="phone"
+                                disabled={!isEditing}
                                 {...register("phone", {
                                     pattern: {
                                         value: /^\+?[\d\s\-\(\)]+$/,
@@ -124,22 +132,41 @@ const UserProfile = () => {
                                 })}
                                 placeholder="Your phone number"
                                 error={errors?.phone?.message}
-                                className="w-full px-5 py-4 rounded-2xl border-gray-100 hover:border-indigo-200 transition-colors bg-white font-medium"
+                                className={clsx(
+                                    "w-full px-5 py-4 rounded-2xl transition-colors font-medium",
+                                    isEditing ? "bg-white border-gray-100 hover:border-indigo-200" : "bg-gray-50/50 border-transparent text-gray-500 cursor-not-allowed"
+                                )}
                             />
                         </div>
                     </div>
 
-                    <div className="pt-8 flex justify-end">
+                    <div className="pt-8 flex justify-end gap-4">
+                        {isEditing && (
+                            <Button 
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    reset();
+                                    setIsEditing(false);
+                                }}
+                                className="px-8 py-4 rounded-2xl font-bold"
+                            >
+                                Cancel
+                            </Button>
+                        )}
                         <Button 
-                            type="submit"
-                            disabled={!isDirty || isSubmitting}
+                            type={isEditing ? "submit" : "button"}
+                            onClick={!isEditing ? (e) => { e.preventDefault(); setIsEditing(true); } : undefined}
+                            disabled={isSubmitting || (isEditing && !isDirty)} // If editing and not dirty, disable button
                             loading={isSubmitting}
                             className={clsx(
                                 "px-10 py-4 rounded-2xl font-bold transition-all shadow-xl active:scale-95",
-                                isDirty ? "bg-indigo-600 text-white shadow-indigo-100 hover:bg-indigo-700" : "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                isEditing 
+                                    ? (isDirty ? "bg-indigo-600 text-white shadow-indigo-100 hover:bg-indigo-700" : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none")
+                                    : "bg-gray-900 text-white shadow-gray-200 hover:bg-black"
                             )}
                         >
-                            Save Updates
+                            {isEditing ? "Save Profile" : "Edit Profile"}
                         </Button>
                     </div>
                 </form>

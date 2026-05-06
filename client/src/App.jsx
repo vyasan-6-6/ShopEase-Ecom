@@ -1,25 +1,16 @@
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Register from "./pages/auth/Register";
-import Home from "./pages/public/Home";
-import Login from "./pages/auth/Login";
-import GuestRoute from "./components/GuestRoute";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import AdminLogin from "./pages/admin/AdminLogin";
-import { getProfile, getAdminProfile } from "./redux/features/auth/authSlice";
+import { getProfile } from "./redux/features/auth/authSlice";
+import { getAdminProfile } from "./redux/features/auth/adminAuthSlice";
 import { useAppDispatch } from "./redux/hooks";
 import { useEffect, useState } from "react";
 import { AUTH_CONFIG } from "./config/app";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import UserDashboard from "./pages/user/UserDashboard";
-import UserProfile from "./pages/user/UserProfile";
-import AddressBook from "./pages/user/AddressBook";
-import AdminProfile from "./pages/admin/AdminProfile";
-import AdminOverview from "./pages/admin/AdminOverview";
-import NotFound from "./pages/public/NotFound";
-import MainLayout from "./components/layout/MainLayout";
 import ScrollToTop from "./components/common/ScrollToTop";
+
+// Extracted Route Modules
+import AdminRoutes from "./routes/AdminRoutes";
+import UserRoutes from "./routes/UserRoutes";
+import PublicRoutes from "./routes/PublicRoutes";
 
 function App() {
     const dispatch = useAppDispatch();
@@ -61,47 +52,19 @@ function App() {
         <BrowserRouter>
             <ScrollToTop />
             <Routes>
-                {/* Public + Guest-only routes inside MainLayout */}
-                <Route element={<MainLayout />}>
-                    <Route index element={<Home />} />
-
-                    {/* Guest-only: logged-in users are redirected to dashboard */}
-                    <Route element={<GuestRoute />}>
-                        <Route path="/auth/login" element={<Login />} />
-                        <Route path="/auth/register" element={<Register />} />
-                        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-                    </Route>
-                </Route>
-
-                {/* Admin login — no MainLayout */}
-                <Route element={<GuestRoute />}>
-                    <Route path="/admin/login" element={<AdminLogin />} />
-                </Route>
-
-                {/* User protected routes */}
-                <Route element={<MainLayout />}>
-                    <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
-                        <Route path="/user/dashboard" element={<UserDashboard />}>
-                            <Route index element={<UserProfile />} />
-                            <Route path="addresses" element={<AddressBook />} />
-                            <Route path="*" element={<NotFound />} />
-                        </Route>
-                    </Route>
-                </Route>
-
-                {/* Admin protected routes */}
-                <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-                    <Route path="/admin/dashboard" element={<AdminDashboard />}>
-                        <Route index element={<AdminOverview />} />
-                        <Route path="profile" element={<AdminProfile />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Route>
-                </Route>
-
-                {/* Catch-all route for undefined paths */}
-                <Route path="*" element={<NotFound />} />
+                {/* 
+                  Descendant routing:
+                  Any path starting with /admin will be handled by AdminRoutes 
+                */}
+                <Route path="/admin/*" element={<AdminRoutes />} />
+                
+                {/* Any path starting with /user will be handled by UserRoutes */}
+                <Route path="/user/*" element={<UserRoutes />} />
+                
+                {/* Everything else (like /, /auth/login, etc.) goes to PublicRoutes */}
+                <Route path="/*" element={<PublicRoutes />} />
             </Routes>
-            <ToastContainer position="top-right" autoClose={3000} />
+            <ToastContainer position="top-right" autoClose={1000} />
         </BrowserRouter>
     );
 }

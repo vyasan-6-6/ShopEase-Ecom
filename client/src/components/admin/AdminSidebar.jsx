@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../../redux/features/auth/authSlice";
+import { adminLogout } from "../../redux/features/auth/adminAuthSlice";
 import { tokenService } from "../../utils/apiClient";
 import { useAppDispatch } from "../../redux/hooks";
 import { memo } from "react";
@@ -12,6 +13,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     const handleLogout = () => {
         tokenService.clearAll();
         dispatch(logout());
+        dispatch(adminLogout());
         navigate("/admin/login", { replace: true });
     };
 
@@ -58,6 +60,9 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 <NavLink to="/admin/dashboard/profile" className={linkClasses} onClick={onClose}>
                     👤 Admin Profile
                 </NavLink>
+                <NavLink to="/admin/dashboard/categories" className={linkClasses} onClick={onClose}>
+                    🏷️ Categories
+                </NavLink>
                 <NavLink to="/admin/dashboard/users" className={linkClasses} onClick={onClose}>
                     👥 Manage Users
                 </NavLink>
@@ -67,7 +72,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
                 {/* Return to Storefront */}
                 <div className="my-4 border-t border-gray-800/50" />
-                <NavLink to="/" className={linkClasses} onClick={onClose}>
+                <NavLink to="/shop" className={linkClasses} onClick={onClose}>
                     <House className="w-4 h-4" /> View Store
                 </NavLink>
             </nav>

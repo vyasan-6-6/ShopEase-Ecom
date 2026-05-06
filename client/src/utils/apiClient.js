@@ -4,6 +4,7 @@ import { API_CONFIG, AUTH_CONFIG } from "../config/app";
 export const tokenService = {
     getAuthToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey),
     getAdminToken: () => localStorage.getItem(AUTH_CONFIG.adminKey),
+    getAnyToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey) || localStorage.getItem(AUTH_CONFIG.adminKey),
     getUser: () => {
         const userData = localStorage.getItem(AUTH_CONFIG.userKey);
         return userData ? JSON.parse(userData) : null;
@@ -74,7 +75,7 @@ const createApiClient = (getToken) => {
     return client;
 };
 
-export const userClient = createApiClient(tokenService.getAuthToken);
+export const userClient = createApiClient(tokenService.getAnyToken);
 export const adminClient = createApiClient(tokenService.getAdminToken);
 
 export const makeRequest = async (client, config) => {
@@ -84,7 +85,6 @@ export const makeRequest = async (client, config) => {
     } catch (error) {
         let message =
         error.response?.data?.error?.message || error.message || "Something went Wrong.";
-            
         // If the backend hands us an array of specific field validation errors (like Joi length constraints)
         // unpack the foremost detail so the frontend gets the exact specific string!
         const payload = error.response?.data?.error;

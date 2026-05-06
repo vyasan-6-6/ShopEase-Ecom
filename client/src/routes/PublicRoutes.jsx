@@ -1,0 +1,37 @@
+import { Routes, Route } from "react-router-dom";
+import MainLayout from "../components/layout/MainLayout";
+import GuestRoute from "../components/GuestRoute";
+import Home from "../pages/public/Home";
+import Shop from "../pages/public/Shop";
+import SingleProduct from "../pages/public/SingleProduct";
+import Cart from "../pages/public/Cart";
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import NotFound from "../pages/public/NotFound";
+import ServerError from "../pages/public/ServerError";
+
+const PublicRoutes = () => {
+    return (
+        <Routes>
+            <Route element={<MainLayout />}>
+                <Route index element={<Home />} />
+                <Route path="shop" element={<Shop />} />
+                <Route path="product/:id" element={<SingleProduct />} />
+                <Route path="cart" element={<Cart />} />
+                <Route path="500" element={<ServerError />} />
+                
+                {/* Guest-only: logged-in users are redirected to dashboard */}
+                <Route element={<GuestRoute />}>
+                    <Route path="auth/login" element={<Login />} />
+                    <Route path="auth/register" element={<Register />} />
+                    <Route path="auth/forgot-password" element={<ForgotPassword />} />
+                </Route>
+            </Route>
+            {/* Catch-all route for undefined paths */}
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
+};
+
+export default PublicRoutes;

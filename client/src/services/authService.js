@@ -1,6 +1,6 @@
 import { makeRequest, tokenService, userClient } from "../utils/apiClient";
 
-export const authAPI = {
+const authAPI = {
     register: async (data) => {
         return makeRequest(userClient, {
             url: "/auth/register",
@@ -99,3 +99,5 @@ export const authAPI = {
         });
     },
 };
+
+export default authAPI;
