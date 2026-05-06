@@ -70,12 +70,22 @@ class ProductController extends BaseController {
     // GET /api/admin/products/:id OR /api/user/products/:id
     static getById = BaseController.asyncHandler(async (req, res) => {
         const product = await ProductService.getProductById(req.params.id);
+        
+        if (!product || (!req.admin && product.status !== "active")) {
+            return BaseController.sendError(res, "Product not found", 404);
+        }
+
         BaseController.sendSuccess(res, "Product fetched successfully", { product });
     });
 
     // GET /api/user/products/slug/:slug
     static getBySlug = BaseController.asyncHandler(async (req, res) => {
         const product = await ProductService.getProductBySlug(req.params.slug);
+        
+        if (!product || (!req.admin && product.status !== "active")) {
+            return BaseController.sendError(res, "Product not found", 404);
+        }
+
         BaseController.sendSuccess(res, "Product fetched successfully", { product });
     });
 

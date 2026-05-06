@@ -13,10 +13,15 @@ const ProductCard = ({ product }) => {
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute top-3 left-3">
+                <div className="absolute top-3 left-3 flex flex-col gap-2">
                     <span className="px-3 py-1 bg-white/90 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-gray-900 rounded-full shadow-sm">
                         {category}
                     </span>
+                    {product.status === "draft" && (
+                        <span className="px-3 py-1 bg-amber-100/90 backdrop-blur-md text-[10px] font-black uppercase tracking-wider text-amber-700 rounded-full shadow-sm border border-amber-200">
+                            Draft
+                        </span>
+                    )}
                 </div>
             </div>
 

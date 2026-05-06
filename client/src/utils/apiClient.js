@@ -4,7 +4,7 @@ import { API_CONFIG, AUTH_CONFIG } from "../config/app";
 export const tokenService = {
     getAuthToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey),
     getAdminToken: () => localStorage.getItem(AUTH_CONFIG.adminKey),
-    getAnyToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey) || localStorage.getItem(AUTH_CONFIG.adminKey),
+    getAnyToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey) || localStorage.getItem(AUTH_CONFIG.adminKey),//shop will be avaible to admin also
     getUser: () => {
         const userData = localStorage.getItem(AUTH_CONFIG.userKey);
         return userData ? JSON.parse(userData) : null;

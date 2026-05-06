@@ -7,8 +7,8 @@ const router = express.Router();
 
 // Public Routes
 router.get("/", authenticateAdminOptional, ProductController.getAll);
-router.get("/:id", ProductController.getById);
-router.get("/slug/:slug", ProductController.getBySlug);
+router.get("/:id", authenticateAdminOptional, ProductController.getById);
+router.get("/slug/:slug", authenticateAdminOptional, ProductController.getBySlug);
 
 // Admin-Protected Routes
 router.post("/", authenticateAdmin, ProductController.create);

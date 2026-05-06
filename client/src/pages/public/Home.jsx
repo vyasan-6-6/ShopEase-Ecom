@@ -7,9 +7,11 @@ import Testimonials from "../../components/home/Testimonials";
 import CTABanner from "../../components/home/CTABanner";
 import { useAppSelector } from "../../redux/hooks";
 import { selectUser } from "../../redux/features/auth/authSelectors";
+import { selectAdmin } from "../../redux/features/auth/adminAuthSelectors";
 
 const Home = () => {
     const user = useAppSelector(selectUser);
+    const admin = useAppSelector(selectAdmin);
     return (
         <div className="flex flex-col w-full">
             <Hero />
@@ -18,7 +20,7 @@ const Home = () => {
             <FeaturedProducts />
             <Testimonials />
             
-            {!user && <CTABanner />}
+            {!user && !admin && <CTABanner />}
         </div>
     );
 };

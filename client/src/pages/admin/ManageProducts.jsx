@@ -248,7 +248,11 @@ const ManageProducts = () => {
                                                 <span className="font-bold text-gray-900">${prod.price?.toFixed(2)}</span>
                                                 <span
                                                     className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                                                        prod.status === "active" ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-500"
+                                                        prod.status === "active"
+                                                            ? "bg-emerald-50 text-emerald-600"
+                                                            : prod.status === "draft"
+                                                            ? "bg-amber-50 text-amber-600"
+                                                            : "bg-gray-100 text-gray-500"
                                                     }`}
                                                 >
                                                     {prod.status}

@@ -133,6 +133,11 @@ const Shop = () => {
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-gray-400 font-medium">No Image</div>
                                             )}
+                                            {product.status === "draft" && (
+                                                <div className="absolute top-3 right-3 bg-amber-100/90 backdrop-blur-sm text-amber-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm z-10 border border-amber-200">
+                                                    Draft
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="p-5 flex flex-col flex-1">
                                             <div className="text-xs font-semibold text-indigo-600 mb-2 uppercase tracking-wider">
