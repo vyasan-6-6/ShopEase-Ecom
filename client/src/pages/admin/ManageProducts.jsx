@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from "react";
-import { Plus, Pencil, Trash2, Package, Search, Loader2, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, Search, Loader2, Image as ImageIcon, Eye } from "lucide-react";
 import ProductFormModal from "../../components/admin/ProductFormModal";
+import ProductViewModal from "../../components/admin/ProductViewModal";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { 
@@ -33,6 +34,8 @@ const ManageProducts = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [viewingProduct, setViewingProduct] = useState(null);
 
     useEffect(() => {
         dispatch(fetchAdminProducts());
@@ -81,6 +84,11 @@ const ManageProducts = () => {
     const openCreate = () => {
         setEditingProduct(null);
         setModalOpen(true);
+    };
+
+    const openView = (prod) => {
+        setViewingProduct(prod);
+        setViewModalOpen(true);
     };
 
     const filteredProducts = products.filter((prod) =>
@@ -205,6 +213,15 @@ const ManageProducts = () => {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
+                                                        onClick={() => openView(prod)}
+                                                        className="px-2 py-2"
+                                                        title="View"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
                                                         onClick={() => openEdit(prod)}
                                                         className="px-2 py-2"
                                                         title="Edit"
@@ -265,6 +282,9 @@ const ManageProducts = () => {
                                             Stock: {prod.stock}
                                         </span>
                                         <div className="flex gap-2">
+                                            <Button variant="outline" size="sm" onClick={() => openView(prod)} className="px-3" title="View">
+                                                <Eye className="w-4 h-4" />
+                                            </Button>
                                             <Button variant="outline" size="sm" onClick={() => openEdit(prod)} className="px-3">
                                                 <Pencil className="w-4 h-4" />
                                             </Button>
@@ -289,6 +309,15 @@ const ManageProducts = () => {
                 onSubmit={handleSubmit}
                 initialData={editingProduct}
                 isLoading={isSubmitting}
+            />
+
+            <ProductViewModal
+                isOpen={viewModalOpen}
+                onClose={() => {
+                    setViewModalOpen(false);
+                    setViewingProduct(null);
+                }}
+                product={viewingProduct}
             />
         </div>
     );
