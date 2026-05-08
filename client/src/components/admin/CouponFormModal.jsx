@@ -1,54 +1,53 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { couponSchema } from "../../utils/couponSchema";
 import Input from "../common/Input";
 import Button from "../common/Button";
 
 const CouponFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) => {
-    const [formData, setFormData] = useState({
-        code: "",
-        discountPercent: "",
-        expiryDate: "",
-        minOrderAmount: 0,
-        isActive: true,
+    const { register, handleSubmit, reset, formState: { errors } } = useForm({
+        resolver: yupResolver(couponSchema),
+        defaultValues: {
+            code: "",
+            discountPercent: "",
+            expiryDate: "",
+            minOrderAmount: 0,
+            isActive: true,
+        }
     });
 
     useEffect(() => {
-        if (initialData && isOpen) {
-            setFormData({
-                code: initialData.code || "",
-                discountPercent: initialData.discountPercent || "",
-                expiryDate: initialData.expiryDate ? new Date(initialData.expiryDate).toISOString().slice(0, 16) : "",
-                minOrderAmount: initialData.minOrderAmount || 0,
-                isActive: initialData.isActive !== undefined ? initialData.isActive : true,
-            });
-        } else if (isOpen) {
-            setFormData({
-                code: "",
-                discountPercent: "",
-                expiryDate: "",
-                minOrderAmount: 0,
-                isActive: true,
-            });
+        if (isOpen) {
+            if (initialData) {
+                reset({
+                    code: initialData.code || "",
+                    discountPercent: initialData.discountPercent || "",
+                    expiryDate: initialData.expiryDate ? new Date(initialData.expiryDate).toISOString().slice(0, 16) : "",
+                    minOrderAmount: initialData.minOrderAmount || 0,
+                    isActive: initialData.isActive !== undefined ? initialData.isActive : true,
+                });
+            } else {
+                reset({
+                    code: "",
+                    discountPercent: "",
+                    expiryDate: "",
+                    minOrderAmount: 0,
+                    isActive: true,
+                });
+            }
         }
-    }, [initialData, isOpen]);
+    }, [initialData, isOpen, reset]);// why is reset listed as a dependency?
 
     if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const submitForm = (data) => {
         onSubmit({
-            ...formData,
-            discountPercent: Number(formData.discountPercent),
-            minOrderAmount: Number(formData.minOrderAmount),
+            ...data,
+            // Ensure proper ISO string format for backend
+            expiryDate: new Date(data.expiryDate).toISOString(),
         });
-    };
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value
-        }));
     };
 
     return (
@@ -65,53 +64,41 @@ const CouponFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) 
                 </div>
 
                 <div className="p-6 overflow-y-auto">
-                    <form id="couponForm" onSubmit={handleSubmit} className="space-y-5">
+                    <form id="couponForm" onSubmit={handleSubmit(submitForm)} className="space-y-5">
                         <Input
                             label="Coupon Code"
-                            name="code"
-                            value={formData.code}
-                            onChange={handleChange}
                             placeholder="e.g. SUMMER20"
-                            required
                             className="uppercase"
+                            {...register("code")}
+                            error={errors.code?.message}
                         />
                         <div className="grid grid-cols-2 gap-4">
                             <Input
                                 label="Discount Percentage"
-                                name="discountPercent"
                                 type="number"
-                                min="1"
-                                max="100"
-                                value={formData.discountPercent}
-                                onChange={handleChange}
                                 placeholder="%"
-                                required
+                                {...register("discountPercent")}
+                                error={errors.discountPercent?.message}
                             />
                             <Input
                                 label="Minimum Order Amount"
-                                name="minOrderAmount"
                                 type="number"
-                                min="0"
-                                value={formData.minOrderAmount}
-                                onChange={handleChange}
                                 placeholder="$"
+                                {...register("minOrderAmount")}
+                                error={errors.minOrderAmount?.message}
                             />
                         </div>
                         <Input
                             label="Expiry Date & Time"
-                            name="expiryDate"
                             type="datetime-local"
-                            value={formData.expiryDate}
-                            onChange={handleChange}
-                            required
+                            {...register("expiryDate")}
+                            error={errors.expiryDate?.message}
                         />
                         <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
                             <input
                                 type="checkbox"
                                 id="isActive"
-                                name="isActive"
-                                checked={formData.isActive}
-                                onChange={handleChange}
+                                {...register("isActive")}
                                 className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                             />
                             <div>

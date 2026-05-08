@@ -216,10 +216,10 @@ const ManageCoupon = () => {
                                         </div>
                                         <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-50">
                                             <Button variant="outline" size="sm" onClick={() => openEdit(c)} className="px-3">
-                                                <Pencil className="w-4 h-4" /> Edit
+                                                <Pencil className="w-4 h-4" title="Edit"/> 
                                             </Button>
                                             <Button variant="danger" size="sm" onClick={() => handleDelete(c.id || c._id)} loading={deletingId === (c.id || c._id)} className="px-3">
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-4 h-4" title="Delete"/>
                                             </Button>
                                         </div>
                                     </div>
