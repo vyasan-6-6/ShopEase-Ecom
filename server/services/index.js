@@ -3,5 +3,6 @@ module.exports={
     AdminService:require("./AdminService"),
     UserService:require("./UserService"),
     CategoryService:require("./CategoryService"),
-   ProductService:require("./ProductService")
+   ProductService:require("./ProductService"),
+   CouponService:require("./CouponService")
 }

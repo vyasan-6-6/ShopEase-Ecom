@@ -81,6 +81,9 @@ class ErrorFactory {
     static database(message) {
         return new DatabaseError(message);
     }
+    static badRequest(message){
+        return new AppError(message,400,"BAD_REQUEST");
+    }
 
     static generic(message, statusCode, code) {
         return new AppError(message, statusCode, code);
