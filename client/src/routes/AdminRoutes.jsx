@@ -7,6 +7,7 @@ import AdminOverview from "../pages/admin/AdminOverview";
 import AdminProfile from "../pages/admin/AdminProfile";
 import ManageCategories from "../pages/admin/ManageCategories";
 import ManageProducts from "../pages/admin/ManageProducts";
+import ManageCoupon from "../pages/admin/ManageCoupon";
 import NotFound from "../pages/public/NotFound";
 
 const AdminRoutes = () => {
@@ -24,6 +25,7 @@ const AdminRoutes = () => {
                     <Route path="profile" element={<AdminProfile />} />
                     <Route path="categories" element={<ManageCategories />} />
                     <Route path="products" element={<ManageProducts />} />
+                    <Route path="coupons" element={<ManageCoupon />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Route>

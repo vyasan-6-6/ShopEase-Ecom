@@ -3,3 +3,4 @@ export { default as adminApi } from "./AdminService";
 export { default as userApi } from "./UserService";
 export { default as categoryApi } from "./CategoryService";
 export { default as productApi } from "./ProductService";
+export { default as couponApi } from "./CouponService";
