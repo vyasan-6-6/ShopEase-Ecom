@@ -5,8 +5,7 @@ import cartApi from "../../../services/CartService";
 export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { rejectWithValue }) => {
     try {
         const res = await cartApi.getCart();
-        console.log("API Response :",res.data);
-        return res.data; // This is the cart object { items: [...] }
+         return res.data; // This is the cart object { items: [...] }
     } catch (error) {
         return rejectWithValue(error.message);
     }

@@ -112,10 +112,10 @@ const CouponFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) 
                 </div>
 
                 <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                    <Button variant="outline" type="button" onClick={onClose} disabled={isLoading}>
+                    <Button variant="outline" type="button" className="cursor-pointer" onClick={onClose} disabled={isLoading}>
                         Cancel
                     </Button>
-                    <Button type="submit" form="couponForm" disabled={isLoading} className="min-w-[120px]">
+                    <Button type="submit" form="couponForm" disabled={isLoading} className="min-w-[120px] cursor-pointer">
                         {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : initialData ? "Save Changes" : "Create Coupon"}
                     </Button>
                 </div>

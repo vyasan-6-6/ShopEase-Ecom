@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { 
@@ -16,9 +16,13 @@ import {
     selectCartLoading 
 } from "../../redux/features/cart/cartSelectors";
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
+import { validateCoupon, clearValidatedCoupon } from "../../redux/features/coupon/couponSlice";
+import { selectValidatingCoupon, selectValidatedCoupon } from "../../redux/features/coupon/couponSelectors";
 import Button from "../../components/common/Button";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2, Shield } from "lucide-react";
+import Input from "../../components/common/Input";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2, Shield, Ticket, X } from "lucide-react";
 import { confirmDelete } from "../../utils/alerts";
+import { toast } from "react-toastify";
 
 const Cart = () => {
     const dispatch = useAppDispatch();
@@ -28,12 +32,29 @@ const Cart = () => {
     const total = useAppSelector(selectCartTotal);
     const loading = useAppSelector(selectCartLoading);
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
+    
+    // Coupon State
+    const validatingCoupon = useAppSelector(selectValidatingCoupon);
+    const appliedCoupon = useAppSelector(selectValidatedCoupon);
+    const [couponCode, setCouponCode] = useState("");
 
     useEffect(() => {
         if (isAuthenticated) {
             dispatch(fetchCart());
         }
     }, [dispatch, isAuthenticated]);
+
+    // Clear coupon if cart becomes empty or if total changes below min order amount
+    useEffect(() => {
+        if (appliedCoupon) {
+            if (total === 0) {
+                dispatch(clearValidatedCoupon());
+            } else if (total < appliedCoupon.minOrderAmount) {
+                toast.warning(`Cart total dropped below minimum order amount ($${appliedCoupon.minOrderAmount}) for coupon ${appliedCoupon.code}`);
+                dispatch(clearValidatedCoupon());
+            }
+        }
+    }, [total, appliedCoupon, dispatch]);
 
     const handleQuantityChange = (productId, newQuantity) => {
         if (newQuantity < 1) return;
@@ -65,6 +86,22 @@ const Cart = () => {
         } else {
             dispatch(clearCartLocal());
         }
+    };
+
+    const handleApplyCoupon = async () => {
+        if (!couponCode.trim()) return;
+        try {
+            await dispatch(validateCoupon({ code: couponCode, cartTotal: total })).unwrap();
+            toast.success("Coupon applied successfully!");
+            setCouponCode("");
+        } catch (error) {
+            toast.error(error || "Invalid coupon code");
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        dispatch(clearValidatedCoupon());
+        toast.info("Coupon removed");
     };
 
     const handleCheckout = () => {
@@ -105,6 +142,9 @@ const Cart = () => {
             </div>
         );
     }
+
+    const discountAmount = appliedCoupon ? (total * (appliedCoupon.discountPercent / 100)) : 0;
+    const finalTotal = Math.max(0, total - discountAmount);
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -194,22 +234,60 @@ const Cart = () => {
                     <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-100/50 sticky top-24">
                         <h2 className="text-2xl font-black text-gray-900 mb-6">Order Summary</h2>
                         
-                        <div className="space-y-4 mb-8">
+                        <div className="space-y-4 mb-6">
                             <div className="flex justify-between text-gray-500">
                                 <span>Subtotal</span>
                                 <span className="font-bold text-gray-900">${total.toFixed(2)}</span>
                             </div>
+
+                            {/* Applied Coupon Display */}
+                            {appliedCoupon && (
+                                <div className="flex justify-between items-center text-green-600 bg-green-50 p-3 rounded-xl border border-green-100">
+                                    <div className="flex items-center gap-2">
+                                        <Ticket className="w-4 h-4" />
+                                        <span className="font-bold uppercase tracking-wider text-xs">{appliedCoupon.code}</span>
+                                        <span className="text-xs">(-{appliedCoupon.discountPercent}%)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-bold">-${discountAmount.toFixed(2)}</span>
+                                        <button onClick={handleRemoveCoupon} className="p-1 hover:bg-green-200 rounded-full transition-colors">
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="flex justify-between text-gray-500">
                                 <span>Shipping</span>
                                 <span className="text-green-600 font-bold font-mono">FREE</span>
                             </div>
+                            
                             <div className="border-t border-dashed border-gray-200 pt-4 mt-4">
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-bold text-gray-900">Total</span>
-                                    <span className="text-3xl font-black text-indigo-600">${total.toFixed(2)}</span>
+                                    <span className="text-3xl font-black text-indigo-600">${finalTotal.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Coupon Input Area */}
+                        {!appliedCoupon && (
+                            <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100 flex gap-2">
+                                <Input 
+                                    placeholder="Enter coupon code" 
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                    className="uppercase font-bold tracking-wider"
+                                />
+                                <Button 
+                                    onClick={handleApplyCoupon} 
+                                    disabled={validatingCoupon || !couponCode.trim()}
+                                    className="px-6 whitespace-nowrap"
+                                >    
+                                    {validatingCoupon ? <Loader2 className="w-5 h-5 animate-spin" /> : "Apply"}
+                                </Button>
+                            </div>
+                        )}
 
                         <Button 
                             onClick={handleCheckout}
@@ -222,12 +300,12 @@ const Cart = () => {
                         <p className="text-center text-xs text-gray-400 mt-6">
                             Tax included. Shipping calculated at checkout.
                         </p>
-                    <div className="flex items-center justify-center gap-2 mt-6">
-                        <Shield className="w-4 h-4 text-green-600" />
-                        <span className="text-xs font-bold text-gray-600">
-                            Safe and secure payment gateway
-                        </span>
-                    </div>
+                        <div className="flex items-center justify-center gap-2 mt-6">
+                            <Shield className="w-4 h-4 text-green-600" />
+                            <span className="text-xs font-bold text-gray-600">
+                                Safe and secure payment gateway
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
