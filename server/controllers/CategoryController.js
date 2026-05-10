@@ -14,6 +14,7 @@ class CategoryController extends BaseController {
     // GET /api/admin/categories
     static getAll = BaseController.asyncHandler(async (req, res) => {
         const categories = await CategoryService.getCategories();
+        BaseController.logAction("CATEGORY_FETCH", req.admin, { categories });
         BaseController.sendSuccess(res, "Categories fetched successfully", { categories });
     });
 
