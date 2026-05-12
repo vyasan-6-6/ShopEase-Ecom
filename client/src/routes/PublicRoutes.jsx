@@ -23,9 +23,9 @@ const PublicRoutes = () => {
                 <Route path="cart" element={<Cart />} />
                 <Route path="500" element={<ServerError />} />
                 
-                {/* <Route element={<ProtectedRoute allowedRoles={["user"]} />}> */}
+                <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
                     <Route path="checkout" element={<Checkout />} />
-                {/* </Route> */}
+                </Route>
                 
                 {/* Guest-only: logged-in users are redirected to dashboard */}
                 <Route element={<GuestRoute />}>

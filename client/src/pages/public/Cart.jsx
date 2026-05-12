@@ -108,8 +108,8 @@ const Cart = () => {
         if (isAuthenticated) {
             navigate("/checkout");
         } else {
-            // Redirect to login but save the intent to come back here
-            navigate("/auth/login?redirect=/cart");
+            // Redirect to login but save the intent to come back to checkout
+            navigate("/auth/login?redirect=/checkout");
         }
     };
 
