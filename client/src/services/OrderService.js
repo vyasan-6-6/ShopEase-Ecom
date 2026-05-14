@@ -20,6 +20,18 @@ const OrderService = {
             method: "GET",
             url: "/orders/my-orders",
         });
+    },
+    cancelOrder: (orderId) => {
+        return makeRequest(userClient, {
+            method: "POST",
+            url: `/orders/${orderId}/cancel`
+        });
+    },
+    returnOrder: (orderId) => {
+        return makeRequest(userClient, {
+            method: "POST",
+            url: `/orders/${orderId}/return`
+        });
     }
 }
 

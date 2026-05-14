@@ -33,6 +33,18 @@ class OrderController extends BaseController {
         BaseController.logAction("ORDER_FETCH", req.user, { orders });
         BaseController.sendSuccess(res, "Orders fetched successfully", { orders }, 200);
     });
+
+    static cancelOrder = BaseController.asyncHandler(async (req, res) => {
+        const order = await OrderService.cancelOrder(req.user.id, req.params.id);
+        BaseController.logAction("ORDER_CANCEL", req.user, { orderId: order._id });
+        BaseController.sendSuccess(res, "Order cancelled successfully", { order }, 200);
+    });
+
+    static returnOrder = BaseController.asyncHandler(async (req, res) => {
+        const order = await OrderService.returnOrder(req.user.id, req.params.id);
+        BaseController.logAction("ORDER_RETURN", req.user, { orderId: order._id });
+        BaseController.sendSuccess(res, "Order returned successfully", { order }, 200);
+    });
 }
 
 module.exports = OrderController;

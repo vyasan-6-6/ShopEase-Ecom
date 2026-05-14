@@ -13,13 +13,9 @@ const Login = memo(() => {
 
     useEffect(() => {
         if (user) {
-            if (user.role === 'admin') {
-                navigate("/admin/dashboard", { replace: true });
-            } else {
-                const searchParams = new URLSearchParams(location.search);
-                const redirectPath = searchParams.get("redirect") || "/";
-                navigate(redirectPath, { replace: true });
-            }
+            const searchParams = new URLSearchParams(location.search);
+            const redirectPath = searchParams.get("redirect") || "/";
+            navigate(redirectPath, { replace: true });
         }
     }, [navigate, user, location.search]);
 

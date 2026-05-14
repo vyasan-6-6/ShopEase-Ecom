@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../../redux/hooks";
 import { selectUser } from "../../redux/features/auth/authSelectors";
+import { selectWalletBalance } from "../../redux/features/wallet/walletSelectors";
+import { fetchWallet } from "../../redux/features/wallet/walletSlice";
 import { useForm } from "react-hook-form";
 import { updateProfile, uploadAvatar } from "../../redux/features/auth/authSlice";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
-import { Camera, User, Mail, Phone } from "lucide-react";
+import { Camera, User, Mail, Phone, Wallet } from "lucide-react";
 import clsx from "clsx";
 import { toast } from "react-toastify";
 
 const UserProfile = () => {
     const dispatch = useAppDispatch();
     const user = useSelector(selectUser);
+    const walletBalance = useSelector(selectWalletBalance);
     const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        dispatch(fetchWallet());
+    }, [dispatch]);
 
     const {
         register,
@@ -77,6 +84,14 @@ const UserProfile = () => {
                     <div className="text-center md:text-left">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tight">Personal Details</h2>
                         <p className="text-gray-500 font-medium mt-1">Manage your account information and avatar</p>
+                    </div>
+
+                    <div className="ml-auto bg-green-50 px-6 py-4 rounded-2xl border border-green-100 flex flex-col items-end shadow-sm">
+                        <div className="flex items-center gap-2 text-green-700 font-bold text-sm mb-1">
+                            <Wallet className="w-4 h-4" />
+                            Wallet Balance
+                        </div>
+                        <div className="text-2xl font-black text-green-900">${walletBalance.toFixed(2)}</div>
                     </div>
                 </div>
 

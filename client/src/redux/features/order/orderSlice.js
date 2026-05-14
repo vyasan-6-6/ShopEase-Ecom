@@ -40,6 +40,30 @@ export const fetchMyOrders = createAsyncThunk(
     }
 );
 
+export const cancelOrderThunk = createAsyncThunk(
+    "order/cancelOrder",
+    async (orderId, { rejectWithValue }) => {
+        try {
+            const res = await orderApi.cancelOrder(orderId);
+            return res.data.order;
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+export const returnOrderThunk = createAsyncThunk(
+    "order/returnOrder",
+    async (orderId, { rejectWithValue }) => {
+        try {
+            const res = await orderApi.returnOrder(orderId);
+            return res.data.order;
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
 const initialState = {
     orders: [],
     currentOrder: null,
@@ -95,6 +119,40 @@ const orderSlice = createSlice({
                 state.orders = action.payload;
             })
             .addCase(fetchMyOrders.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            // Cancel Order
+            .addCase(cancelOrderThunk.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(cancelOrderThunk.fulfilled, (state, action) => {
+                state.loading = false;
+                const updatedOrder = action.payload;
+                state.orders = state.orders.map(o => o._id === updatedOrder._id ? updatedOrder : o);//replace that order which is cancelled with the new updated order
+                if (state.currentOrder && state.currentOrder.order?._id === updatedOrder._id) {//current order is assigned to current user when it is created in payment page 
+                    state.currentOrder.order = updatedOrder;//update it here when it is cancelled
+                }
+            })
+            .addCase(cancelOrderThunk.rejected, (state, action) => {
+                state.loading = false;//when cancelled order failed
+                state.error = action.payload;//error will be set
+            })
+            // Return Order
+            .addCase(returnOrderThunk.pending, (state) => { 
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(returnOrderThunk.fulfilled, (state, action) => { 
+                state.loading = false; 
+                const updatedOrder = action.payload;
+                state.orders = state.orders.map(o => o._id === updatedOrder._id ? updatedOrder : o);//replace that order which is returned with the new updated order
+                if (state.currentOrder && state.currentOrder.order?._id === updatedOrder._id) {//current order is assigned to current user when it is created in payment page 
+                    state.currentOrder.order = updatedOrder;//update it here when it is returned
+                }
+            })
+            .addCase(returnOrderThunk.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

@@ -15,4 +15,10 @@ router.post('/verify-payment', OrderController.verifyPayment);
 // Get logged in user's orders
 router.get('/my-orders', OrderController.getUserOrders);
 
+// Cancel an order
+router.post('/:id/cancel', OrderController.cancelOrder);
+
+// Return an order
+router.post('/:id/return', OrderController.returnOrder);
+
 module.exports = router;

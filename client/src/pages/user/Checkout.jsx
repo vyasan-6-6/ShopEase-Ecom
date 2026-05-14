@@ -71,17 +71,17 @@ const Checkout = () => {
  
     const handlePaymentSuccess = async (response) => {
         try {
-            await dispatch(verifyPayment({
+            const verifyRes = await dispatch(verifyPayment({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature
             })).unwrap();//removes Redux action wrapper and gives actual success/error directly.
-            
+            console.log("verifyRes",verifyRes);
             // Clean up Redux state after successful online payment
             dispatch(clearValidatedCoupon());
             dispatch(clearUserCart());
             toast.success("Payment successful! Order placed.");
-            navigate("/shop"); // redirect to orders page ideally
+            navigate(`/order-confirmation/${verifyRes.order._id}`); // redirect to confirmation page
         } catch (error) {
             toast.error(error || "Payment verification failed.");
         }
@@ -99,11 +99,11 @@ const Checkout = () => {
             };
 
             const response = await dispatch(createOrder(orderData)).unwrap();
-
             if (paymentMethod === "COD") {
                 dispatch(clearValidatedCoupon());
+                dispatch(clearUserCart());
                 toast.success("Order placed successfully via Cash on Delivery!");
-                navigate("/shop"); // redirect to orders page ideally
+                navigate(`/order-confirmation/${response.order._id}`); // redirect to confirmation page
                 return;
             }
 
@@ -116,11 +116,11 @@ const Checkout = () => {
 
                 const options = {
                     key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Ensure you expose this in frontend .env
-                    amount: response.data.amount,
-                    currency: response.data.currency,
+                    amount: response.amount,
+                    currency: response.currency,
                     name: "ShopEase",
                     description: "Order Payment",
-                    order_id: response.data.razorpayOrderId,
+                    order_id: response.razorpayOrderId,
                     handler: handlePaymentSuccess,
                     prefill: {
                         name: user?.name || "Customer",

@@ -71,12 +71,14 @@ useEffect(()=>{
              <Input
           label="Admin Email" 
           type="email"
+          placeholder="Enter your email"
           {...register("email",{required:"Email is required"})} 
           error={errors.email?.message || serverErrors.email}
         />
           <Input
           label="Password" 
           type="password"
+          placeholder="Enter your password"
           {...register("password",{required:"Password is required"})}  
           error={errors.password?.message || serverErrors.password}
         />

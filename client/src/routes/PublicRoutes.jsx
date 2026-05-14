@@ -7,6 +7,7 @@ import Shop from "../pages/public/Shop";
 import SingleProduct from "../pages/public/SingleProduct";
 import Cart from "../pages/public/Cart";
 import Checkout from "../pages/user/Checkout";
+import OrderConfirmation from "../pages/user/OrderConfirmation";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -25,6 +26,7 @@ const PublicRoutes = () => {
                 
                 <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
                     <Route path="checkout" element={<Checkout />} />
+                    <Route path="order-confirmation/:id" element={<OrderConfirmation />} />
                 </Route>
                 
                 {/* Guest-only: logged-in users are redirected to dashboard */}

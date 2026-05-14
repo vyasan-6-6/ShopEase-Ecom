@@ -118,13 +118,7 @@ class OrderService {
             .update(body.toString())
             .digest("hex");
 
-        const isAuthentic = expectedSignature === razorpay_signature;
-        console.log("isAuthentic", isAuthentic);
-        console.log("expectedSignature", expectedSignature);
-        console.log("razorpay_signature", razorpay_signature);
-        console.log("body", body);
-        console.log("razorpay_order_id", razorpay_order_id);
-        console.log("razorpay_payment_id", razorpay_payment_id);
+        const isAuthentic = expectedSignature === razorpay_signature; 
         if (isAuthentic) {
             order.paymentStatus = 'Completed';
             order.razorpayPaymentId = razorpay_payment_id;
@@ -149,6 +143,46 @@ class OrderService {
         return await Order.find({ user: userId }) 
             .populate("items.product", "name images price")
             .sort({ createdAt: -1 });
+    }
+
+    static async cancelOrder(userId, orderId) {
+        const order = await Order.findOne({ _id: orderId, user: userId });
+        if (!order) throw ErrorFactory.notFound("Order not found");
+        
+        if (!['Processing', 'Pending'].includes(order.orderStatus)) {
+            throw ErrorFactory.badRequest(`Cannot cancel order. Status is ${order.orderStatus}`);
+        }
+        
+        order.orderStatus = 'Cancelled';
+        
+        if (order.paymentStatus === 'Completed') {
+            order.paymentStatus = 'Refunded';
+            const WalletService = require("./WalletService");
+            await WalletService.addFunds(userId, order.totalAmount, "Refund for cancelled order", orderId);
+        }
+        
+        await order.save();
+        return order;
+    }
+
+    static async returnOrder(userId, orderId) {
+        const order = await Order.findOne({ _id: orderId, user: userId });
+        if (!order) throw ErrorFactory.notFound("Order not found");
+        
+        if (order.orderStatus !== 'Delivered') {
+            throw ErrorFactory.badRequest(`Cannot return order. Status is ${order.orderStatus}`);
+        }
+        
+        order.orderStatus = 'Returned';
+        
+        if (order.paymentStatus === 'Completed') {
+            order.paymentStatus = 'Refunded';
+            const WalletService = require("./WalletService"); //  circular dependency avoided
+            await WalletService.addFunds(userId, order.totalAmount, "Refund for returned order", orderId);
+        }
+        
+        await order.save();
+        return order;
     }
 }
 
