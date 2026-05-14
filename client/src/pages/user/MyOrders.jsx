@@ -5,11 +5,13 @@ import Button from "../../components/common/Button";
 import { Package, XCircle, RotateCcw, Truck } from "lucide-react";
 import { toast } from "react-toastify";
 import { confirmAction } from "../../utils/alerts";
+import { selectMyOrders, selectOrderLoading } from "../../redux/features/order/orderSelectors";
 
 const MyOrders = () => {
+
     const dispatch = useAppDispatch();
-    const orders = useAppSelector((state) => state.order.orders);
-    const loading = useAppSelector((state) => state.order.loading);
+    const orders = useAppSelector(selectMyOrders);
+    const loading = useAppSelector(selectOrderLoading);
 
     useEffect(() => {
         dispatch(fetchMyOrders());

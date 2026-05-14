@@ -162,6 +162,7 @@ class OrderService {
         }
         
         await order.save();
+        await order.populate("items.product", "name images price");
         return order;
     }
 
@@ -182,6 +183,7 @@ class OrderService {
         }
         
         await order.save();
+        await order.populate("items.product", "name images price");
         return order;
     }
 }

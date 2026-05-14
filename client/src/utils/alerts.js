@@ -24,6 +24,11 @@ export const confirmDelete = async (title = "Are you sure?", text = "You won't b
     return result.isConfirmed;
 };
 
+const conf = async()=>{
+    const res = await Swal.fire({
+        
+    })
+}
 export const confirmAction = async (title = "Are you sure?", text = "Do you want to proceed?", confirmButtonText = "Yes") => {
     const result = await Swal.fire({
         title,
