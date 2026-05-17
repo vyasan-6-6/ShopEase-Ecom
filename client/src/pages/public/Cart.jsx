@@ -16,6 +16,7 @@ import {
     selectCartLoading 
 } from "../../redux/features/cart/cartSelectors";
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
+import { selectIsAdminAuthenticated } from "../../redux/features/auth/adminAuthSelectors";
 import { validateCoupon, clearValidatedCoupon } from "../../redux/features/coupon/couponSlice";
 import { selectValidatingCoupon, selectValidatedCoupon } from "../../redux/features/coupon/couponSelectors";
 import Button from "../../components/common/Button";
@@ -32,6 +33,7 @@ const Cart = () => {
     const total = useAppSelector(selectCartTotal);
     const loading = useAppSelector(selectCartLoading);
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
+    const isAdminAuthenticated = useAppSelector(selectIsAdminAuthenticated);
     
     // Coupon State
     const validatingCoupon = useAppSelector(selectValidatingCoupon);
@@ -39,10 +41,10 @@ const Cart = () => {
     const [couponCode, setCouponCode] = useState("");
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated || isAdminAuthenticated) {
             dispatch(fetchCart());
         }
-    }, [dispatch, isAuthenticated]);
+    }, [dispatch, isAuthenticated, isAdminAuthenticated]);
 
     // Clear coupon if cart becomes empty or if total changes below min order amount
     useEffect(() => {
@@ -59,7 +61,7 @@ const Cart = () => {
     const handleQuantityChange = (productId, newQuantity) => {
         if (newQuantity < 1) return;
         
-        if (isAuthenticated) {
+        if (isAuthenticated || isAdminAuthenticated) {
             dispatch(updateCartItemQuantity({ productId, quantity: newQuantity }));
         } else {
             dispatch(updateQuantityLocal({ productId, quantity: newQuantity }));
@@ -70,7 +72,7 @@ const Cart = () => {
         const confirmed = await confirmDelete("Remove Item?", "Are you sure you want to remove this item from your cart?");
         if (!confirmed) return;
         
-        if (isAuthenticated) {
+        if (isAuthenticated || isAdminAuthenticated) {
             dispatch(removeItemFromCart(productId));
         } else {
             dispatch(removeFromCartLocal(productId));
@@ -81,7 +83,7 @@ const Cart = () => {
         const confirmed = await confirmDelete("Clear Cart?", "Are you sure you want to remove all items from your cart?");
         if (!confirmed) return;
 
-        if (isAuthenticated) {
+        if (isAuthenticated || isAdminAuthenticated) {
             dispatch(clearUserCart());
         } else {
             dispatch(clearCartLocal());
@@ -105,7 +107,7 @@ const Cart = () => {
     };
 
     const handleCheckout = () => {
-        if (isAuthenticated) {
+        if (isAuthenticated || isAdminAuthenticated) {
             navigate("/checkout");
         } else {
             // Redirect to login but save the intent to come back to checkout

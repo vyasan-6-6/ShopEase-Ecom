@@ -5,6 +5,7 @@ import { fetchProductById, clearSelectedProduct } from "../../redux/features/pro
 import { selectSelectedProduct, selectProductLoading, selectProductError } from "../../redux/features/product/productSelectors";
 import { addItemToCart, addToCartLocal } from "../../redux/features/cart/cartSlice";
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
+import { selectIsAdminAuthenticated } from "../../redux/features/auth/adminAuthSelectors";
 import Button from "../../components/common/Button";
 import { ArrowLeft, ShoppingCart, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -18,6 +19,7 @@ const SingleProduct = () => {
     const loading = useAppSelector(selectProductLoading);
     const error = useAppSelector(selectProductError);
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
+    const isAdminAuthenticated = useAppSelector(selectIsAdminAuthenticated);
 
     const [quantity, setQuantity] = useState(1);
     const [mainImage, setMainImage] = useState("");
@@ -44,7 +46,7 @@ const SingleProduct = () => {
 
         const productId = product.id || product._id;
 
-        if (isAuthenticated) {
+        if (isAuthenticated || isAdminAuthenticated) {
             dispatch(addItemToCart({ productId, quantity }));
         } else {
             dispatch(addToCartLocal({ 
@@ -184,14 +186,23 @@ const SingleProduct = () => {
                                 </span>
                             </div>
 
-                            <Button
-                                className="w-full py-4 text-lg"
-                                onClick={handleAddToCart}
-                                disabled={product.stock === 0}
-                            >
-                                <ShoppingCart className="w-5 h-5 mr-2" />
-                                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
-                            </Button>
+                            {product.status === "draft" ? (
+                                <Button
+                                    className="w-full py-4 text-lg bg-amber-100 text-amber-700 hover:bg-amber-200 border-none disabled:bg-amber-100 disabled:text-amber-700 disabled:opacity-100"
+                                    disabled={true}
+                                >
+                                    Available Soon
+                                </Button>
+                            ) : (
+                                <Button
+                                    className="w-full py-4 text-lg"
+                                    onClick={handleAddToCart}
+                                    disabled={product.stock === 0}
+                                >
+                                    <ShoppingCart className="w-5 h-5 mr-2" />
+                                    {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>

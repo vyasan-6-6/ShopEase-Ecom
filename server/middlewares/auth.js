@@ -54,7 +54,7 @@ const requireAdmin = (req, res, next) => {
 };
 const authenticateAdminOptional = (req, res, next) => {
   const authHeader = req.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader ||!authHeader.startsWith('Bearer ')) {
     return next();
   }
   const token = authHeader.split(' ')[1];

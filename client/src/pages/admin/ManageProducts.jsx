@@ -31,6 +31,7 @@ const ManageProducts = () => {
     const categories = useAppSelector(selectAllCategories);
     
     const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
     const [modalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
@@ -91,10 +92,12 @@ const ManageProducts = () => {
         setViewModalOpen(true);
     };
 
-    const filteredProducts = products.filter((prod) =>
-        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prod.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredProducts = products.filter((prod) => {
+        const matchesSearch = prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            prod.category?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = statusFilter === "all" || prod.status === statusFilter;
+        return matchesSearch && matchesStatus;  
+    });
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -111,14 +114,29 @@ const ManageProducts = () => {
                 </Button>
             </div>
 
-            {/* Search Bar */}
-            <div className="max-w-md">
-                <Input
-                    leftIcon={Search}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products by name or category..."
-                />
+            {/* Search and Filter Bar */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 max-w-md">
+                    <Input
+                        leftIcon={Search}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search products..."
+                    />
+                </div>
+                <div className="flex items-center gap-4">
+                    <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">Status:</label>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl px-6 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer shadow-sm"
+                    >
+                        <option value="all">All Products</option>
+                        <option value="active">Active Only</option>
+                        <option value="draft">Drafts Only</option>
+                        <option value="inactive">Inactive Only</option>
+                    </select>
+                </div>
             </div>
 
             {/* Products Table */}

@@ -6,15 +6,29 @@ import { useAppSelector } from "../redux/hooks";
 // Accepts an array of allowed roles, e.g., ["admin"] or ["user"]
 const ProtectedRoute = ({ allowedRoles = ["user"] }) => {
     const isAdminRoute = allowedRoles.includes("admin");
-    
+
     // Select state based on route type
     const user = useAppSelector(selectUser);
     const admin = useAppSelector(selectAdmin);
     const userLoading = useAppSelector(selectAuthLoading);
     const adminLoading = useAppSelector(selectAdminLoading);
 
-    const currentUser = isAdminRoute ? admin : user;
-    const isLoading = isAdminRoute ? adminLoading : userLoading;
+    let currentUser = null;
+    let isLoading = false;
+
+    // Check if it allows multiple roles
+    const isMixedRoute = allowedRoles.includes("user") && allowedRoles.includes("admin");
+
+    if (isMixedRoute) {
+        currentUser = user || admin;
+        isLoading = userLoading || adminLoading;
+    } else if (allowedRoles.includes("admin")) {
+        currentUser = admin;
+        isLoading = adminLoading;
+    } else {
+        currentUser = user;
+        isLoading = userLoading;
+    }
 
     if (isLoading) {
         return (
@@ -25,11 +39,15 @@ const ProtectedRoute = ({ allowedRoles = ["user"] }) => {
     }
 
     if (!currentUser) {
-        return <Navigate to={isAdminRoute ? "/admin/login" : "/auth/login"} replace />;
+        if (allowedRoles.includes("admin") && !allowedRoles.includes("user")) {
+            return <Navigate to="/admin/login" replace />;
+        }
+        return <Navigate to="/auth/login" replace />;
     }
 
     // Role check (for mixed role routes if any)
-    if (!allowedRoles.includes(currentUser.role)) {
+    const resolvedRole = currentUser.role || (currentUser === admin ? "admin" : "user");
+    if (!allowedRoles.includes(resolvedRole)) {
         return <Navigate to="/" replace />;
     }
 

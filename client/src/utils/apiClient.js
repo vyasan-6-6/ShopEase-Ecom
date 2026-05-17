@@ -54,10 +54,8 @@ const createApiClient = (getToken) => {
             console.log("INTERCEPTOR CAUGHT 401. URL:", error.config?.url, "PATH:", window.location.pathname, "isAuthApi:", isAuthApi, "isAuthPage:", isAuthPage);
             
             if (status === 401 && !isAuthApi && !isAuthPage) {
-                console.warn("Unauthorized access detected. Redirecting to login...", {
-                    url: error.config?.url,
-                    path: window.location.pathname
-                });
+                console.warn("Unauthorized access detected. Clearing session and redirecting...");
+                tokenService.clearAll(); // Clear localStorage to break the loop
                 window.location.href = "/auth/login";
             }
             // Handle forbidden

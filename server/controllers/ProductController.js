@@ -37,7 +37,7 @@ class ProductController extends BaseController {
         const query = {};//create empty filter object for mongodb
 
         if (!req.admin) {//if req is from normal users , only fetch active products
-            query.status = "active";
+            query.status = ['active','draft'];
         }
 
         // Optional category filtering
@@ -71,7 +71,7 @@ class ProductController extends BaseController {
     static getById = BaseController.asyncHandler(async (req, res) => {
         const product = await ProductService.getProductById(req.params.id);
         
-        if (!product || (!req.admin && product.status !== "active")) {
+        if (!product || (!req.admin && !(product.status === "active" || product.status === "draft"))) {
             return BaseController.sendError(res, "Product not found", 404);
         }
 
@@ -82,7 +82,7 @@ class ProductController extends BaseController {
     static getBySlug = BaseController.asyncHandler(async (req, res) => {
         const product = await ProductService.getProductBySlug(req.params.slug);
         
-        if (!product || (!req.admin && product.status !== "active")) {
+        if (!product || (!req.admin && !(product.status == "active" || product.status == "draft"))) {
             return BaseController.sendError(res, "Product not found", 404);
         }
 

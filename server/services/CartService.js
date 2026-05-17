@@ -27,7 +27,9 @@ class CartService {
         if (!product) {
             throw ErrorFactory.notFound("Product not found");
         }
-
+        if (product.status === "draft" || product.status === "inactive") {
+            throw ErrorFactory.badRequest("Product is not available for purchase");
+        }
         let cart = await Cart.findOne({ user: userId });
 
         if (!cart) {

@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { fetchPublicProducts } from "../../redux/features/product/productSlice";
+import ProductCard from "../../components/common/ProductCard";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
 import { selectPublicProducts, selectProductPagination, selectProductLoading } from "../../redux/features/product/productSelectors";
 import { selectActiveCategories, selectCategoryLoading } from "../../redux/features/category/categorySelectors";
-import { addItemToCart, addToCartLocal } from "../../redux/features/cart/cartSlice";
-import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
-import { ShoppingCart } from "lucide-react";
-import { toast } from "react-toastify";
 import Button from "../../components/common/Button";
 
 const Shop = () => {
@@ -16,8 +13,7 @@ const Shop = () => {
     const navigate = useNavigate();
     const products = useSelector(selectPublicProducts);
     const pagination = useSelector(selectProductPagination);
-    const productsLoading = useSelector(selectProductLoading);
-    const isAuthenticated = useSelector(selectIsAuthenticated);
+    const productsLoading = useSelector(selectProductLoading); 
 
     const categories = useSelector(selectActiveCategories);
     const categoriesLoading = useSelector(selectCategoryLoading);
@@ -118,84 +114,7 @@ const Shop = () => {
                         <>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                                 {products.map((product) => (
-                                    <Link
-                                        to={`/product/${product.id || product._id}`}
-                                        key={product.id || product._id}
-                                        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group flex flex-col hover:-translate-y-1"
-                                    >
-                                        <div className="aspect-4/3 bg-gray-100 relative overflow-hidden">
-                                            {product.images && product.images.length > 0 ? (
-                                                <img
-                                                    src={product.images[0]}
-                                                    alt={product.name}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400 font-medium">No Image</div>
-                                            )}
-                                            {product.status === "draft" && (
-                                                <div className="absolute top-3 right-3 bg-amber-100/90 backdrop-blur-sm text-amber-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm z-10 border border-amber-200">
-                                                    Draft
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-5 flex flex-col flex-1">
-                                            <div className="text-xs font-semibold text-indigo-600 mb-2 uppercase tracking-wider">
-                                                {product.category?.name || "Uncategorized"}
-                                            </div>
-                                            <h3 className="text-lg font-bold text-gray-900 mb-1 leading-tight">{product.name}</h3>
-                                            <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">{product.description}</p>
-
-                                            <div className="flex items-center justify-between mt-auto">
-                                                <div className="flex flex-col">
-                                                    {product.compareAtPrice > product.price && (
-                                                        <span className="text-xs text-gray-400 line-through">${product.compareAtPrice.toFixed(2)}</span>
-                                                    )}
-                                                    <span className="text-xl font-extrabold text-gray-900">${product.price.toFixed(2)}</span>
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <Button 
-                                                        size="sm" 
-                                                        variant="outline"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            navigate(`/product/${product.id || product._id}`);
-                                                        }}
-                                                    >
-                                                        Details
-                                                    </Button>
-                                                    <Button 
-                                                        size="sm" 
-                                                        variant="primary" 
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            
-                                                            const productId = product.id || product._id;
-                                                            if (isAuthenticated) {
-                                                                dispatch(addItemToCart({ productId, quantity: 1 }));
-                                                            } else {
-                                                                dispatch(addToCartLocal({ 
-                                                                    productId, 
-                                                                    product: {
-                                                                        id: productId,
-                                                                        name: product.name,
-                                                                        price: product.price,
-                                                                        images: product.images
-                                                                    }, 
-                                                                    quantity: 1 
-                                                                }));
-                                                            }
-                                                            toast.success("Added to cart!");
-                                                        }}
-                                                    >
-                                                        <ShoppingCart className="w-4 h-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
+                                    <ProductCard key={product.id || product._id} product={product} />
                                 ))}
                             </div>
 

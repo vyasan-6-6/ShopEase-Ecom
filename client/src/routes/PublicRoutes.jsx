@@ -24,7 +24,7 @@ const PublicRoutes = () => {
                 <Route path="cart" element={<Cart />} />
                 <Route path="500" element={<ServerError />} />
                 
-                <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+                <Route element={<ProtectedRoute allowedRoles={["user", "admin"]} />}>
                     <Route path="checkout" element={<Checkout />} />
                     <Route path="order-confirmation/:id" element={<OrderConfirmation />} />
                 </Route>

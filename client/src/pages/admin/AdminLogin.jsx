@@ -67,7 +67,7 @@ useEffect(()=>{
                 Back to User Login
             </Button>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
              <Input
           label="Admin Email" 
           type="email"
@@ -82,9 +82,23 @@ useEffect(()=>{
           {...register("password",{required:"Password is required"})}  
           error={errors.password?.message || serverErrors.password}
         />
-        <Button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Admin Login"}
-        </Button>
+        <div className="pt-2">
+            <Button fullWidth type="submit" disabled={loading} loading={loading}>
+              {loading ? "Logging in..." : "Admin Login"}
+            </Button>
+        </div>
+          <div className="text-center">
+    <p className="text-sm text-gray-500 font-medium">
+      Not an admin?{" "}
+      <button 
+      type="button"
+        onClick={() => navigate("/auth/login")}
+        className="text-indigo-600 hover:text-indigo-700 font-bold hover:underline transition-all"
+      >
+        Login as user
+      </button>
+    </p>
+  </div>
         </form>
     </AuthLayout>
    )
