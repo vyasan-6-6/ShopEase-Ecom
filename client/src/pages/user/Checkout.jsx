@@ -13,7 +13,7 @@ import { clearValidatedCoupon } from "../../redux/features/coupon/couponSlice";
 import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { toast } from "react-toastify";
-import { Loader2, CreditCard, Banknote, ShieldCheck } from "lucide-react";
+import { Loader2, CreditCard, Banknote, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 import { checkoutSchema } from "../../utils/checkoutSchema";
 
@@ -44,8 +44,9 @@ const Checkout = () => {
     const appliedCoupon = useAppSelector(selectValidatedCoupon);
     
     const [paymentMethod, setPaymentMethod] = useState("COD");
+    const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
     
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: yupResolver(checkoutSchema),
         defaultValues: {
             street: "",
@@ -59,6 +60,35 @@ const Checkout = () => {
 
     const discountAmount = appliedCoupon ? (total * (appliedCoupon.discountPercent / 100)) : 0;
     const finalTotal = Math.max(0, total - discountAmount);//prevent final price from going below 0
+
+    useEffect(() => {
+        if (user?.addresses?.length > 0) {
+            let defaultIndex = user.addresses.findIndex(a => a.isDefault);
+            if (defaultIndex === -1) defaultIndex = 0;
+            
+            const defaultAddress = user.addresses[defaultIndex];
+            if (defaultAddress) {
+                setSelectedAddressIndex(defaultIndex);
+                setValue("street", defaultAddress.street);
+                setValue("city", defaultAddress.city);
+                setValue("state", defaultAddress.state);
+                setValue("zipCode", defaultAddress.zipCode);
+                setValue("country", defaultAddress.country);
+            }
+        }
+        if (user?.phone) {
+            setValue("phone", user.phone);
+        }
+    }, [user, setValue]);
+
+    const handleSelectAddress = (addr, index) => {
+        setSelectedAddressIndex(index);
+        setValue("street", addr.street);
+        setValue("city", addr.city);
+        setValue("state", addr.state);
+        setValue("zipCode", addr.zipCode);
+        setValue("country", addr.country);
+    };
 
     useEffect(() => {
         if (!cartLoading && items.length === 0) {
@@ -156,6 +186,44 @@ const Checkout = () => {
                         <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                             Shipping Details
                         </h2>
+                        
+                        {user?.addresses?.length > 0 && (
+                            <div className="mb-8 p-5 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                <label className="text-sm font-bold text-gray-700 mb-4 block">Quick Select Address</label>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {user.addresses.map((addr, idx) => {
+                                        const isSelected = selectedAddressIndex === idx;
+                                        return (
+                                            <div 
+                                                key={idx}
+                                                onClick={() => handleSelectAddress(addr, idx)}
+                                                className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                                                    isSelected 
+                                                        ? 'border-indigo-600 bg-indigo-50/30 shadow-md' 
+                                                        : 'border-gray-200 hover:border-indigo-300 bg-white hover:shadow-md'
+                                                }`}
+                                            >
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="font-bold text-gray-900 capitalize flex items-center gap-2">
+                                                        {addr.label}
+                                                        {addr.isDefault && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full uppercase tracking-wider font-black">Default</span>}
+                                                    </span>
+                                                    {isSelected && (
+                                                        <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+                                                    )}
+                                                </div>
+                                                <p className="text-sm text-gray-500 line-clamp-1">{addr.street}</p>
+                                                <p className="text-sm text-gray-500">{addr.city}, {addr.state} {addr.zipCode}</p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <div className="mt-6 mb-2 flex items-center gap-4 before:h-px before:flex-1 before:bg-gray-200 after:h-px after:flex-1 after:bg-gray-200">
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Or enter manually</span>
+                                </div>
+                            </div>
+                        )}
+
                         <form id="checkoutForm" onSubmit={handleSubmit(processCheckout)} className="space-y-5">
                             <Input
                                 label="Street Address"
