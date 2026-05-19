@@ -37,7 +37,7 @@ class ProductController extends BaseController {
         const query = {};//create empty filter object for mongodb
 
         if (!req.admin) {//if req is from normal users , only fetch active products
-            query.status = ['active','draft'];
+            query.status = { $in: ['active','draft'] };//used to fetch only active and draft products ,$in is used to check if the status is either active or draft
         }
 
         // Optional category filtering
@@ -50,11 +50,23 @@ class ProductController extends BaseController {
             query.name = { $regex: req.query.search, $options: "i" };
         }
 
+        // Price Filtering 
+        if (req.query.minPrice || req.query.maxPrice) {
+            query.price = {};
+            if (req.query.minPrice) query.price.$gte = Number(req.query.minPrice);
+            if (req.query.maxPrice) query.price.$lte = Number(req.query.maxPrice);
+        }
+
         const page = parseInt(req.query.page) || 1;    //get page number from query parameter or default to 1
         const limit = parseInt(req.query.limit) || 10; //get limit from query parameter or default to 10
         const skip = (page - 1) * limit;           //calculate skip value
 
-        const { products, total } = await ProductService.getProducts(query, skip, limit);
+        // Sorting 
+        let sortOption = { createdAt: -1 };
+        if (req.query.sort === "price_asc") sortOption = { price: 1 };
+        if (req.query.sort === "price_desc") sortOption = { price: -1 };
+
+        const { products, total } = await ProductService.getProducts(query, skip, limit, sortOption);
         
         BaseController.sendSuccess(res, "Products fetched successfully", { 
             products,

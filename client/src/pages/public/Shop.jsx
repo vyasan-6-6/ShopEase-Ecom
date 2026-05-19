@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams  } from "react-router-dom";
 import { fetchPublicProducts } from "../../redux/features/product/productSlice";
 import ProductCard from "../../components/common/ProductCard";
 import { fetchCategories } from "../../redux/features/category/categorySlice";
@@ -9,8 +9,7 @@ import { selectActiveCategories, selectCategoryLoading } from "../../redux/featu
 import Button from "../../components/common/Button";
 
 const Shop = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const dispatch = useDispatch(); 
     const products = useSelector(selectPublicProducts);
     const pagination = useSelector(selectProductPagination);
     const productsLoading = useSelector(selectProductLoading); 
@@ -22,8 +21,15 @@ const Shop = () => {
     const category = searchParams.get("category");
     const search = searchParams.get("search");
 
+    const sort = searchParams.get("sort");
+    const minParam = searchParams.get("minPrice");
+    const maxParam = searchParams.get("maxPrice");
+
     const [selectedCategory, setSelectedCategory] = useState(category || "");
     const [searchQuery, setSearchQuery] = useState(search || "");
+    const [sortOrder, setSortOrder] = useState(sort || "newest");
+    const [minPrice, setMinPrice] = useState(minParam || "");
+    const [maxPrice, setMaxPrice] = useState(maxParam || "");
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
@@ -31,19 +37,26 @@ const Shop = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        dispatch(fetchPublicProducts({ 
+        const params = { 
             page: currentPage, 
             limit: 10, 
             category: selectedCategory,
-            search: searchQuery 
-        }));
-    }, [dispatch, currentPage, selectedCategory, searchQuery]);
+            search: searchQuery,
+            sort: sortOrder
+        };
+        if (minPrice) params.minPrice = minPrice;
+        if (maxPrice) params.maxPrice = maxPrice;
+        dispatch(fetchPublicProducts(params));
+    }, [dispatch, currentPage, selectedCategory, searchQuery, sortOrder, minPrice, maxPrice]);
 
-    useEffect(() => { 
+ useEffect(()=>{
         setSelectedCategory(category || ""); 
         setSearchQuery(search || "");
+        setSortOrder(sort || "newest");
+        setMinPrice(minParam || "");
+        setMaxPrice(maxParam || "");
         setCurrentPage(1);
-    }, [category, search]);
+    }, [category, search, sort, minParam, maxParam]);
 
     const handleCategoryClick = (categoryId) => {
         setSearchParams({ category:categoryId });// this for url change 
@@ -70,7 +83,7 @@ const Shop = () => {
                         {categoriesLoading ? (
                             <p className="text-gray-500 text-sm">Loading categories...</p>
                         ) : (
-                            <ul className="space-y-2">
+                            <ul className="space-y-2 max-h-80 overflow-y-auto pr-2">
                                 <li>
                                     <button
                                         onClick={() => handleCategoryClick("")}
@@ -98,17 +111,83 @@ const Shop = () => {
                             </ul>
                         )}
                     </div>
+                    
+                    {/* Price Filter */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+                        <h2 className="text-lg font-bold text-gray-900 mb-4">Price Range</h2>
+                        <div className="flex items-center gap-2 mb-4">
+                            <input 
+                                type="number" 
+                                placeholder="Min" 
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                                className="w-full bg-gray-50 border-transparent rounded-xl py-2 px-3 text-sm focus:bg-white focus:border-indigo-100 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium"
+                                min="0"
+                            />
+                            <span className="text-gray-400 font-medium">-</span>
+                            <input 
+                                type="number" 
+                                placeholder="Max" 
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                                className="w-full bg-gray-50 border-transparent rounded-xl py-2 px-3 text-sm focus:bg-white focus:border-indigo-100 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium"
+                                min="0"
+                            />
+                        </div>
+                        <Button 
+                            onClick={() => {
+                                setSearchParams(prev => {
+                                    const p = new URLSearchParams(prev); 
+                                    if (minPrice) p.set("minPrice", minPrice);
+                                    else p.delete("minPrice");
+                                    if (maxPrice) p.set("maxPrice", maxPrice);
+                                    else p.delete("maxPrice");
+                                    p.set("page", "1");
+                                    return p;
+                                });
+                                setCurrentPage(1);
+                            }}
+                            className="w-full py-2"
+                        >
+                            Apply Filter
+                        </Button>
+                    </div>
                 </aside>
 
                 {/* Main Content - Products Grid */}
                 <main className="flex-1">
+                    <div className="flex justify-between items-center mb-6">
+                        <p className="text-gray-500 font-medium">
+                            {products.length} {products.length === 1 ? 'Product' : 'Products'} Found
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-gray-500">Sort By:</span>
+                            <select
+                                value={sortOrder}
+                                onChange={(e) => {
+                                    setSortOrder(e.target.value);
+                                    setSearchParams(prev => {
+                                        const p = new URLSearchParams(prev);
+                                        p.set("sort", e.target.value);
+                                        return p;
+                                    });
+                                }}
+                                className="bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm"
+                            >
+                                <option value="newest">Newest First</option>
+                                <option value="price_asc">Price: Low to High</option>
+                                <option value="price_desc">Price: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
+
                     {productsLoading ? (
                         <div className="flex justify-center items-center h-64">
                             <span className="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
                         </div>
                     ) : products.length === 0 ? (
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-                            <p className="text-gray-500 text-lg">No products found in this category.</p>
+                            <p className="text-gray-500 text-lg">No products found.</p>
                         </div>
                     ) : (
                         <>
