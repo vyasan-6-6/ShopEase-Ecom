@@ -77,3 +77,12 @@ export const addressSchema = yup.object().shape({
         .max(100, "Country name is too long"),
     isDefault: yup.boolean(),
 });
+
+export const profileSchema = yup.object().shape({
+    name: yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
+    phone: yup.string().nullable().notRequired().test(
+        'is-valid-phone', 
+        'Please enter a valid phone number', 
+        (value) => !value || /^\+?[\d\s\-\(\)]+$/.test(value)
+    ),
+});

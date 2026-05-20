@@ -10,7 +10,9 @@ import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { Camera, User, Mail, Phone, Wallet } from "lucide-react";
 import clsx from "clsx";
-import { toast } from "react-toastify";
+import { toast } from "react-toastify"; 
+import { yupResolver } from "@hookform/resolvers/yup";
+import { profileSchema } from "../../utils/authSchema";
 
 const UserProfile = () => {
     const dispatch = useAppDispatch();
@@ -28,6 +30,7 @@ const UserProfile = () => {
         reset,
         formState: { errors, isDirty, isSubmitting },
     } = useForm({ 
+        resolver: yupResolver(profileSchema),
         defaultValues: { 
             email: user?.email, 
             name: user?.name,
@@ -117,10 +120,7 @@ const UserProfile = () => {
                             </label>
                             <Input
                                 name="name"
-                                {...register("name", {
-                                    required: "Name is required",
-                                    minLength: { value: 2, message: "Name must be at least 2 characters" },
-                                })}
+                                {...register("name")}
                                 disabled={!isEditing}
                                 placeholder="Your full name"
                                 error={errors.name?.message}
@@ -139,12 +139,7 @@ const UserProfile = () => {
                             <Input
                                 name="phone"
                                 disabled={!isEditing}
-                                {...register("phone", {
-                                    pattern: {
-                                        value: /^\+?[\d\s\-\(\)]+$/,
-                                        message: "Please enter a valid phone number",
-                                    },
-                                })}
+                                {...register("phone")}
                                 placeholder="Your phone number"
                                 error={errors?.phone?.message}
                                 className={clsx(

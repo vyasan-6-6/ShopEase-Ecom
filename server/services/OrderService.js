@@ -216,7 +216,7 @@ class OrderService {
             }
         }
         return await Order.find(filter)
-            .populate("user", "firstName lastName email")
+            .populate("user", "name email")
             .populate("items.product", "name images price")
             .sort({ createdAt: -1 });
     }
