@@ -3,7 +3,7 @@ import adminApi from "../../../services/AdminService";
 
 export const fetchAllOrders = createAsyncThunk(
     "adminOrder/fetchAllOrders",
-    async (params, { rejectWithValue }) => {
+    async (params = {}, { rejectWithValue }) => {
         try {
             const response = await adminApi.getAllOrders(params);
             return response.data.orders;

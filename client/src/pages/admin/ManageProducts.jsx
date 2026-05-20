@@ -1,5 +1,6 @@
 import { useState, useEffect, memo } from "react";
 import { Plus, Pencil, Trash2, Package, Search, Loader2, Image as ImageIcon, Eye } from "lucide-react";
+import { useDebounce } from "../../hooks/useDebounce";
 import ProductFormModal from "../../components/admin/ProductFormModal";
 import ProductViewModal from "../../components/admin/ProductViewModal";
 import { toast } from "react-toastify";
@@ -31,6 +32,7 @@ const ManageProducts = () => {
     const categories = useAppSelector(selectAllCategories);
     
     const [searchQuery, setSearchQuery] = useState("");
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
     const [statusFilter, setStatusFilter] = useState("all");
     const [modalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -93,8 +95,8 @@ const ManageProducts = () => {
     };
 
     const filteredProducts = products.filter((prod) => {
-        const matchesSearch = prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            prod.category?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = prod.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+            prod.category?.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
         const matchesStatus = statusFilter === "all" || prod.status === statusFilter;
         return matchesSearch && matchesStatus;  
     });

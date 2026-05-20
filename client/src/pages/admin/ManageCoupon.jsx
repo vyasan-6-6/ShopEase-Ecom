@@ -1,5 +1,6 @@
 import { useState, useEffect, memo } from "react";
 import { Plus, Pencil, Trash2, Ticket, Search, Loader2 } from "lucide-react";
+import { useDebounce } from "../../hooks/useDebounce";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { 
@@ -25,6 +26,7 @@ const ManageCoupon = () => {
     const isLoading = useAppSelector(selectCouponLoading);
     
     const [searchQuery, setSearchQuery] = useState("");
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
     const [modalOpen, setModalOpen] = useState(false);
     const [editingCoupon, setEditingCoupon] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
@@ -80,7 +82,7 @@ const ManageCoupon = () => {
     };
 
     const filteredCoupons = (coupons || []).filter((c) =>
-        c.code.toLowerCase().includes(searchQuery.toLowerCase())
+        c.code.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     );
 
     return (

@@ -1,34 +1,27 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { fetchAllOrders, updateOrderStatus } from "../../redux/features/order/adminOrderSlice"; import Swal from "sweetalert2";
+import { fetchAllOrders, updateOrderStatus } from "../../redux/features/order/adminOrderSlice";
+import Swal from "sweetalert2";
 import { Package, Search } from "lucide-react";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const AdminOrders = () => {
     const dispatch = useAppDispatch();
     const { orders, loading } = useAppSelector((state) => state.adminOrder);
-    
+
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(() => {
-        dispatch(fetchAllOrders({}));
-    }, [dispatch]);
-
-    const handleSearch = (e) => {
-        e.preventDefault();
         const params = {};
-        if (searchTerm) params.search = searchTerm;
+        if (debouncedSearchTerm) params.search = debouncedSearchTerm;
         if (statusFilter !== "All") params.status = statusFilter;
         dispatch(fetchAllOrders(params));
-    };
+    }, [dispatch, debouncedSearchTerm, statusFilter]);
 
     const handleStatusFilterChange = (e) => {
-        const newStatus = e.target.value;
-        setStatusFilter(newStatus);
-        const params = {};
-        if (searchTerm) params.search = searchTerm;
-        if (newStatus !== "All") params.status = newStatus;
-        dispatch(fetchAllOrders(params));
+        setStatusFilter(e.target.value);
     };
 
     const handleStatusUpdate = async (orderId, newStatus) => {
@@ -76,7 +69,7 @@ const AdminOrders = () => {
             </header>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
-                <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1 relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="h-5 w-5 text-gray-400" />
@@ -100,14 +93,7 @@ const AdminOrders = () => {
                             {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                     </div>
-
-                    <button
-                        type="submit"
-                        className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
-                    >
-                        Search
-                    </button>
-                </form>
+                </div>
             </div>
 
             {loading ? (
@@ -119,7 +105,7 @@ const AdminOrders = () => {
                     <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900">No orders found</h3>
                     <p className="mt-1 text-gray-500">Try adjusting your search or filters.</p>
-                </div>
+                </div>                                                                                          
             ) : (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
@@ -169,13 +155,10 @@ const AdminOrders = () => {
                                                 value={order.orderStatus}
                                                 onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
                                                 className="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500 p-1"
-                                                disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned'}
-                                            >
+                                                disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned' || order.orderStatus === 'Delivered'}
+                                            >   
                                                 {statusOptions.map(s => (
-                                                    <option key={s} value={s} disabled={
-                                                        (order.orderStatus === 'Delivered' && s === 'Processing') ||
-                                                        (order.orderStatus === 'Delivered' && s === 'Shipped')
-                                                    }>
+                                                    <option key={s} value={s}>
                                                         Mark {s}
                                                     </option>
                                                 ))}
