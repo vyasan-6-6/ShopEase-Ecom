@@ -45,6 +45,26 @@ class OrderController extends BaseController {
         BaseController.logAction("ORDER_RETURN", req.user, { orderId: order._id });
         BaseController.sendSuccess(res, "Order returned successfully", { order }, 200);
     });
+
+    // --- Admin Methods ---
+
+    static getAllOrders = BaseController.asyncHandler(async (req, res) => {
+        const query = req.query; // { status, search }
+        const orders = await OrderService.getAllOrders(query);
+        BaseController.logAction("ADMIN_ORDER_FETCH_ALL", req.admin, { query });
+        BaseController.sendSuccess(res, "All orders fetched successfully", { orders }, 200);
+    });
+
+    static updateOrderStatus = BaseController.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const { status } = req.body;
+        if (!status) {
+            throw ErrorFactory.badRequest("Status is required");
+        }
+        const order = await OrderService.updateOrderStatus(id, status);
+        BaseController.logAction("ADMIN_ORDER_STATUS_UPDATE", req.admin, { orderId: id, status });
+        BaseController.sendSuccess(res, "Order status updated successfully", { order }, 200);
+    });
 }
 
 module.exports = OrderController;

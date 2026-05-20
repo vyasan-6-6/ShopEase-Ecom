@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { fetchMyOrders } from "../../redux/features/order/orderSlice";
 import { selectMyOrders, selectOrderLoading } from "../../redux/features/order/orderSelectors";
 import Button from "../../components/common/Button";
-import { CheckCircle, Package, Truck, CreditCard, ChevronRight, MapPin,   Phone, Box, Clock } from "lucide-react";
+import { CheckCircle, Package, Truck, CreditCard, ChevronRight, MapPin, Phone, Box, Clock } from "lucide-react";
 
 const OrderConfirmation = () => {
     const { id } = useParams();
@@ -78,15 +78,14 @@ const OrderConfirmation = () => {
                     <div className="relative">
                         {/* Connecting Line */}
                         {['Processing', 'Shipped', 'Delivered'].includes(order.orderStatus) && (
-                            <div className="absolute left-[18px] top-5 bottom-5 w-1 bg-gray-200 md:left-[16.66%] md:top-[18px] md:bottom-auto md:h-1 md:w-[66.66%]">
-                                <div className={`bg-indigo-500 transition-all duration-1000 w-full md:h-full ${
-                                    order.orderStatus === 'Processing' ? 'h-0 md:w-0' :
-                                    order.orderStatus === 'Shipped' ? 'h-1/2 md:w-1/2' :
-                                    'h-full md:w-full'
-                                }`}></div>
+                            <div className="absolute left-[18px] top-5 bottom-5 w-1 bg-gray-200 md:left-[16.66%] md:top-[18px] md:bottom-auto md:h-1 md:w-[66.66%]  ">
+                                <div className={`bg-indigo-500 transition-all duration-1000 w-full md:h-full ${order.orderStatus === 'Processing' ? 'h-0 md:w-0' :
+                                        order.orderStatus === 'Shipped' ? 'h-1/2 md:w-1/2' :
+                                            'h-full md:w-full'
+                                    }`}></div>
                             </div>
                         )}
-                        
+
                         {order.orderStatus === 'Cancelled' ? (
                             <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 font-bold text-center">
                                 This order has been cancelled.
@@ -109,9 +108,8 @@ const OrderConfirmation = () => {
                                 </div>
                                 {/* Step 2: Shipped */}
                                 <div className="flex md:flex-col items-center gap-4 text-center md:flex-1">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ring-4 ring-white shadow-sm z-10 transition-colors ${
-                                        ['Shipped', 'Delivered'].includes(order.orderStatus) ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-400'
-                                    }`}>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ring-4 ring-white shadow-sm z-10 transition-colors ${['Shipped', 'Delivered'].includes(order.orderStatus) ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-400'
+                                        }`}>
                                         <Truck className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -121,9 +119,8 @@ const OrderConfirmation = () => {
                                 </div>
                                 {/* Step 3: Delivered */}
                                 <div className="flex md:flex-col items-center gap-4 text-center md:flex-1">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ring-4 ring-white shadow-sm z-10 transition-colors ${
-                                        order.orderStatus === 'Delivered' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-400'
-                                    }`}>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ring-4 ring-white shadow-sm z-10 transition-colors ${order.orderStatus === 'Delivered' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-400'
+                                        }`}>
                                         <CheckCircle className="w-5 h-5" />
                                     </div>
                                     <div>

@@ -28,6 +28,22 @@ const adminApi = {
             method: 'PUT',
             data: data,
         });
+    },
+
+    getAllOrders: async (params) => {
+        return makeRequest(adminClient, {
+            url: "/admin/orders",
+            method: 'GET',
+            params: params // { status, search }
+        });
+    },
+
+    updateOrderStatus: async (orderId, status) => {
+        return makeRequest(adminClient, {
+            url: `/admin/order/${orderId}/status`,
+            method: 'PUT',
+            data: { status }
+        });
     }
 }
 

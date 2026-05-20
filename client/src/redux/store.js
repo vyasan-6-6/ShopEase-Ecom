@@ -7,6 +7,7 @@ import cartReducer from "./features/cart/cartSlice"
 import couponReducer from "./features/coupon/couponSlice"
 import orderReducer from "./features/order/orderSlice"
 import walletReducer from "./features/wallet/walletSlice"
+import adminOrderReducer from "./features/order/adminOrderSlice"
 
 export const store = configureStore({
     reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
         cart: cartReducer,
         coupon: couponReducer,
         order: orderReducer,
-        wallet: walletReducer
+        wallet: walletReducer,
+        adminOrder: adminOrderReducer
     }
 })

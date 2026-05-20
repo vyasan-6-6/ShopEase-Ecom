@@ -10,6 +10,12 @@ router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
 
 // router.use("/categories", categoryRoutes);
 // router.use("/products", productRoutes);
+
+// Order Management
+const OrderController = require('../controllers/OrderController');
+router.get("/orders", authenticateAdmin, OrderController.getAllOrders);
+router.put("/order/:id/status", authenticateAdmin, OrderController.updateOrderStatus);
+
 // router.get("/users/:id");
 // router.put("/users/:id");
 // router.post("/users/:id/ban");

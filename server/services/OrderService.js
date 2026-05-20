@@ -186,6 +186,64 @@ class OrderService {
         await order.populate("items.product", "name images price");
         return order;
     }
+
+    static async getAllOrders(query = {}) {
+        let filter = {};
+        if (query.status) {
+            filter.orderStatus = query.status;
+        }
+        if (query.search) {
+            // Find user by name or email, or order by ID
+            // Since we need to join user, it's easier to handle user search if we use aggregation or find with populate.
+            // But an easy way for Order ID is:
+            const mongoose = require('mongoose');
+            if (mongoose.Types.ObjectId.isValid(query.search)) {
+                filter._id = query.search;
+            } else {
+                // To search by user we might need to lookup user ids first
+                const User = require('../models/User');
+                const users = await User.find({
+                    $or: [
+                        { firstName: { $regex: query.search, $options: 'i' } },
+                        { lastName: { $regex: query.search, $options: 'i' } },
+                        { email: { $regex: query.search, $options: 'i' } }
+                    ]
+                });
+                const userIds = users.map(u => u._id);
+                if (userIds.length > 0) {
+                    filter.user = { $in: userIds };
+                }
+            }
+        }
+        return await Order.find(filter)
+            .populate("user", "firstName lastName email")
+            .populate("items.product", "name images price")
+            .sort({ createdAt: -1 });
+    }
+
+    static async updateOrderStatus(orderId, status) {
+        const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
+        if (!validStatuses.includes(status)) {
+            throw ErrorFactory.badRequest("Invalid order status");
+        }
+        const order = await Order.findById(orderId);
+        if (!order) {
+            throw ErrorFactory.notFound("Order not found");
+        }
+        
+        order.orderStatus = status;
+        
+        // If delivered, we might want to update paymentStatus to Completed if COD
+        if (status === 'Delivered' && order.paymentMethod === 'COD' && order.paymentStatus === 'Pending') {
+            order.paymentStatus = 'Completed';
+        }
+
+        await order.save();
+        return await order.populate([
+            { path: "user", select: "firstName lastName email" },
+            { path: "items.product", select: "name images price" }
+        ]);
+    }
 }
 
 module.exports = OrderService;
