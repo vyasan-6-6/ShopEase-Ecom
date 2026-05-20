@@ -204,14 +204,15 @@ class OrderService {
                 const User = require('../models/User');
                 const users = await User.find({
                     $or: [
-                        { firstName: { $regex: query.search, $options: 'i' } },
-                        { lastName: { $regex: query.search, $options: 'i' } },
+                        { name: { $regex: query.search, $options: 'i' } },
                         { email: { $regex: query.search, $options: 'i' } }
                     ]
                 });
                 const userIds = users.map(u => u._id);
                 if (userIds.length > 0) {
                     filter.user = { $in: userIds };
+                } else {
+                    filter.user = { $in: "no data found" };
                 }
             }
         }
@@ -243,6 +244,66 @@ class OrderService {
             { path: "user", select: "firstName lastName email" },
             { path: "items.product", select: "name images price" }
         ]);
+    }
+
+    static async getSalesReport(startDate, endDate){
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
+        const matchStage = {
+            createdAt: { $gte: start, $lte: end },
+            orderStatus: { $nin: ['Cancelled', 'Returned'] }
+        };
+
+        const totalStats = await Order.aggregate([
+            { $match: matchStage },
+            { 
+                $group: { 
+                    _id: null, 
+                    totalRevenue: { $sum: "$totalAmount" },
+                    totalOrders: { $sum: 1 }
+                } 
+            }
+        ]);
+        
+        const mostSoldProducts = await Order.aggregate([
+            { $match: matchStage },
+            { $unwind: "$items" },
+            {
+                $group: {
+                    _id: "$items.product",
+                    totalQuantitySold: { $sum: "$items.quantity" },
+                    revenueGenerated: { $sum: { $multiply: ["$items.quantity", "$items.priceAtPurchase"] } }
+                }
+            },
+            { $sort: { totalQuantitySold: -1 } },
+            { $limit: 5 },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "product"
+                }
+            },
+            { $unwind: "$product" },
+            {
+                $project: {
+                    _id: 1,
+                    totalQuantitySold: 1,
+                    revenueGenerated: 1,
+                    name: "$product.name",
+                    images: "$product.images"
+                }
+            }
+        ]); 
+
+        return {
+            totalRevenue: totalStats[0]?.totalRevenue || 0,//[{}]
+            totalOrders: totalStats[0]?.totalOrders || 0,
+            mostSoldProducts
+        };
     }
 }
 

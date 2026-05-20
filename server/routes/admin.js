@@ -15,6 +15,7 @@ router.put("/updateProfile", authenticateAdmin, AdminController.updateProfile);
 const OrderController = require('../controllers/OrderController');
 router.get("/orders", authenticateAdmin, OrderController.getAllOrders);
 router.put("/order/:id/status", authenticateAdmin, OrderController.updateOrderStatus);
+router.get("/reports/sales", authenticateAdmin, OrderController.getSalesReport);
 
 // router.get("/users/:id");
 // router.put("/users/:id");

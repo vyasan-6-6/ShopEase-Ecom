@@ -75,6 +75,9 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 <NavLink to="/admin/dashboard/coupons" className={linkClasses} onClick={onClose}>
                     🎫 Coupons
                 </NavLink>
+                <NavLink to="/admin/dashboard/reports" className={linkClasses} onClick={onClose}>
+                    📈 Reports
+                </NavLink>
 
                 {/* Return to Storefront */}
                 <div className="my-4 border-t border-gray-800/50" />

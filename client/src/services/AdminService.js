@@ -44,6 +44,14 @@ const adminApi = {
             method: 'PUT',
             data: { status }
         });
+    },
+
+    getSalesReport: async (startDate, endDate) => {
+        return makeRequest(adminClient, {
+            url: "/admin/reports/sales",
+            method: 'GET',
+            params: { startDate, endDate }
+        });
     }
 }
 

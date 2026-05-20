@@ -65,6 +65,16 @@ class OrderController extends BaseController {
         BaseController.logAction("ADMIN_ORDER_STATUS_UPDATE", req.admin, { orderId: id, status });
         BaseController.sendSuccess(res, "Order status updated successfully", { order }, 200);
     });
+
+    static getSalesReport = BaseController.asyncHandler(async (req, res) => {
+        const { startDate, endDate } = req.query;
+        if (!startDate || !endDate) {
+            throw ErrorFactory.badRequest("startDate and endDate are required");
+        }
+        const report = await OrderService.getSalesReport(startDate, endDate);
+        BaseController.logAction("ADMIN_SALES_REPORT_GENERATE", req.admin, { startDate, endDate });
+        BaseController.sendSuccess(res, "Sales report generated successfully", report, 200);
+    });
 }
 
 module.exports = OrderController;
