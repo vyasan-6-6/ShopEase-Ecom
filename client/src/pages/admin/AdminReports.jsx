@@ -11,9 +11,11 @@ const AdminReports = () => {
         d.setMonth(d.getMonth() - 1);
         return d.toISOString().split("T")[0];
     });
+    
     const [endDate, setEndDate] = useState(() => {
         return new Date().toISOString().split("T")[0];
     });
+
     const [reportData, setReportData] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -43,36 +45,13 @@ const AdminReports = () => {
         window.print();
     };
 
-    const handleDownloadPDF = async () => {
-        // Dynamically load html2pdf if not already present
-        if (!window.html2pdf) {
-            toast.info("Preparing PDF engine...");
-            const script = document.createElement("script");
-            script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-            script.async = true;
-            document.body.appendChild(script);
-            
-            await new Promise((resolve, reject) => {
-                script.onload = resolve;
-                script.onerror = reject;
-            });
-        }
-
-        const element = document.getElementById("report-content");
-        const opt = {
-            margin:       0.5,
-            filename:     `sales_report_${startDate}_to_${endDate}.pdf`,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        window.html2pdf().set(opt).from(element).save().then(() => {
-            toast.success("PDF Downloaded successfully!");
-        }).catch(err => {
-            console.error("PDF generation failed", err);
-            toast.error("Failed to generate PDF");
-        });
+    const handleDownloadPDF = () => {
+        // html2canvas does not support modern CSS color functions like 'oklch' which Tailwind uses.
+        // The most robust way to generate a high-quality, text-selectable PDF is using the native browser engine.
+        toast.info("Please select 'Save as PDF' in the destination dropdown.", { autoClose: 4000 });
+        setTimeout(() => {
+            window.print();
+        }, 1000);
     };
 
     return (
@@ -139,7 +118,7 @@ const AdminReports = () => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                    <div className="bg-white text-black">
                         <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100/50">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">

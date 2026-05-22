@@ -51,6 +51,14 @@ const productSchema = new mongoose.Schema(
             enum: ["active", "inactive", "draft"],
             default: "active",
         },
+        averageRating: {
+            type: Number,
+            default: 0
+        },
+        reviewCount: {
+            type: Number,
+            default: 0
+        }
     },
     { timestamps: true }
 );

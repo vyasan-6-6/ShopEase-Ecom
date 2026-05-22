@@ -103,10 +103,41 @@ const authenticateAnyUser = (req, res, next) => {
   }
 };
 
+const authenticateAnyUserOptional = (req, res, next) => {
+  const authHeader = req.headers.authorization || req.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = verifyUserToken(token);
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role
+    };
+    return next();
+  } catch (error) {
+    try {
+      const decoded = verifyAdminToken(token);
+      req.user = {
+        id: decoded.id,
+        email: decoded.email,
+        role: decoded.role
+      };
+      return next();
+    } catch (adminError) {
+      return next();
+    }
+  }
+};
+
 module.exports = {
   authenticateAdmin,
   authenticateAdminOptional,
   authenticateUser,
   authenticateAnyUser,
+  authenticateAnyUserOptional,
   requireAdmin
 }

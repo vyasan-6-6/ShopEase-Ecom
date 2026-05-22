@@ -148,6 +148,11 @@ const validateCouponRequest = Joi.object({
     cartTotal: Joi.number().min(0).required().messages(customMessages),
 });
 
+const reviewValidation = Joi.object({
+    rating: Joi.number().min(1).max(5).required().messages(customMessages),
+    comment: Joi.string().min(5).max(1000).trim().required().messages(customMessages),
+});
+
 module.exports = {
     registerValidation,
     loginValidation,
@@ -162,5 +167,6 @@ module.exports = {
     updateQuantityValidation,
     couponValidation,
     validateCouponRequest,
-    updateValidation
+    updateValidation,
+    reviewValidation
 };

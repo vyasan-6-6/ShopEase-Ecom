@@ -1,14 +1,20 @@
 const express = require("express");
 const ProductController = require("../controllers/ProductController");
-const { authenticateAdmin, authenticateAdminOptional } = require("../middlewares/auth");
+const { authenticateAdmin, authenticateAdminOptional, authenticateUser, authenticateAnyUserOptional } = require("../middlewares/auth");
 const upload = require("../middlewares/uploadMiddleware");
+const ReviewController = require("../controllers/ReviewController");
 
 const router = express.Router();
 
 // Public Routes
+router.get("/reviews/latest", ReviewController.getLatestReviews);
 router.get("/", authenticateAdminOptional, ProductController.getAll);
 router.get("/:id", authenticateAdminOptional, ProductController.getById);
 router.get("/slug/:slug", authenticateAdminOptional, ProductController.getBySlug);
+
+// Review Routes
+router.get("/:productId/reviews", authenticateAnyUserOptional, ReviewController.getProductReviews);
+router.post("/:productId/reviews", authenticateUser, ReviewController.addReview);
 
 // Admin-Protected Routes
 router.post("/", authenticateAdmin, ProductController.create);

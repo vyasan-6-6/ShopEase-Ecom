@@ -84,7 +84,9 @@ class ErrorFactory {
     static badRequest(message){
         return new AppError(message,400,"BAD_REQUEST");
     }
-
+static forbidden(message){
+    return new AppError(message,403,"FORBIDDEN");
+}
     static generic(message, statusCode, code) {
         return new AppError(message, statusCode, code);
     }
