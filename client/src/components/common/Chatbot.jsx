@@ -110,6 +110,36 @@ const Chatbot = () => {
         }
     };
 
+    const handleCancelOrder = async (orderId) => {
+        setIsTyping(true);
+        try {
+            const response = await orderApi.cancelOrder(orderId);
+            setIsTyping(false);
+            if (response && response.success) {
+                addBotMessage(`❌ **Order Cancelled Successfully!**\n\nYour order \`${orderId}\` has been cancelled. If you paid online, the refund has been credited to your Wallet.`);
+                await handleOrderLookup(orderId);
+            }
+        } catch (error) {
+            setIsTyping(false);
+            addBotMessage(`❌ **Failed to cancel order:** ${error.message}`);
+        }
+    };
+
+    const handleReturnOrder = async (orderId) => {
+        setIsTyping(true);
+        try {
+            const response = await orderApi.returnOrder(orderId);
+            setIsTyping(false);
+            if (response && response.success) {
+                addBotMessage(`↩️ **Return Processed Successfully!**\n\nYour return for order \`${orderId}\` has been initiated. The refund has been credited directly to your Wallet.`);
+                await handleOrderLookup(orderId);
+            }
+        } catch (error) {
+            setIsTyping(false);
+            addBotMessage(`❌ **Failed to process return:** ${error.message}`);
+        }
+    };
+
     // Handle user inputs or options clicked
     const processMessage = async (text) => {
         const cleanedText = text.trim();
@@ -424,6 +454,29 @@ const Chatbot = () => {
                                                         <p className="font-bold text-gray-700 uppercase tracking-wider">Delivery Address:</p>
                                                         <p className="normal-case">{msg.orderData.shippingAddress.street}, {msg.orderData.shippingAddress.city}, {msg.orderData.shippingAddress.state} - {msg.orderData.shippingAddress.zipCode}</p>
                                                         <p className="font-semibold text-gray-600">Ph: {msg.orderData.shippingAddress.phone}</p>
+                                                    </div>
+                                                )}
+
+                                                {msg.orderData.isOwnerOrAdmin && (
+                                                    <div className="border-t border-gray-50 pt-2 flex flex-wrap gap-2 justify-end">
+                                                        {['Pending', 'Processing'].includes(msg.orderData.status) && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleCancelOrder(msg.orderData.orderId)}
+                                                                className="text-[9px] font-bold bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 px-2.5 py-1 rounded-md transition-all active:scale-95 cursor-pointer uppercase tracking-tight animate-fadeIn"
+                                                            >
+                                                                ❌ Cancel Order
+                                                            </button>
+                                                        )}
+                                                        {msg.orderData.status === 'Delivered' && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleReturnOrder(msg.orderData.orderId)}
+                                                                className="text-[9px] font-bold bg-amber-50 hover:bg-amber-100 border border-amber-100 text-amber-600 px-2.5 py-1 rounded-md transition-all active:scale-95 cursor-pointer uppercase tracking-tight animate-fadeIn"
+                                                            >
+                                                                ↩️ Return Order
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
