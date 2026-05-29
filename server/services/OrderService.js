@@ -19,6 +19,12 @@ class OrderService {
 
         for (const item of cart.items) {
             if (!item.product) continue;
+            
+            // Check if product is in stock
+            if (item.product.stock < item.quantity) {
+                throw ErrorFactory.badRequest(`Product "${item.product.name}" does not have enough stock. Available: ${item.product.stock}`);
+            }
+
             subtotal += item.product.price * item.quantity;
             orderItems.push({
                 product: item.product._id.toString(),
@@ -64,6 +70,7 @@ class OrderService {
         // 5. Handle Payment Method
         if (paymentMethod === 'COD') {
             await newOrder.save();
+            await OrderService.decrementProductStock(newOrder);
             await Cart.findOneAndUpdate({ user: userId }, { items: [] });
             
             return {
@@ -92,6 +99,7 @@ class OrderService {
             
             newOrder.razorpayOrderId = razorpayOrder.id;
             await newOrder.save();
+            await OrderService.decrementProductStock(newOrder);
 
             return {
                 success: true,
@@ -154,6 +162,7 @@ class OrderService {
         }
         
         order.orderStatus = 'Cancelled';
+        await OrderService.incrementProductStock(order);
         
         if (order.paymentStatus === 'Completed') {
             order.paymentStatus = 'Refunded';
@@ -175,6 +184,7 @@ class OrderService {
         }
         
         order.orderStatus = 'Returned';
+        await OrderService.incrementProductStock(order);
         
         if (order.paymentStatus === 'Completed') {
             order.paymentStatus = 'Refunded';
@@ -232,6 +242,14 @@ class OrderService {
             throw ErrorFactory.notFound("Order not found");
         }
         
+        const previousStatus = order.orderStatus;
+        order.orderStatus = status;
+        
+        
+        // Handle stock updates on cancel, return or reactivations
+        if(['Cancelled','Returned'].includes(previousStatus) &&  status !== previousStatus){
+            throw ErrorFactory.badRequest(`Cannot change status. Order is already ${previousStatus.toLowerCase()} and cannot be changed again.`)
+        }
         order.orderStatus = status;
         
         // If delivered, we might want to update paymentStatus to Completed if COD
@@ -239,9 +257,15 @@ class OrderService {
             order.paymentStatus = 'Completed';
         }
 
+
+        // SIMPLIFIED STOCK UPDATE: Only increment when moving to Cancelled/Returned for the first time
+        if ((status === 'Cancelled' || status === 'Returned') && !['Cancelled', 'Returned'].includes(previousStatus)) {
+            await OrderService.incrementProductStock(order);
+        }
+
         await order.save();
         return await order.populate([
-            { path: "user", select: "firstName lastName email" },
+            { path: "user", select: "name email" },
             { path: "items.product", select: "name images price" }
         ]);
     }
@@ -321,6 +345,28 @@ class OrderService {
         }
 
         return order;
+    }
+
+    static async decrementProductStock(order) {
+        const Product = require("../models/Product");
+        for (const item of order.items) {
+            await Product.findByIdAndUpdate(
+                item.product,
+                { $inc: { stock: -item.quantity } },
+                { new: true }
+            );
+        }
+    }
+
+    static async incrementProductStock(order) {
+        const Product = require("../models/Product");
+        for (const item of order.items) {
+            await Product.findByIdAndUpdate(
+                item.product,
+                { $inc: { stock: item.quantity } },
+                { new: true }
+            );
+        }
     }
 }
 

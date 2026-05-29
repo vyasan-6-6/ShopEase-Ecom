@@ -30,14 +30,14 @@ const Hero = () => {
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
                         <Link
-                            to="/products"
+                            to="/shop"
                             className="w-full sm:w-auto px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all shadow-xl shadow-gray-200 hover:-translate-y-1 active:scale-95"
                         >
                             Shop Now
                             <ArrowRight className="w-5 h-5" />
                         </Link>
                         <Link
-                            to="/categories"
+                            to="/shop"
                             className="w-full sm:w-auto px-8 py-4 bg-white border border-gray-100 text-gray-900 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition-all shadow-sm hover:shadow-md active:scale-95"
                         >
                             <ShoppingBag className="w-5 h-5 text-indigo-600" />
