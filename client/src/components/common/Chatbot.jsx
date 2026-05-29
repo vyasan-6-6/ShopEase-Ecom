@@ -347,6 +347,66 @@ const Chatbot = () => {
                                                     </span>
                                                 </div>
 
+                                                {/* Visual Progress Steps */}
+                                                {msg.orderData.status !== 'Cancelled' && msg.orderData.status !== 'Returned' && (() => {
+                                                    const currentStatus = msg.orderData.status;
+                                                    let activeStep = 0; // 0 = Placed/Processing, 1 = Shipped, 2 = Delivered
+
+                                                    if (currentStatus === 'Shipped') activeStep = 1;
+                                                    else if (currentStatus === 'Delivered') activeStep = 2;
+
+                                                    return (
+                                                        <div className="py-2.5 px-2 bg-gray-50/50 rounded-lg border border-gray-100/50 mt-1">
+                                                            <div className="flex items-center justify-between relative">
+                                                                {/* Background Bar */}
+                                                                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-gray-200 z-0"></div>
+                                                                
+                                                                {/* Active Progress Bar */}
+                                                                <div 
+                                                                    className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-emerald-500 transition-all duration-700 ease-out z-0"
+                                                                    style={{ width: activeStep === 0 ? "0%" : activeStep === 1 ? "50%" : "100%" }}
+                                                                ></div>
+
+                                                                {/* Step 1: Placed */}
+                                                                <div className="flex flex-col items-center z-10">
+                                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold border transition-all duration-300 ${
+                                                                        activeStep >= 0 
+                                                                            ? "bg-emerald-500 border-emerald-500 text-white shadow-sm" 
+                                                                            : "bg-white border-gray-300 text-gray-400"
+                                                                    }`}>
+                                                                        1
+                                                                    </div>
+                                                                    <span className="text-[9px] font-bold mt-1 text-gray-700 uppercase tracking-tight">Placed</span>
+                                                                </div>
+
+                                                                {/* Step 2: Shipped */}
+                                                                <div className="flex flex-col items-center z-10">
+                                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold border transition-all duration-300 ${
+                                                                        activeStep >= 1 
+                                                                            ? "bg-emerald-500 border-emerald-500 text-white shadow-sm" 
+                                                                            : "bg-white border-gray-300 text-gray-400"
+                                                                    }`}>
+                                                                        2
+                                                                    </div>
+                                                                    <span className="text-[9px] font-bold mt-1 text-gray-700 uppercase tracking-tight">Shipped</span>
+                                                                </div>
+
+                                                                {/* Step 3: Delivered */}
+                                                                <div className="flex flex-col items-center z-10">
+                                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold border transition-all duration-300 ${
+                                                                        activeStep >= 2 
+                                                                            ? "bg-emerald-500 border-emerald-500 text-white shadow-sm" 
+                                                                            : "bg-white border-gray-300 text-gray-400"
+                                                                    }`}>
+                                                                        3
+                                                                    </div>
+                                                                    <span className="text-[9px] font-bold mt-1 text-gray-700 uppercase tracking-tight">Delivered</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })()}
+
                                                 <div className="space-y-2">
                                                     {msg.orderData.items.map((it, idx) => (
                                                         <div key={idx} className="flex items-center justify-between text-xs">
