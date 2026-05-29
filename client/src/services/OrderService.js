@@ -32,6 +32,12 @@ const OrderService = {
             method: "POST",
             url: `/orders/${orderId}/return`
         });
+    },
+    getOrderStatusForChatbot: (orderId) => {
+        return makeRequest(userClient, {
+            method: "GET",
+            url: `/orders/status/${orderId}`
+        });
     }
 }
 

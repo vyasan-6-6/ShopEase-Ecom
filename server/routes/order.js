@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const OrderController = require('../controllers/OrderController');
-const { authenticateAnyUser } = require('../middlewares/auth');
+const { authenticateAnyUser, authenticateAnyUserOptional } = require('../middlewares/auth');
 
-// All order routes require authentication
+// Get order status by ID (for Chatbot - supports optional authentication)
+router.get('/status/:id', authenticateAnyUserOptional, OrderController.getOrderStatusForChatbot);
+
+// All other order routes require authentication
 router.use(authenticateAnyUser);
 
 // Create an order (COD or Razorpay initialization)

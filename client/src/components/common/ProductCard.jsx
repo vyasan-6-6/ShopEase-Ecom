@@ -16,7 +16,7 @@ const ProductCard = ({ product }) => {
     const name = product.name || product.title;
     const price = product.price;
     const image = product.images?.[0] || product.image;
-    const rating = product.rating || 4.5;
+    const rating = product.averageRating || 4.5;
     const categoryName = product.category?.name || product.category || "Uncategorized";
     const status = product.status || "active";
 

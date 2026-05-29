@@ -1,10 +1,16 @@
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 import Navbar from "../common/Navbar"
 import Footer from "../common/Footer"
 import AdminQuickBar from "../admin/AdminQuickBar"
+import Chatbot from "../common/Chatbot"
 import { memo } from "react"
 
 const MainLayout = () => {
+  const location = useLocation();
+
+  // Hide chatbot on Login, Register, and Forgot Password pages
+  const isAuthPage = location.pathname.startsWith("/auth");
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 uppercase tracking-tight">
         <AdminQuickBar />
@@ -16,6 +22,7 @@ const MainLayout = () => {
             <Outlet/>
         </main>
         <Footer/>
+        {!isAuthPage && <Chatbot />}
     </div>
   )
 }

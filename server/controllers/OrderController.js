@@ -75,6 +75,43 @@ class OrderController extends BaseController {
         BaseController.logAction("ADMIN_SALES_REPORT_GENERATE", req.admin, { startDate, endDate });
         BaseController.sendSuccess(res, "Sales report generated successfully", report, 200);
     });
+
+    static getOrderStatusForChatbot = BaseController.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const userId = req.user?.id;
+        const userRole = req.user?.role;
+
+        const order = await OrderService.getOrderStatusForChatbot(id);
+
+        const isOwnerOrAdmin = userId && (order.user?._id?.toString() === userId || userRole === 'admin');
+
+        const safeData = {
+            orderId: order._id,
+            status: order.orderStatus,
+            paymentMethod: order.paymentMethod,
+            paymentStatus: order.paymentStatus,
+            totalAmount: order.totalAmount,
+            createdAt: order.createdAt,
+            itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+            items: order.items.map(item => ({
+                name: item.product?.name || "Product",
+                quantity: item.quantity,
+                price: item.priceAtPurchase,
+                image: item.product?.images?.[0] || ""
+            })),
+            isOwnerOrAdmin
+        };
+
+        if (isOwnerOrAdmin) {
+            safeData.shippingAddress = order.shippingAddress;
+            safeData.discountAmount = order.discountAmount;
+            safeData.subtotal = order.subtotal;
+            safeData.customerName = `${order.user?.name || ''}`.trim() || order.user?.email || "Customer";
+        }
+
+        BaseController.logAction("CHATBOT_ORDER_FETCH", req.user || { id: "GUEST" }, { orderId: id, isOwnerOrAdmin });
+        BaseController.sendSuccess(res, "Order status retrieved successfully for chatbot", safeData, 200);
+    });
 }
 
 module.exports = OrderController;

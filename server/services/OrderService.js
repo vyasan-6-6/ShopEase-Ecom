@@ -305,6 +305,23 @@ class OrderService {
             mostSoldProducts
         };
     }
+
+    static async getOrderStatusForChatbot(orderId) {
+        const mongoose = require('mongoose');
+        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+            throw ErrorFactory.badRequest("Invalid Order ID format. Order ID must be a 24-character hexadecimal string.");
+        }
+
+        const order = await Order.findById(orderId)
+            .populate("items.product", "name price images")
+            .populate("user", "name email");
+
+        if (!order) {
+            throw ErrorFactory.notFound(`Order with ID ${orderId} was not found.`);
+        }
+
+        return order;
+    }
 }
 
 module.exports = OrderService;
