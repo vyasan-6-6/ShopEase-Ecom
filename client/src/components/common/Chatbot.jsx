@@ -209,15 +209,27 @@ const Chatbot = () => {
                     await handleRecommendProducts();
                 } else if (lowerText.includes("faq") || lowerText.includes("help") || lowerText.includes("policy")) {
                     handleFaqOption();
-                } else {
-                    addBotMessage("I'm sorry, I didn't quite catch that. Could you please choose one of the options below or paste an Order ID?", "options", {
-                        options: [
-                            { label: "📦 Track an Order", value: "track_order" },
-                            { label: "🛒 List My Orders", value: "list_orders" },
-                            { label: "✨ Recommended Products", value: "recommend_products" },
-                            { label: "❓ General FAQs", value: "faqs" }
-                        ]
-                    });
+                                } else {
+                    try {
+                        setIsTyping(true);
+                        const response = await orderApi.askAI(cleanedText);
+                        setIsTyping(false);
+                        if (response && response.success && response.data?.reply) {
+                            addBotMessage(response.data.reply);
+                        } else {
+                            throw new Error("Invalid response");
+                        }
+                    } catch (error) {
+                        setIsTyping(false);
+                        addBotMessage("I'm sorry, I didn't quite catch that. How can I help you? Choose one of these options or paste an Order ID:", "options", {
+                            options: [
+                                { label: "📦 Track an Order", value: "track_order" },
+                                { label: "🛒 List My Orders", value: "list_orders" },
+                                { label: "✨ Recommended Products", value: "recommend_products" },
+                                { label: "❓ General FAQs", value: "faqs" }
+                            ]
+                        });
+                    }
                 }
             }
         }, 600);

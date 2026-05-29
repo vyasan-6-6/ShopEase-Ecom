@@ -38,6 +38,13 @@ const OrderService = {
             method: "GET",
             url: `/orders/status/${orderId}`
         });
+    },
+    askAI: (message) => {
+        return makeRequest(userClient, {
+            method: "POST",
+            url: "/chatbot",
+            data: { message }
+        });
     }
 }
 

@@ -90,6 +90,9 @@ static forbidden(message){
     static generic(message, statusCode, code) {
         return new AppError(message, statusCode, code);
     }
+    static internal(message){
+        return new AppError(message,500,"INTERNAL_ERROR");
+    }
 }
 
 class ErrorUtils {
