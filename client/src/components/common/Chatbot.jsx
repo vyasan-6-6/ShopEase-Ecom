@@ -2,6 +2,7 @@ import  { useState, useRef, useEffect } from "react";
 import { useAppSelector } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import orderApi from "../../services/OrderService";
+import productApi from "../../services/ProductService";
 import {
     MessageSquare,
     X,
@@ -22,6 +23,7 @@ const Chatbot = () => {
             options: [
                 { label: "📦 Track an Order", value: "track_order" },
                 { label: "🛒 List My Orders", value: "list_orders" },
+                { label: "✨ Recommended Products", value: "recommend_products" },
                 { label: "❓ General FAQs", value: "faqs" }
             ]
         }
@@ -140,6 +142,24 @@ const Chatbot = () => {
         }
     };
 
+    const handleRecommendProducts = async () => {
+        setIsTyping(true);
+        try {
+            const response = await productApi.getAllProducts({ limit: 3, sort: "price_desc" });
+            setIsTyping(false);
+            if (response && response.success && response.data.products?.length > 0) {
+                addBotMessage("✨ **Top Recommended Products!**\nHere are some of our popular products chosen just for you. Click any product to view its details!", "product_list", {
+                    products: response.data.products
+                });
+            } else {
+                addBotMessage("Sorry, I couldn't fetch product recommendations at the moment. Please browse our Shop!");
+            }
+        } catch (error) {
+            setIsTyping(false);
+            addBotMessage(`❌ Failed to load recommendations: ${error.message}`);
+        }
+    };
+
     // Handle user inputs or options clicked
     const processMessage = async (text) => {
         const cleanedText = text.trim();
@@ -177,6 +197,7 @@ const Chatbot = () => {
                         options: [
                             { label: "📦 Track an Order", value: "track_order" },
                             { label: "🛒 List My Orders", value: "list_orders" },
+                            { label: "✨ Recommended Products", value: "recommend_products" },
                             { label: "❓ General FAQs", value: "faqs" }
                         ]
                     });
@@ -184,6 +205,8 @@ const Chatbot = () => {
                     addBotMessage("To track your order, please provide your 24-character Order ID (e.g. `64b7f9a12a3b4c5d6e7f8g90`). If you are logged in, you can click \"List My Orders\" to see recent purchases.");
                 } else if (lowerText.includes("list") || lowerText.includes("my orders")) {
                     await handleListOrdersOption();
+                } else if (lowerText.includes("recommend") || lowerText.includes("product") || lowerText.includes("popular")) {
+                    await handleRecommendProducts();
                 } else if (lowerText.includes("faq") || lowerText.includes("help") || lowerText.includes("policy")) {
                     handleFaqOption();
                 } else {
@@ -191,6 +214,7 @@ const Chatbot = () => {
                         options: [
                             { label: "📦 Track an Order", value: "track_order" },
                             { label: "🛒 List My Orders", value: "list_orders" },
+                            { label: "✨ Recommended Products", value: "recommend_products" },
                             { label: "❓ General FAQs", value: "faqs" }
                         ]
                     });
@@ -263,6 +287,8 @@ const Chatbot = () => {
                 addBotMessage("Please type or paste your **24-character hexadecimal Order ID** (e.g. `64b7f9a12a3b4c5d6e7f8g90`). The bot will instantly fetch the live status!");
             } else if (value === "list_orders") {
                 await handleListOrdersOption();
+            } else if (value === "recommend_products") {
+                await handleRecommendProducts();
             } else if (value === "faqs") {
                 handleFaqOption();
             } else if (value.startsWith("order_select_")) {
@@ -479,6 +505,42 @@ const Chatbot = () => {
                                                         )}
                                                     </div>
                                                 )}
+                                            </div>
+                                        )}
+
+                                        {/* Rich Product Recommendation Cards */}
+                                        {isBot && msg.type === "product_list" && msg.products && (
+                                            <div className="grid grid-cols-1 gap-3.5 mt-2 animate-fadeIn w-full">
+                                                {msg.products.map((prod) => (
+                                                    <div key={prod._id} className="bg-white border border-gray-150 rounded-xl overflow-hidden shadow-sm flex hover:shadow-md transition-all duration-300">
+                                                        {/* Product Image */}
+                                                        <div className="w-20 h-20 shrink-0 bg-gray-50 flex items-center justify-center border-r border-gray-100 p-1.5">
+                                                            <img 
+                                                                src={prod.images?.[0] || "https://placehold.co/100"} 
+                                                                alt={prod.name} 
+                                                                className="max-h-full max-w-full object-contain rounded-md"
+                                                            />
+                                                        </div>
+                                                        {/* Product Details */}
+                                                        <div className="p-2.5 flex flex-col justify-between flex-grow min-w-0">
+                                                            <div className="space-y-0.5">
+                                                                <h4 className="text-[11px] font-bold text-gray-800 truncate leading-tight normal-case">{prod.name}</h4>
+                                                                <p className="text-[9px] text-gray-500 line-clamp-1 leading-normal normal-case truncate">{prod.description || "Premium quality product at the best price."}</p>
+                                                            </div>
+                                                            <div className="flex items-center justify-between mt-1 pt-1 border-t border-gray-50">
+                                                                <span className="text-[11px] font-extrabold text-indigo-600">₹{parseFloat(prod.price).toLocaleString('en-IN')}</span>
+                                                                <a 
+                                                                    href={`/product/${prod.id}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-[8px] font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded transition-all active:scale-95 text-center uppercase tracking-wide"
+                                                                >
+                                                                    View Product
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
 
