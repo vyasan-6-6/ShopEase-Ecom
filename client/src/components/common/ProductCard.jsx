@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { addItemToCart, addToCartLocal } from "../../redux/features/cart/cartSlice";
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import { selectIsAdminAuthenticated } from "../../redux/features/auth/adminAuthSelectors"; 
+import { toast } from "react-toastify";
 
 const ProductCard = ({ product }) => {
     const dispatch = useAppDispatch(); 
@@ -25,7 +26,10 @@ const ProductCard = ({ product }) => {
         e.stopPropagation();
         
         if (isAuthenticated || isAdminAuthenticated) {
-            dispatch(addItemToCart({ productId: id, quantity: 1 }));
+            dispatch(addItemToCart({ productId: id, quantity: 1 }))
+                .unwrap()
+                .then(() => toast.success("Added to cart!"))
+                .catch((err) => toast.error(err || "Failed to add item"));
         } else {
             dispatch(addToCartLocal({ 
                 productId: id, 
@@ -37,6 +41,7 @@ const ProductCard = ({ product }) => {
                 }, 
                 quantity: 1 
             }));
+            toast.success("Added to cart!");
         }
     };
 

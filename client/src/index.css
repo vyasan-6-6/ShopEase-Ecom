@@ -3,7 +3,11 @@
 
 @layer base {
   html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;/*used for smooth font rendering on mac OS*/
+    -moz-osx-font-smoothing: grayscale;/*used for smooth font rendering on linux OS*/
+  }
+  ::selection {
+    background-color: #14b8a6;
+    color: white;
   }
 }

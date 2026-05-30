@@ -5,7 +5,7 @@ export default {
       "./src/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
-      extend: {
+      extend: {//it is used to extend the theme , otherwise the tailwind will deeltes your previous customisations and only use tailwind theme. so we use extend to add our customisations to the tailwind theme. if we want to override the entire theme , we can use theme instead of extend.
         fontFamily: {
           sans: ['Inter', 'sans-serif'],
         },

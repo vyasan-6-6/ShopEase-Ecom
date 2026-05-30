@@ -100,7 +100,10 @@ const SingleProduct = () => {
         const productId = product.id || product._id;
 
         if (isAuthenticated || isAdminAuthenticated) {
-            dispatch(addItemToCart({ productId, quantity }));
+            dispatch(addItemToCart({ productId, quantity }))
+                .unwrap()
+                .then(() => toast.success("Added to cart!"))
+                .catch((err) => toast.error(err || "Failed to add to cart"));
         } else {
             dispatch(addToCartLocal({ 
                 productId, 
@@ -112,9 +115,8 @@ const SingleProduct = () => {
                 }, 
                 quantity 
             }));
+            toast.success("Added to cart!");
         }
-        
-        toast.success("Added to cart!");
     };
 
     if (loading) {
