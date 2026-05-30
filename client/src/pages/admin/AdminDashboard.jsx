@@ -32,8 +32,8 @@ const AdminDashboard = () => {
             <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
             {/* MAIN CONTENT AREA */}
-            <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-gray-50  ">
-                <main className="flex-1 p-4 lg:p-10 pt-20 lg:pt-10 w-full max-w-[100vw] lg:max-w-none">
+            <div className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-gray-50/50">
+                <main className="flex-1 p-4 lg:p-8 pt-20 lg:pt-8 w-full max-w-7xl mx-auto">
                     <Outlet />
                 </main>
             </div>

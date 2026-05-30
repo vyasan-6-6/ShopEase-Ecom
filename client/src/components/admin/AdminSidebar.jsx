@@ -19,8 +19,8 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
     const linkClasses = ({ isActive }) =>
         clsx(
-            "px-4 py-3 rounded-xl transition font-medium",
-            isActive ? "bg-gray-800 text-white shadow-inner" : "text-gray-400 hover:bg-gray-800/50 hover:text-white"
+            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-bold text-sm",
+            isActive ? "bg-brand-500 text-white shadow-lg shadow-brand-500/20 translate-x-1" : "text-gray-400 hover:bg-gray-800 hover:text-white"
         );
     return (
         <>
@@ -39,10 +39,10 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 isOpen ? "translate-x-0" : "-translate-x-full"
             )}>
                 <div className="flex items-center justify-between mb-10">
-                    <h2 className="text-2xl font-black tracking-tighter">
-                        Shop<span className="text-indigo-500">Ease</span>
+                    <h2 className="text-2xl font-black tracking-tight text-white">
+                        Shop<span className="text-brand-400">Ease</span>
                         <br />
-                        <span className="text-[10px] bg-gray-800 px-2 py-0.5 rounded text-gray-400 font-black uppercase tracking-[0.2em]">ADMIN PORTAL</span>
+                        <span className="text-[10px] bg-brand-900/50 text-brand-200 px-2 py-0.5 rounded-full font-black uppercase tracking-widest mt-1 inline-block">ADMIN PORTAL</span>
                     </h2>
                     {/* Close button - Mobile only */}
                     <button 

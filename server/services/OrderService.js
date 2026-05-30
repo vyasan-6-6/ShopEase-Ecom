@@ -2,8 +2,7 @@ const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const CouponService = require("./CouponService");
 const { ErrorFactory } = require("../utils/errors");
-const Razorpay = require("razorpay");
-const crypto = require("crypto");
+const PaymentService = require("./payment");
 
 class OrderService {
     static async createOrder(userId, shippingAddress, paymentMethod, couponCode) {
@@ -80,24 +79,10 @@ class OrderService {
             };
         } 
         else if (paymentMethod === 'RAZORPAY') {
-            if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-                throw ErrorFactory.internal("Razorpay keys are not configured");
-            }
-
-            const razorpay = new Razorpay({
-                key_id: process.env.RAZORPAY_KEY_ID,
-                key_secret: process.env.RAZORPAY_KEY_SECRET
-            });
-
-            const options = {
-                amount: Math.round(totalAmount * 100), 
-                currency: "INR",
-                receipt: `receipt_order_${newOrder._id}`
-            };
-
-            const razorpayOrder = await razorpay.orders.create(options);
+            const receiptId = `receipt_order_${newOrder._id}`;
+            const paymentIntent = await PaymentService.createIntent(totalAmount, "INR", receiptId);
             
-            newOrder.razorpayOrderId = razorpayOrder.id;
+            newOrder.razorpayOrderId = paymentIntent.id;
             await newOrder.save();
             await OrderService.decrementProductStock(newOrder);
 
@@ -105,9 +90,9 @@ class OrderService {
                 success: true,
                 message: "Razorpay order created",
                 order: newOrder,
-                razorpayOrderId: razorpayOrder.id,
-                amount: options.amount,
-                currency: options.currency
+                razorpayOrderId: paymentIntent.id,
+                amount: paymentIntent.amount,
+                currency: paymentIntent.currency
             };
         } else {
             throw ErrorFactory.badRequest("Invalid payment method");
@@ -120,13 +105,7 @@ class OrderService {
             throw ErrorFactory.notFound("Order not found for this payment");
         }
 
-        const body = razorpay_order_id + "|" + razorpay_payment_id;
-        const expectedSignature = crypto
-            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-            .update(body.toString())
-            .digest("hex");
-
-        const isAuthentic = expectedSignature === razorpay_signature; 
+        const isAuthentic = PaymentService.verifySignature(razorpay_order_id, razorpay_payment_id, razorpay_signature); 
         if (isAuthentic) {
             order.paymentStatus = 'Completed';
             order.razorpayPaymentId = razorpay_payment_id;
@@ -145,6 +124,30 @@ class OrderService {
             await order.save();
             throw ErrorFactory.badRequest("Invalid payment signature");
         }
+    }
+
+    static async handleWebhookPaymentSuccess(razorpayOrderId, razorpayPaymentId) {
+        const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
+        if (!order) {
+            console.log(`Webhook Error: Order not found for razorpayOrderId: ${razorpayOrderId}`);
+            return;
+        }
+
+        // If it's already marked completed by the frontend callback, just ignore.
+        if (order.paymentStatus === 'Completed') {
+            console.log(`Webhook Info: Order ${order._id} is already marked as Completed.`);
+            return;
+        }
+
+        order.paymentStatus = 'Completed';
+        order.razorpayPaymentId = razorpayPaymentId;
+        // Webhooks don't have the frontend signature, so we just log 'webhook-verified'
+        order.razorpaySignature = 'webhook-verified'; 
+        
+        await order.save();
+        await Cart.findOneAndUpdate({ user: order.user }, { items: [] });
+
+        console.log(`Webhook Success: Order ${order._id} marked as Paid!`);
     }
 
     static async getUserOrders(userId) {

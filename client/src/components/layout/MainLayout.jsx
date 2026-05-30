@@ -15,10 +15,7 @@ const MainLayout = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 uppercase tracking-tight">
         <AdminQuickBar />
         <Navbar/>
-        <main className="grow"> {/* 
-        flex-grow forces this <main> tag to stretch, which 
-        always pins your Footer straight to the bottom of the screen! 
-      */}
+        <main className="grow w-full max-w-7xl mx-auto flex flex-col"> 
             <Outlet/>
         </main>
         <Footer/>

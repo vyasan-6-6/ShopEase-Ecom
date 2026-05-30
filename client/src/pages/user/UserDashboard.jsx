@@ -41,12 +41,12 @@ const UserDashboard = () => {
                                             className={clsx(
                                                 "group flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300 font-bold text-sm",
                                                 isActive 
-                                                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100 translate-x-1" 
-                                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                                    ? "bg-brand-500 text-white shadow-lg shadow-brand-100 translate-x-1" 
+                                                    : "text-gray-500 hover:bg-brand-50 hover:text-brand-900"
                                             )}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <link.icon className={clsx("w-5 h-5", isActive ? "text-white" : "text-gray-400 group-hover:text-indigo-600")} />
+                                                <link.icon className={clsx("w-5 h-5", isActive ? "text-white" : "text-gray-400 group-hover:text-brand-500")} />
                                                 {link.name}
                                             </div>
                                             <ChevronRight className={clsx("w-4 h-4 transition-transform", isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1")} />
@@ -76,10 +76,10 @@ const UserDashboard = () => {
                                     key={link.name}
                                     to={link.path}
                                     className={clsx(
-                                        "flex-none flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-sm whitespace-nowrap transition-all shadow-sm",
+                                        "flex-none flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-sm whitespace-nowrap transition-all shadow-sm snap-start",
                                         isActive 
-                                            ? "bg-white text-indigo-600 border border-indigo-100 shadow-indigo-50" 
-                                            : "bg-white/50 text-gray-500 border border-transparent hover:bg-white"
+                                            ? "bg-white text-brand-600 border border-brand-100 shadow-brand-50" 
+                                            : "bg-white/50 text-gray-500 border border-transparent hover:bg-brand-50 hover:text-brand-600"
                                     )}
                                 >
                                     <link.icon className="w-4 h-4" />

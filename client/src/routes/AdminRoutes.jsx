@@ -15,12 +15,9 @@ import NotFound from "../pages/public/NotFound";
 const AdminRoutes = () => {
     return (
         <Routes>
-            {/* Admin login — no MainLayout */}
             <Route element={<GuestRoute />}>
                 <Route path="login" element={<AdminLogin />} />
             </Route>
-
-            {/* Admin protected routes */}
             <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
                 <Route path="dashboard" element={<AdminDashboard />}>
                     <Route index element={<AdminOverview />} />
