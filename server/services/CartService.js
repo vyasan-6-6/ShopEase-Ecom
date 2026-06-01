@@ -103,6 +103,39 @@ class CartService {
         }
         return this.getCart(userId);
     }
+
+
+    static async mergeCart(userId,localCartItems){
+       if(!localCartItems || localCartItems.length===0){
+        return this.getCart(userId);
+       }
+       let cart = await Cart.findOne({user:userId});
+        
+       if(!cart){
+        const itemsToCreate = localCartItems.map(item=>({
+            product:item.product.id || item.product._id,
+            quantity:item.quantity
+        }));
+        await Cart.create({user:userId,items:itemsToCreate});
+       }else{
+        //if item exist
+        for(const localItem of localCartItems){
+            const productId = localItem.product.id || localItem.product._id;
+            const productIndex  = cart.items.findIndex((item)=>item.product.toString()===productId);
+
+            if(productIndex>-1){
+                cart.items[productIndex].quantity +=localItem.quantity;
+            }else{
+                cart.items.push({
+                    product:productId,
+                     quantity:localItem.quantity
+                })
+            }
+        }
+       }
+       await cart.save();
+       return this.getCart(userId);
+    }
 }
 
 module.exports = CartService;

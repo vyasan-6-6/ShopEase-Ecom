@@ -364,6 +364,7 @@ export const authSlice = createSlice({
                 state.error = action.payload;
             })
             
+            
         }
      
 });

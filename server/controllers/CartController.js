@@ -66,6 +66,12 @@ class CartController extends BaseController {
         await CartService.clearCart(userId);
         return BaseController.sendSuccess(res, "Cart cleared successfully", { items: [] });
     });
+
+    static mergeCart  = BaseController.asyncHandler(async (req,res)=>{
+    const {localItems} =req.body;
+    const cart = await CartService.mergeCart(req.user.id,localItems);
+    BaseController.sendSuccess(res, "Cart merged successfully", cart);
+    });
 }
 
 module.exports = CartController;
