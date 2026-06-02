@@ -93,7 +93,7 @@ const ProductCard = ({ product }) => {
                 </h3>
 
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-50">
-                    <span className="text-xl font-bold text-gray-900">${price?.toFixed(2)}</span>
+                    <span className="text-xl font-bold text-gray-900">₹{price?.toFixed(2)}</span>
                     
                     {status === "draft" ? (
                         <div className="h-10 flex items-center justify-center text-sm font-bold text-amber-700 bg-amber-100/50 px-4 rounded-xl border border-amber-200/50">

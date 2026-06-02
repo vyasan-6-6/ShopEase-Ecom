@@ -331,7 +331,7 @@ const Checkout = () => {
                                                 <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                                             </div>
                                         </div>
-                                        <p className="font-bold text-gray-900">${(item.product.price * item.quantity).toFixed(2)}</p>
+                                        <p className="font-bold text-gray-900">₹{(item.product.price * item.quantity).toFixed(2)}</p>
                                     </div>
                                 );
                             })}
@@ -340,13 +340,13 @@ const Checkout = () => {
                         <div className="space-y-4 mb-8 pt-6 border-t border-gray-100">
                             <div className="flex justify-between text-gray-500">
                                 <span>Subtotal</span>
-                                <span className="font-bold text-gray-900">${total.toFixed(2)}</span>
+                                <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
                             </div>
                             
                             {appliedCoupon && (
                                 <div className="flex justify-between text-green-600">
                                     <span>Discount ({appliedCoupon.code})</span>
-                                    <span className="font-bold">-${discountAmount.toFixed(2)}</span>
+                                    <span className="font-bold">-₹{discountAmount.toFixed(2)}</span>
                                 </div>
                             )}
 
@@ -358,7 +358,7 @@ const Checkout = () => {
                             <div className="border-t border-dashed border-gray-200 pt-4 mt-4">
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-bold text-gray-900">Total</span>
-                                    <span className="text-3xl font-black text-indigo-600">${finalTotal.toFixed(2)}</span>
+                                    <span className="text-3xl font-black text-indigo-600">₹{finalTotal.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

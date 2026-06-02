@@ -204,9 +204,9 @@ const ManageProducts = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-gray-900">${prod.price?.toFixed(2)}</span>
+                                                    <span className="text-sm font-bold text-gray-900">₹{prod.price?.toFixed(2)}</span>
                                                     {prod.compareAtPrice && (
-                                                        <span className="text-xs text-gray-400 line-through">${prod.compareAtPrice?.toFixed(2)}</span>
+                                                        <span className="text-xs text-gray-400 line-through">₹{prod.compareAtPrice?.toFixed(2)}</span>
                                                     )}
                                                 </div>
                                             </td>
@@ -282,7 +282,7 @@ const ManageProducts = () => {
                                             <p className="font-bold text-gray-900 line-clamp-1">{prod.name}</p>
                                             <p className="text-sm font-medium text-gray-500 mt-0.5">{prod.category?.name}</p>
                                             <div className="flex items-center gap-2 mt-2">
-                                                <span className="font-bold text-gray-900">${prod.price?.toFixed(2)}</span>
+                                                <span className="font-bold text-gray-900">₹{prod.price?.toFixed(2)}</span>
                                                 <span
                                                     className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
                                                         prod.status === "active"

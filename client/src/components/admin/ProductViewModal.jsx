@@ -61,9 +61,9 @@ const ProductViewModal = ({ isOpen, onClose, product }) => {
                         <div>
                             <p className="text-sm font-bold text-gray-500 mb-1">Price</p>
                             <div className="flex items-center gap-2">
-                                <span className="font-black text-gray-900">${product.price?.toFixed(2)}</span>
+                                <span className="font-black text-gray-900">₹{product.price?.toFixed(2)}</span>
                                 {product.compareAtPrice && (
-                                    <span className="text-xs font-medium text-gray-400 line-through">${product.compareAtPrice?.toFixed(2)}</span>
+                                    <span className="text-xs font-medium text-gray-400 line-through">₹{product.compareAtPrice?.toFixed(2)}</span>
                                 )}
                             </div>
                         </div>

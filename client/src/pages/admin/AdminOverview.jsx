@@ -15,7 +15,7 @@ const AdminOverview = () => {
     const stats = [
         {
             title: "Total Revenue",
-            value: "$128,430.00",
+            value: "₹128,430.00",
             change: "+12.5%",
             isPositive: true,
             icon: DollarSign,
@@ -53,11 +53,11 @@ const AdminOverview = () => {
 
     // Dummy Data for Recent Activities
     const recentActivities = [
-        { id: 1, user: "John Doe", action: "placed an order", time: "2 minutes ago", amount: "$150.00", status: "Success" },
+        { id: 1, user: "John Doe", action: "placed an order", time: "2 minutes ago", amount: "₹150.00", status: "Success" },
         { id: 2, user: "Sarah Smith", action: "created a new account", time: "15 minutes ago", amount: null, status: "Success" },
         { id: 3, user: "Mike Johnson", action: "updated product inventory", time: "1 hour ago", amount: null, status: "Update" },
-        { id: 4, user: "Emma Wilson", action: "requested a refund", time: "3 hours ago", amount: "$45.00", status: "Pending" },
-        { id: 5, user: "Robert Brown", action: "purchased 'Pro Headphones'", time: "5 hours ago", amount: "$299.00", status: "Success" }
+        { id: 4, user: "Emma Wilson", action: "requested a refund", time: "3 hours ago", amount: "₹45.00", status: "Pending" },
+        { id: 5, user: "Robert Brown", action: "purchased 'Pro Headphones'", time: "5 hours ago", amount: "₹299.00", status: "Success" }
     ];
 
     return (

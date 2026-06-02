@@ -3,23 +3,23 @@ const { ErrorFactory } = require("../utils/errors");
 
 class ChatbotService {
     static async getAIResponse(message) {
-        const apiKey = config.OpenAI.API_KEY;
+        const apiKey = config.OpenRouter.API_KEY;
 
         // Verify configuration
-        if (!apiKey || apiKey === "YOUR_OPENAI_API_KEY_HERE" || apiKey.trim() === "") {
-            throw ErrorFactory.badRequest("OpenAI API is not configured on this server");
+        if (!apiKey  || apiKey.trim() === "") {
+            throw ErrorFactory.badRequest("OpenRouter API is not configured on this server");
         }
 
         try {
-            // Secure connection to OpenAI Chat Completion API
-            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            // Secure connection to OpenRouter Chat Completion API
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: "gpt-4o-mini",
+                    model: "nvidia/nemotron-nano-9b-v2:free",
                     messages: [
                         {
                             role: "system",
@@ -37,8 +37,8 @@ class ChatbotService {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                const errMsg = errorData.error?.message || `OpenAI API returned status ${response.status}`;
-                throw ErrorFactory.internal(`OpenAI service error: ${errMsg}`);
+                const errMsg = errorData.error?.message || `OpenRouter API returned status ${response.status}`;
+                throw ErrorFactory.internal(`OpenRouter service error: ${errMsg}`);
             }
 
             const data = await response.json();

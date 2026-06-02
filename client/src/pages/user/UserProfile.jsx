@@ -94,7 +94,7 @@ const UserProfile = () => {
                             <Wallet className="w-4 h-4" />
                             Wallet Balance
                         </div>
-                        <div className="text-2xl font-black text-green-900">${walletBalance.toFixed(2)}</div>
+                        <div className="text-2xl font-black text-green-900">₹{walletBalance.toFixed(2)}</div>
                     </div>
                 </div>
 

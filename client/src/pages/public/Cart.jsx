@@ -178,7 +178,7 @@ const Cart = () => {
                                 <div className="flex-grow text-center sm:text-left">
                                     <h3 className="text-xl font-bold text-gray-900 mb-1">{item.product.name}</h3>
                                     <p className="text-indigo-600 font-black text-lg mb-4">
-                                        ${productPrice.toFixed(2)}
+                                        ₹{productPrice.toFixed(2)}
                                     </p>
 
                                       {/* Quantity Controls */}
@@ -210,7 +210,7 @@ const Cart = () => {
                                 {/* Item Total */}
                                 <div className="text-right flex-shrink-0">
                                     <p className="text-xl font-black text-gray-900">
-                                        ${(productPrice * item.quantity).toFixed(2)}
+                                        ₹{(productPrice * item.quantity).toFixed(2)}
                                     </p>
                                 </div>
                             </div>
@@ -239,7 +239,7 @@ const Cart = () => {
                         <div className="space-y-4 mb-6">
                             <div className="flex justify-between text-gray-500">
                                 <span>Subtotal</span>
-                                <span className="font-bold text-gray-900">${total.toFixed(2)}</span>
+                                <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
                             </div>
 
                             {/* Applied Coupon Display */}
@@ -251,7 +251,7 @@ const Cart = () => {
                                         <span className="text-xs">(-{appliedCoupon.discountPercent}%)</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-bold">-${discountAmount.toFixed(2)}</span>
+                                        <span className="font-bold">-₹{discountAmount.toFixed(2)}</span>
                                         <button onClick={handleRemoveCoupon} className="p-1 hover:bg-green-200 rounded-full transition-colors">
                                             <X className="w-3 h-3" />
                                         </button>
@@ -267,7 +267,7 @@ const Cart = () => {
                             <div className="border-t border-dashed border-gray-200 pt-4 mt-4">
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-bold text-gray-900">Total</span>
-                                    <span className="text-3xl font-black text-indigo-600">${finalTotal.toFixed(2)}</span>
+                                    <span className="text-3xl font-black text-indigo-600">₹{finalTotal.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

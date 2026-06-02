@@ -13,7 +13,7 @@ const Hero = () => {
                 <div className="flex-1 text-center lg:text-left space-y-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full text-indigo-700 font-bold text-sm">
                         <Zap className="w-4 h-4 fill-indigo-600" />
-                        <span>Limited Time: Free Shipping on all orders over $99</span>
+                        <span>Limited Time: Free Shipping on all orders over ₹99</span>
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] tracking-tight">

@@ -206,7 +206,7 @@ const Navbar = () => {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-sm font-bold text-gray-900 truncate">{prod.name}</p>
-                                                        <p className="text-xs font-medium text-indigo-600">${prod.price?.toFixed(2)}</p>
+                                                        <p className="text-xs font-medium text-indigo-600">₹{prod.price?.toFixed(2)}</p>
                                                     </div>
                                                 </button>
                                             </li>

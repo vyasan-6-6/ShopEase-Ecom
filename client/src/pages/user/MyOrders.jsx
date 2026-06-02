@@ -88,7 +88,7 @@ const MyOrders = () => {
                             </div>
                             <div>
                                 <div className="text-xs text-gray-500 font-bold mb-1 uppercase tracking-wider">Total</div>
-                                <div className="text-gray-900 font-black">${order.totalAmount.toFixed(2)}</div>
+                                <div className="text-gray-900 font-black">₹{order.totalAmount.toFixed(2)}</div>
                             </div>
                             <div className="flex flex-col md:flex-row gap-2 items-start md:items-center">
                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
@@ -122,7 +122,7 @@ const MyOrders = () => {
                                             <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                                         </div>
                                         <div className="font-bold text-gray-900 pr-2">
-                                            ${(item.priceAtPurchase * item.quantity).toFixed(2)}
+                                            ₹{(item.priceAtPurchase * item.quantity).toFixed(2)}
                                         </div>
                                     </div>
                                 );

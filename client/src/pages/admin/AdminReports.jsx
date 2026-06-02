@@ -126,7 +126,7 @@ const AdminReports = () => {
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-1">Total Revenue</p>
-                                    <p className="text-4xl font-black text-gray-900">${reportData.totalRevenue?.toFixed(2)}</p>
+                                    <p className="text-4xl font-black text-gray-900">₹{reportData.totalRevenue?.toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>
@@ -177,7 +177,7 @@ const AdminReports = () => {
                                                     {item.totalQuantitySold}
                                                 </td>
                                                 <td className="px-6 py-4 text-right font-black text-gray-900">
-                                                    ${item.revenueGenerated?.toFixed(2)}
+                                                    ₹{item.revenueGenerated?.toFixed(2)}
                                                 </td>
                                             </tr>
                                         ))}

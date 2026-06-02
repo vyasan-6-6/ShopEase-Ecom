@@ -221,11 +221,11 @@ const SingleProduct = () => {
 
                         <div className="flex items-center gap-4 mb-8">
                             <span className="text-4xl font-extrabold text-gray-900">
-                                ${product.price.toFixed(2)}
+                                ₹{product.price.toFixed(2)}
                             </span>
                             {product.compareAtPrice > product.price && (
                                 <span className="text-xl text-gray-400 line-through font-medium">
-                                    ${product.compareAtPrice.toFixed(2)}
+                                    ₹{product.compareAtPrice.toFixed(2)}
                                 </span>
                             )}
                         </div>

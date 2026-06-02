@@ -50,6 +50,9 @@ module.exports = {
         api_key: process.env.CLOUDINARY_API_KEY,
         api_secret: process.env.CLOUDINARY_API_SECRET,
     },
+    OpenRouter: {
+        API_KEY: process.env.OPENROUTER_API_KEY,
+    },
     OpenAI: {
         API_KEY: process.env.OPENAI_API_KEY,
     }
