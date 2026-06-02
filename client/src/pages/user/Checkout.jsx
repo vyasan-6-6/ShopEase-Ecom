@@ -369,7 +369,7 @@ const Checkout = () => {
                             disabled={orderLoading || items.length === 0} 
                             className="w-full py-4 text-lg"
                         >
-                            {orderLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : `Place Order • $${finalTotal.toFixed(2)}`}
+                            {orderLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : `Place Order • ₹${finalTotal.toFixed(2)}`}
                         </Button>
                         
                         <div className="flex items-center justify-center gap-2 mt-6 text-gray-400">

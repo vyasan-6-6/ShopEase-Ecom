@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { 
-    fetchCart,  
-    removeItemFromCart, 
-    updateCartItemQuantity, 
+import {
+    fetchCart,
+    removeItemFromCart,
+    updateCartItemQuantity,
     clearUserCart,
     updateQuantityLocal,
     removeFromCartLocal,
     clearCartLocal
 } from "../../redux/features/cart/cartSlice";
-import { 
-    selectCartItems, 
-    selectCartTotal, 
-    selectCartLoading 
+import {
+    selectCartItems,
+    selectCartTotal,
+    selectCartLoading
 } from "../../redux/features/cart/cartSelectors";
 import { selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import { selectIsAdminAuthenticated } from "../../redux/features/auth/adminAuthSelectors";
@@ -28,13 +28,13 @@ import { toast } from "react-toastify";
 const Cart = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    
-    const items = useAppSelector(selectCartItems);  
+
+    const items = useAppSelector(selectCartItems);
     const total = useAppSelector(selectCartTotal);
     const loading = useAppSelector(selectCartLoading);
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const isAdminAuthenticated = useAppSelector(selectIsAdminAuthenticated);
-    
+
     // Coupon State
     const validatingCoupon = useAppSelector(selectValidatingCoupon);
     const appliedCoupon = useAppSelector(selectValidatedCoupon);
@@ -60,7 +60,7 @@ const Cart = () => {
 
     const handleQuantityChange = (productId, newQuantity) => {
         if (newQuantity < 1) return;
-        
+
         if (isAuthenticated || isAdminAuthenticated) {
             dispatch(updateCartItemQuantity({ productId, quantity: newQuantity }));
         } else {
@@ -71,7 +71,7 @@ const Cart = () => {
     const handleRemove = async (productId) => {
         const confirmed = await confirmDelete("Remove Item?", "Are you sure you want to remove this item from your cart?");
         if (!confirmed) return;
-        
+
         if (isAuthenticated || isAdminAuthenticated) {
             dispatch(removeItemFromCart(productId));
         } else {
@@ -135,7 +135,7 @@ const Cart = () => {
                 </div>
                 <h2 className="text-3xl font-black text-gray-900 mb-4">Your cart is empty</h2>
                 <p className="text-gray-500 mb-8 max-w-md mx-auto">
-                    Looks like you haven't added anything to your cart yet. 
+                    Looks like you haven't added anything to your cart yet.
                     Explore our amazing products and find something you love!
                 </p>
                 <Button onClick={() => navigate("/shop")} className="px-8 py-4 text-lg">
@@ -161,15 +161,15 @@ const Cart = () => {
                         const productImage = item.product.images?.[0] || "/placeholder-product.png";
 
                         return (
-                            <div 
-                                key={productId} 
+                            <div
+                                key={productId}
                                 className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-6 items-center"
                             >
                                 {/* Product Image */}
                                 <div className="w-32 h-32 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0">
-                                    <img 
-                                        src={productImage} 
-                                        alt={item.product.name} 
+                                    <img
+                                        src={productImage}
+                                        alt={item.product.name}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
@@ -181,24 +181,24 @@ const Cart = () => {
                                         ₹{productPrice.toFixed(2)}
                                     </p>
 
-                                      {/* Quantity Controls */}
+                                    {/* Quantity Controls */}
                                     <div className="flex items-center justify-center sm:justify-start gap-4">
                                         <div className="flex items-center bg-gray-50 rounded-xl border border-gray-100">
-                                            <button 
+                                            <button
                                                 onClick={() => handleQuantityChange(productId, item.quantity - 1)}
                                                 className="p-2 hover:text-indigo-600 transition-colors"
                                             >
                                                 <Minus className="w-4 h-4" />
                                             </button>
                                             <span className="w-8 text-center font-bold text-gray-900">{item.quantity}</span>
-                                            <button 
+                                            <button
                                                 onClick={() => handleQuantityChange(productId, item.quantity + 1)}
                                                 className="p-2 hover:text-indigo-600 transition-colors"
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </button>
                                         </div>
-                                        <button 
+                                        <button
                                             onClick={() => handleRemove(productId)}
                                             className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                                         >
@@ -218,8 +218,8 @@ const Cart = () => {
                     })}
 
                     <div className="flex justify-between items-center pt-4">
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={handleClear}
                             className="text-red-500 hover:bg-red-50 border-red-100"
                         >
@@ -235,7 +235,7 @@ const Cart = () => {
                 <div className="lg:col-span-1">
                     <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-gray-100/50 sticky top-24">
                         <h2 className="text-2xl font-black text-gray-900 mb-6">Order Summary</h2>
-                        
+
                         <div className="space-y-4 mb-6">
                             <div className="flex justify-between text-gray-500">
                                 <span>Subtotal</span>
@@ -263,7 +263,7 @@ const Cart = () => {
                                 <span>Shipping</span>
                                 <span className="text-green-600 font-bold font-mono">FREE</span>
                             </div>
-                            
+
                             <div className="border-t border-dashed border-gray-200 pt-4 mt-4">
                                 <div className="flex justify-between items-center">
                                     <span className="text-lg font-bold text-gray-900">Total</span>
@@ -274,28 +274,30 @@ const Cart = () => {
 
                         {/* Coupon Input Area */}
                         {!appliedCoupon && (
-                            <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100 flex gap-2">
-                                <Input 
-                                    placeholder="Enter coupon code" 
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                    className="uppercase font-bold tracking-wider"
-                                />
-                                <Button 
-                                    onClick={handleApplyCoupon} 
+                            <div className="mb-8 flex gap-3">
+                                <div className="flex-1">
+                                    <input
+                                        placeholder="Enter coupon code"
+                                        value={couponCode}
+                                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm uppercase font-bold tracking-wider outline-none focus:ring-2 focus:ring-black focus:border-black transition-all"
+                                    />
+                                </div>
+                                <Button
+                                    onClick={handleApplyCoupon}
                                     disabled={validatingCoupon || !couponCode.trim()}
-                                    className="px-6 whitespace-nowrap"
-                                >    
+                                    className="py-2.5 px-6 whitespace-nowrap rounded-xl text-sm"
+                                >
                                     {validatingCoupon ? <Loader2 className="w-5 h-5 animate-spin" /> : "Apply"}
                                 </Button>
                             </div>
                         )}
 
-                        <Button 
+                        <Button
                             onClick={handleCheckout}
                             className="w-full py-4 text-lg flex items-center justify-center gap-2 group"
                         >
-                            Checkout 
+                            Checkout
                             <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                         </Button>
 
