@@ -3,6 +3,7 @@ import { useAppSelector } from "../../redux/hooks";
 import { selectUser, selectIsAuthenticated } from "../../redux/features/auth/authSelectors";
 import orderApi from "../../services/OrderService";
 import productApi from "../../services/ProductService";
+import { confirmAction } from "../../utils/alerts";
 import {
     MessageSquare,
     X,
@@ -113,6 +114,15 @@ const Chatbot = () => {
     };
 
     const handleCancelOrder = async (orderId) => {
+        addBotMessage("Are you sure you want to cancel this order? This action cannot be undone.", "options", {
+            options: [
+                { label: "✅ Yes, Cancel Order", value: `confirm_cancel_${orderId}` },
+                { label: "❌ No, Keep It", value: "abort_action" }
+            ]
+        });
+    };
+
+    const executeCancelOrder = async (orderId) => {
         setIsTyping(true);
         try {
             const response = await orderApi.cancelOrder(orderId);
@@ -128,6 +138,15 @@ const Chatbot = () => {
     };
 
     const handleReturnOrder = async (orderId) => {
+        addBotMessage("Are you sure you want to return this order? The refund will be processed to your wallet.", "options", {
+            options: [
+                { label: "✅ Yes, Return Order", value: `confirm_return_${orderId}` },
+                { label: "❌ No, Keep It", value: "abort_action" }
+            ]
+        });
+    };
+
+    const executeReturnOrder = async (orderId) => {
         setIsTyping(true);
         try {
             const response = await orderApi.returnOrder(orderId);
@@ -306,6 +325,14 @@ const Chatbot = () => {
             } else if (value.startsWith("order_select_")) {
                 const selectedOrderId = value.replace("order_select_", "");
                 await handleOrderLookup(selectedOrderId);
+            } else if (value.startsWith("confirm_cancel_")) {
+                const selectedOrderId = value.replace("confirm_cancel_", "");
+                await executeCancelOrder(selectedOrderId);
+            } else if (value.startsWith("confirm_return_")) {
+                const selectedOrderId = value.replace("confirm_return_", "");
+                await executeReturnOrder(selectedOrderId);
+            } else if (value === "abort_action") {
+                addBotMessage("Okay, action cancelled. Let me know if you need anything else!");
             } else if (value === "faq_delivery") {
                 addBotMessage("🚚 **Delivery Timelines:**\nStandard shipping takes 3-5 business days. Express shipping options are available at checkout and usually arrive within 1-2 business days.");
             } else if (value === "faq_returns") {
