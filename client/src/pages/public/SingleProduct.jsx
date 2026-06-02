@@ -28,6 +28,10 @@ const SingleProduct = () => {
     const [quantity, setQuantity] = useState(1);
     const [mainImage, setMainImage] = useState("");
 
+    // Image Zoom states
+    const [isZooming, setIsZooming] = useState(false);
+    const [backgroundPosition, setBackgroundPosition] = useState('0% 0%');
+
     // Review states
     const [reviews, setReviews] = useState([]);
     const [canReview, setCanReview] = useState(false);
@@ -119,6 +123,13 @@ const SingleProduct = () => {
         }
     };
 
+    const handleMouseMove = (e) => {
+        const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - left) / width) * 100;
+        const y = ((e.clientY - top) / height) * 100;
+        setBackgroundPosition(`${x}% ${y}%`);
+    };
+
     if (loading) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
@@ -153,18 +164,56 @@ const SingleProduct = () => {
                 Back to Results
             </button>
 
-            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden relative">
                 <div className="grid grid-cols-1 md:grid-cols-2">
 
                     {/* Images Section */}
                     <div className="p-8 bg-gray-50/50 flex flex-col items-center border-b md:border-b-0 md:border-r border-gray-100">
-                        <div className="w-full aspect-square rounded-2xl bg-white border border-gray-100 overflow-hidden mb-4 relative shadow-sm">
+                        <div 
+                            className="w-full aspect-square rounded-2xl bg-white border border-gray-100 overflow-hidden mb-4 relative shadow-sm md:cursor-crosshair"
+                            onMouseEnter={() => setIsZooming(true)}
+                            onMouseLeave={() => setIsZooming(false)}
+                            onMouseMove={handleMouseMove}
+                            onTouchStart={(e) => {
+                                setIsZooming(true);
+                                // Trigger initial position calculation for touch
+                                const touch = e.touches[0];
+                                const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+                                const x = ((touch.clientX - left) / width) * 100;
+                                const y = ((touch.clientY - top) / height) * 100;
+                                setBackgroundPosition(`${x}% ${y}%`);
+                            }}
+                            onTouchEnd={() => setIsZooming(false)}
+                            onTouchMove={(e) => {
+                                const touch = e.touches[0];
+                                const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+                                const x = ((touch.clientX - left) / width) * 100;
+                                const y = ((touch.clientY - top) / height) * 100;
+                                setBackgroundPosition(`${x}% ${y}%`);
+                            }}
+                        >
                             {mainImage ? (
-                                <img
-                                    src={mainImage}
-                                    alt={product.name}
-                                    className="w-full h-full object-contain p-4"
-                                />
+                                <>
+                                    {/* Base Image (Fades out on mobile, stays visible on desktop) */}
+                                    <img
+                                        src={mainImage}
+                                        alt={product.name}
+                                        className={`w-full h-full object-contain p-4 transition-opacity duration-300 ${isZooming ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
+                                    />
+                                    
+                                    {/* In-Place Zoom Overlay (Approach 1) - Only visible on Mobile */}
+                                    {isZooming && (
+                                        <div 
+                                            className="absolute inset-0 z-10 pointer-events-none md:hidden"
+                                            style={{
+                                                backgroundImage: `url(${mainImage})`,
+                                                backgroundPosition: backgroundPosition,
+                                                backgroundSize: '250%',
+                                                backgroundRepeat: 'no-repeat'
+                                            }}
+                                        />
+                                    )}
+                                </>
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-400 font-medium bg-gray-50">
                                     No Image Available
@@ -280,6 +329,19 @@ const SingleProduct = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Side-by-Side Zoom Overlay (Flipkart Style) - Only visible on desktop */}
+                {isZooming && mainImage && (
+                    <div 
+                        className="hidden md:block absolute top-0 right-0 w-1/2 h-full bg-white z-50 border-l border-gray-100 shadow-inner pointer-events-none"
+                        style={{
+                            backgroundImage: `url(${mainImage})`,
+                            backgroundPosition: backgroundPosition,
+                            backgroundSize: '250%',
+                            backgroundRepeat: 'no-repeat'
+                        }}
+                    />
+                )}
             </div>
 
             {/* Reviews Section */}
