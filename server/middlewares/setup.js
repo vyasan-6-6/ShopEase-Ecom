@@ -13,12 +13,12 @@ const setupMiddleware = (app) => {
     );
 
     const corsOptions = {
-        origin:config.CORS.ORIGIN,
-        credential:config.CORS.CREDENTIALS,
-        allowedHeaders:config.CORS.ALLOWED_HEADERS,
-        method:config.CORS.METHODS,
-        optionsSuccessStatus:200
-    }
+        origin: config.CORS.ORIGIN,
+        credentials: config.CORS.CREDENTIALS,
+        allowedHeaders: config.CORS.ALLOWED_HEADERS,
+        methods: config.CORS.METHODS,
+        optionsSuccessStatus: 200
+    };
     app.use(cors(corsOptions));
 
     const limiter = rateLimit({

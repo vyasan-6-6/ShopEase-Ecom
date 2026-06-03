@@ -45,9 +45,12 @@ class ProductController extends BaseController {
             query.category = req.query.category;
         }
 
-        // Optional search filtering
+        // Optional search filtering (keyword search in name and description)
         if (req.query.search) {
-            query.name = { $regex: req.query.search, $options: "i" };
+            query.$or = [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { description: { $regex: req.query.search, $options: "i" } }
+            ];
         }
 
         // Price Filtering 
@@ -55,6 +58,11 @@ class ProductController extends BaseController {
             query.price = {};
             if (req.query.minPrice) query.price.$gte = Number(req.query.minPrice);
             if (req.query.maxPrice) query.price.$lte = Number(req.query.maxPrice);
+        }
+
+        // Rating Filtering (minimum average rating)
+        if (req.query.rating) {
+            query.averageRating = { $gte: Number(req.query.rating) };
         }
 
         const page = parseInt(req.query.page) || 1;    //get page number from query parameter or default to 1

@@ -30,23 +30,24 @@ const Navbar = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [, setSearchParams] = useSearchParams();
     
     const profileRef = useRef(null);
     const catRef = useRef(null);
     const searchRef = useRef(null);
-    const [searchTerm, setSearchTerm] = useState(() => {
-        return new URLSearchParams(window.location.search).get("search") || "";
-    });
+
+    const searchParamValue = new URLSearchParams(location.search).get("search") || "";
+    const [searchTerm, setSearchTerm] = useState(searchParamValue);
+    const [prevSearchParam, setPrevSearchParam] = useState(searchParamValue);
+
+    if (searchParamValue !== prevSearchParam) {
+        setSearchTerm(searchParamValue);
+        setPrevSearchParam(searchParamValue);
+    }
+
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const debouncedSearch = useDebounce(searchTerm, 500);
-
-    // Sync input with URL search param
-    useEffect(() => {
-        const searchParam = new URLSearchParams(location.search).get("search");
-        setSearchTerm(searchParam || "");
-    }, [location.search]);
 
     // Live debounced search when on Shop page
     useEffect(() => {
@@ -54,7 +55,9 @@ const Navbar = () => {
             const currentSearch = new URLSearchParams(location.search).get("search") || "";
             const trimmedSearch = debouncedSearch.trim();
             
-            if (trimmedSearch !== currentSearch) {
+            // Only update the URL when the debounced value aligns with the current input state
+            // This prevents race conditions when clearing the search parameter externally from Shop page
+            if (debouncedSearch === searchTerm && trimmedSearch !== currentSearch) {
                 setSearchParams(prev => {
                     const params = new URLSearchParams(prev);
                     if (trimmedSearch) {
@@ -67,7 +70,7 @@ const Navbar = () => {
                 });
             }
         }
-    }, [debouncedSearch, location.pathname, setSearchParams]);
+    }, [debouncedSearch, searchTerm, location.pathname, location.search, setSearchParams]);
 
     // Fetch search suggestions
     useEffect(() => {
@@ -109,13 +112,15 @@ const Navbar = () => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);//one time mount and unmount means no dependencies for closing the dropdown
- 
-    // Close menus whenever the URL changes (navigation)
-    useEffect(() => {
+
+    // Close menus whenever the URL changes (navigation) - derived state pattern
+    const [prevPathname, setPrevPathname] = useState(location.pathname);
+    if (location.pathname !== prevPathname) {
         setIsProfileOpen(false);
         setIsOpen(false);
         setIsCatOpen(false);
-    }, [location.pathname]);
+        setPrevPathname(location.pathname);
+    }
 
     const handleLogout = () => {
         tokenService.clearAll();
