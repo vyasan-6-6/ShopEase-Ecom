@@ -90,6 +90,8 @@ const seedOrders = async () => {
                 discountAmount,
                 totalAmount,
                 orderStatus,
+                isDeleted: false,
+                deletedAt: null,
                 createdAt: pastDate,
                 updatedAt: pastDate
             });

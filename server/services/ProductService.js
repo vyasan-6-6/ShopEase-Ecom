@@ -47,7 +47,7 @@ class ProductService {
     }
 
     static async deleteProduct(id) {
-        const product = await Product.findByIdAndDelete(id);//it returns the document that was deleted. If no document is found, it returns null.
+        const product = await Product.findByIdAndUpdate(id,{isDeleted:true,deletedAt:new Date()});//it returns the document that was deleted. If no document is found, it returns null.
         if (!product) {
             throw ErrorFactory.notFound("Product not found");
         }

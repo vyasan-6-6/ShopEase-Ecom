@@ -56,7 +56,9 @@ const seedReviews = async () => {
                             user: order.user,
                             product: item.product,
                             rating: randomRating,
-                            comment: randomComment
+                            comment: randomComment,
+                            isDeleted: false,
+                            deletedAt: null
                         });
                         
                         await review.save();

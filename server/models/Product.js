@@ -58,6 +58,14 @@ const productSchema = new mongoose.Schema(
         reviewCount: {
             type: Number,
             default: 0
+        },
+        isDeleted:{
+            type:Boolean,
+            default:false
+        },
+        deletedAt:{
+            type:Date,
+            default:null
         }
     },
     { timestamps: true }
@@ -80,4 +88,7 @@ productSchema.set("toJSON", {
     },
 });
 
+productSchema.pre(/^find/, function () {
+    this.where({ isDeleted: { $ne: true } });
+});
 module.exports = mongoose.model("Product", productSchema);

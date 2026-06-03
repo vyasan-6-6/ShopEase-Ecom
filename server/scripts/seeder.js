@@ -1,5 +1,5 @@
 const Admin = require("../models/Admin");
-const logger = require("./logger");
+const logger = require("../utils/logger");
 const config = require("../config/config");
 const mongoose= require("mongoose");
 const User = require("../models/User")
@@ -44,6 +44,8 @@ const seedTestUsers = async () => {
             status: "active",
             phone: "555-0100",
             isVerified: true,
+            isDeleted: false,
+            deletedAt: null,
             addresses: [
                 {
                     label: "home",
@@ -64,6 +66,8 @@ const seedTestUsers = async () => {
             status: "active",
             phone: "234-0430",
             isVerified: true,
+            isDeleted: false,
+            deletedAt: null,
             addresses: [
                 {
                     label: "work",

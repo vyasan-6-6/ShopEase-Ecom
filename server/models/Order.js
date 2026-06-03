@@ -77,7 +77,19 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled',"Returned"],
         default: 'Processing'
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
+
+orderSchema.pre(/^find/, function () {
+    this.where({ isDeleted: { $ne: true } });
+});
 
 module.exports = mongoose.model('Order', orderSchema);
