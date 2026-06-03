@@ -3,6 +3,8 @@ const ProductController = require("../controllers/ProductController");
 const { authenticateAdmin, authenticateAdminOptional, authenticateUser, authenticateAnyUserOptional } = require("../middlewares/auth");
 const upload = require("../middlewares/uploadMiddleware");
 const ReviewController = require("../controllers/ReviewController");
+const { productRules, productUpdateRules } = require("../validation/authValidation");
+const { validateRequest } = require("../middlewares/validation");
 
 const router = express.Router();
 
@@ -17,8 +19,8 @@ router.get("/:productId/reviews", authenticateAnyUserOptional, ReviewController.
 router.post("/:productId/reviews", authenticateUser, ReviewController.addReview);
 
 // Admin-Protected Routes
-router.post("/", authenticateAdmin, ProductController.create);
-router.put("/:id", authenticateAdmin, ProductController.update);
+router.post("/", productRules, validateRequest, authenticateAdmin, ProductController.create);
+router.put("/:id", productUpdateRules, validateRequest, authenticateAdmin, ProductController.update);
 router.delete("/:id", authenticateAdmin, ProductController.delete);
 
 // Protected upload endpoint (MUST be protected)
