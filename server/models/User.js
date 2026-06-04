@@ -60,6 +60,10 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        deletedAt: {
+            type: Date,
+            default: null,
+        },
 
         role: {
             type: String,
@@ -208,5 +212,9 @@ userSchema.methods.editAddress = async function (addressId, updatedData) {
 
     return this.save();
 };
+
+userSchema.pre(/^find/, function () {
+    this.where({ isDeleted: { $ne: true } });
+});
 
 module.exports = mongoose.model("User", userSchema);

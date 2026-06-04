@@ -1,0 +1,43 @@
+const mongoose = require("mongoose");
+
+const reviewSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+    },
+    comment: {
+        type: String,
+        trim: true,
+        required: true,
+        maxlength: 1000
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: {
+        type: Date,
+        default: null
+    }
+}, { timestamps: true });
+
+// Ensure one user can only review a product once
+reviewSchema.index({ user: 1, product: 1 }, { unique: true });
+
+reviewSchema.pre(/^find/, function () {
+    this.where({ isDeleted: { $ne: true } });
+});
+
+module.exports = mongoose.model("Review", reviewSchema);

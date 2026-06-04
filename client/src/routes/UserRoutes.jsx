@@ -4,6 +4,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import UserDashboard from "../pages/user/UserDashboard";
 import UserProfile from "../pages/user/UserProfile";
 import AddressBook from "../pages/user/AddressBook";
+import MyOrders from "../pages/user/MyOrders";
 import NotFound from "../pages/public/NotFound";
 
 const UserRoutes = () => {
@@ -13,6 +14,7 @@ const UserRoutes = () => {
                 <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
                     <Route path="dashboard" element={<UserDashboard />}>
                         <Route index element={<UserProfile />} />
+                        <Route path="orders" element={<MyOrders />} />
                         <Route path="addresses" element={<AddressBook />} />
                         <Route path="*" element={<NotFound />} />
                     </Route>

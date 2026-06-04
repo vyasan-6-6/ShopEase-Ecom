@@ -7,23 +7,28 @@ import AdminOverview from "../pages/admin/AdminOverview";
 import AdminProfile from "../pages/admin/AdminProfile";
 import ManageCategories from "../pages/admin/ManageCategories";
 import ManageProducts from "../pages/admin/ManageProducts";
+import ManageCoupon from "../pages/admin/ManageCoupon";
+import AdminOrders from "../pages/admin/AdminOrders";
+import AdminReports from "../pages/admin/AdminReports";
+import BannerManagement from "../pages/admin/BannerManagement";
 import NotFound from "../pages/public/NotFound";
 
 const AdminRoutes = () => {
     return (
         <Routes>
-            {/* Admin login — no MainLayout */}
             <Route element={<GuestRoute />}>
                 <Route path="login" element={<AdminLogin />} />
             </Route>
-
-            {/* Admin protected routes */}
             <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
                 <Route path="dashboard" element={<AdminDashboard />}>
                     <Route index element={<AdminOverview />} />
                     <Route path="profile" element={<AdminProfile />} />
                     <Route path="categories" element={<ManageCategories />} />
                     <Route path="products" element={<ManageProducts />} />
+                    <Route path="orders" element={<AdminOrders />} />
+                    <Route path="coupons" element={<ManageCoupon />} />
+                    <Route path="reports" element={<AdminReports />} />
+                    <Route path="banners" element={<BannerManagement />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Route>

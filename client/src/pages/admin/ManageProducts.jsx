@@ -1,6 +1,8 @@
 import { useState, useEffect, memo } from "react";
-import { Plus, Pencil, Trash2, Package, Search, Loader2, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, Search, Loader2, Image as ImageIcon, Eye } from "lucide-react";
+import { useDebounce } from "../../hooks/useDebounce";
 import ProductFormModal from "../../components/admin/ProductFormModal";
+import ProductViewModal from "../../components/admin/ProductViewModal";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { 
@@ -30,9 +32,13 @@ const ManageProducts = () => {
     const categories = useAppSelector(selectAllCategories);
     
     const [searchQuery, setSearchQuery] = useState("");
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
+    const [statusFilter, setStatusFilter] = useState("all");
     const [modalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [viewingProduct, setViewingProduct] = useState(null);
 
     useEffect(() => {
         dispatch(fetchAdminProducts());
@@ -83,10 +89,17 @@ const ManageProducts = () => {
         setModalOpen(true);
     };
 
-    const filteredProducts = products.filter((prod) =>
-        prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prod.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const openView = (prod) => {
+        setViewingProduct(prod);
+        setViewModalOpen(true);
+    };
+
+    const filteredProducts = products.filter((prod) => {
+        const matchesSearch = prod.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+            prod.category?.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+        const matchesStatus = statusFilter === "all" || prod.status === statusFilter;
+        return matchesSearch && matchesStatus;  
+    });
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -103,14 +116,29 @@ const ManageProducts = () => {
                 </Button>
             </div>
 
-            {/* Search Bar */}
-            <div className="max-w-md">
-                <Input
-                    leftIcon={Search}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products by name or category..."
-                />
+            {/* Search and Filter Bar */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 max-w-md">
+                    <Input
+                        leftIcon={Search}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search products..."
+                    />
+                </div>
+                <div className="flex items-center gap-4">
+                    <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">Status:</label>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl px-6 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer shadow-sm"
+                    >
+                        <option value="all">All Products</option>
+                        <option value="active">Active Only</option>
+                        <option value="draft">Drafts Only</option>
+                        <option value="inactive">Inactive Only</option>
+                    </select>
+                </div>
             </div>
 
             {/* Products Table */}
@@ -176,9 +204,9 @@ const ManageProducts = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-gray-900">${prod.price?.toFixed(2)}</span>
+                                                    <span className="text-sm font-bold text-gray-900">₹{prod.price?.toFixed(2)}</span>
                                                     {prod.compareAtPrice && (
-                                                        <span className="text-xs text-gray-400 line-through">${prod.compareAtPrice?.toFixed(2)}</span>
+                                                        <span className="text-xs text-gray-400 line-through">₹{prod.compareAtPrice?.toFixed(2)}</span>
                                                     )}
                                                 </div>
                                             </td>
@@ -202,6 +230,15 @@ const ManageProducts = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => openView(prod)}
+                                                        className="px-2 py-2"
+                                                        title="View"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </Button>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
@@ -245,10 +282,14 @@ const ManageProducts = () => {
                                             <p className="font-bold text-gray-900 line-clamp-1">{prod.name}</p>
                                             <p className="text-sm font-medium text-gray-500 mt-0.5">{prod.category?.name}</p>
                                             <div className="flex items-center gap-2 mt-2">
-                                                <span className="font-bold text-gray-900">${prod.price?.toFixed(2)}</span>
+                                                <span className="font-bold text-gray-900">₹{prod.price?.toFixed(2)}</span>
                                                 <span
                                                     className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${
-                                                        prod.status === "active" ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-500"
+                                                        prod.status === "active"
+                                                            ? "bg-emerald-50 text-emerald-600"
+                                                            : prod.status === "draft"
+                                                            ? "bg-amber-50 text-amber-600"
+                                                            : "bg-gray-100 text-gray-500"
                                                     }`}
                                                 >
                                                     {prod.status}
@@ -261,6 +302,9 @@ const ManageProducts = () => {
                                             Stock: {prod.stock}
                                         </span>
                                         <div className="flex gap-2">
+                                            <Button variant="outline" size="sm" onClick={() => openView(prod)} className="px-3" title="View">
+                                                <Eye className="w-4 h-4" />
+                                            </Button>
                                             <Button variant="outline" size="sm" onClick={() => openEdit(prod)} className="px-3">
                                                 <Pencil className="w-4 h-4" />
                                             </Button>
@@ -285,6 +329,15 @@ const ManageProducts = () => {
                 onSubmit={handleSubmit}
                 initialData={editingProduct}
                 isLoading={isSubmitting}
+            />
+
+            <ProductViewModal
+                isOpen={viewModalOpen}
+                onClose={() => {
+                    setViewModalOpen(false);
+                    setViewingProduct(null);
+                }}
+                product={viewingProduct}
             />
         </div>
     );

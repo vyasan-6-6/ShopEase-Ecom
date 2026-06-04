@@ -1,10 +1,10 @@
 const { ErrorFactory } = require("../utils/errors");
-const { verifyUserToken,verifyAdminToken } = require("../utils/jwt");
+const { verifyUserToken, verifyAdminToken } = require("../utils/jwt");
 
 
-const authenticateUser = (req,res,next)=>{
-const authHeader = req.headers.authorization;
- if (!authHeader || !authHeader.startsWith('Bearer ')) {
+const authenticateUser = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return next(ErrorFactory.authentication('Access token required'));
   }
   const token = authHeader.split(" ")[1];
@@ -12,35 +12,35 @@ const authHeader = req.headers.authorization;
   try {
     const decoded = verifyUserToken(token);
     req.user = {
-        id:decoded.id,
-        email:decoded.email,
-        role:decoded.role
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role
     }
     next();
-  } catch (error) { 
-    
+  } catch (error) {
+
     next(ErrorFactory.authentication("Invalid or expired token"));
   }
 }
 
-const authenticateAdmin=(req,res,next)=>{
+const authenticateAdmin = (req, res, next) => {
   const authHeader = req.get('Authorization');
-   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return next(ErrorFactory.authentication('Access token required'));
   }
   const token = authHeader.split(' ')[1];
   try {
-    const decoded  = verifyAdminToken(token);
+    const decoded = verifyAdminToken(token);
     req.admin = {
-      id:decoded.id,
-      email:decoded.email,
-      role:decoded.role,
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role,
     }
     next();
   } catch (error) {
     next(ErrorFactory.authentication("Invalid or expired token"));
   }
-  }
+}
 const requireAdmin = (req, res, next) => {
   if (!req.user) {
     return next(ErrorFactory.authentication('Not authenticated'));
@@ -66,7 +66,7 @@ const authenticateAdminOptional = (req, res, next) => {
       role: decoded.role,
     };
   } catch (error) {
-   
+
   }
   next();
 };
@@ -103,10 +103,41 @@ const authenticateAnyUser = (req, res, next) => {
   }
 };
 
+const authenticateAnyUserOptional = (req, res, next) => {
+  const authHeader = req.headers.authorization || req.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = verifyUserToken(token);
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role
+    };
+    return next();
+  } catch (error) {
+    try {
+      const decoded = verifyAdminToken(token);
+      req.user = {
+        id: decoded.id,
+        email: decoded.email,
+        role: decoded.role
+      };
+      return next();
+    } catch (adminError) {
+      return next();
+    }
+  }
+};
+
 module.exports = {
   authenticateAdmin,
   authenticateAdminOptional,
   authenticateUser,
   authenticateAnyUser,
+  authenticateAnyUserOptional,
   requireAdmin
 }

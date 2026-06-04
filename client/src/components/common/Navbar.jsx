@@ -10,6 +10,7 @@ import { selectActiveCategories } from "../../redux/features/category/categorySe
 import { logout } from "../../redux/features/auth/authSlice";
 import { adminLogout } from "../../redux/features/auth/adminAuthSlice";
 import { tokenService } from "../../utils/apiClient";
+import { productApi } from "../../services";
 import { useDebounce } from "../../hooks/useDebounce";
 import clsx from "clsx";
 
@@ -29,20 +30,24 @@ const Navbar = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const location = useLocation();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [, setSearchParams] = useSearchParams();
     
     const profileRef = useRef(null);
     const catRef = useRef(null);
-    const [searchTerm, setSearchTerm] = useState(() => {
-        return new URLSearchParams(window.location.search).get("search") || "";
-    });
-    const debouncedSearch = useDebounce(searchTerm, 500);
+    const searchRef = useRef(null);
 
-    // Sync input with URL search param
-    useEffect(() => {
-        const searchParam = new URLSearchParams(location.search).get("search");
-        setSearchTerm(searchParam || "");
-    }, [location.search]);
+    const searchParamValue = new URLSearchParams(location.search).get("search") || "";
+    const [searchTerm, setSearchTerm] = useState(searchParamValue);
+    const [prevSearchParam, setPrevSearchParam] = useState(searchParamValue);
+
+    if (searchParamValue !== prevSearchParam) {
+        setSearchTerm(searchParamValue);
+        setPrevSearchParam(searchParamValue);
+    }
+
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const debouncedSearch = useDebounce(searchTerm, 500);
 
     // Live debounced search when on Shop page
     useEffect(() => {
@@ -50,7 +55,9 @@ const Navbar = () => {
             const currentSearch = new URLSearchParams(location.search).get("search") || "";
             const trimmedSearch = debouncedSearch.trim();
             
-            if (trimmedSearch !== currentSearch) {
+            // Only update the URL when the debounced value aligns with the current input state
+            // This prevents race conditions when clearing the search parameter externally from Shop page
+            if (debouncedSearch === searchTerm && trimmedSearch !== currentSearch) {
                 setSearchParams(prev => {
                     const params = new URLSearchParams(prev);
                     if (trimmedSearch) {
@@ -63,7 +70,25 @@ const Navbar = () => {
                 });
             }
         }
-    }, [debouncedSearch, location.pathname, setSearchParams]);
+    }, [debouncedSearch, searchTerm, location.pathname, location.search, setSearchParams]);
+
+    // Fetch search suggestions
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (debouncedSearch.trim().length > 1) {
+                try {
+                    const params = { search: debouncedSearch.trim(), limit: 5 };
+                    const res = await productApi.getAllProducts(params);
+                    setSuggestions(res.data?.products || []);
+                } catch (error) {
+                    console.error("Failed to fetch suggestions:", error);
+                }
+            } else {
+                setSuggestions([]);
+            }
+        };
+        fetchSuggestions();
+    }, [debouncedSearch]);
 
     // Fetch categories on mount
     useEffect(() => {
@@ -79,18 +104,23 @@ const Navbar = () => {
             if (catRef.current && !catRef.current.contains(event.target)) {
                 setIsCatOpen(false);
             }
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);//one time mount and unmount means no dependencies for closing the dropdown
- 
-    // Close menus whenever the URL changes (navigation)
-    useEffect(() => {
+
+    // Close menus whenever the URL changes (navigation) - derived state pattern
+    const [prevPathname, setPrevPathname] = useState(location.pathname);
+    if (location.pathname !== prevPathname) {
         setIsProfileOpen(false);
         setIsOpen(false);
         setIsCatOpen(false);
-    }, [location.pathname]);
+        setPrevPathname(location.pathname);
+    }
 
     const handleLogout = () => {
         tokenService.clearAll();
@@ -101,10 +131,12 @@ const Navbar = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        if (searchTerm.trim()) {
-            navigate(`/shop?page=1&search=${(searchTerm.trim())}`); 
-            setIsOpen(false);
-        }
+        setShowSuggestions(false);
+        const searchParam = searchTerm.trim();
+        let url = `/shop?page=1`;
+        if (searchParam) url += `&search=${searchParam}`;
+        navigate(url); 
+        setIsOpen(false);
     };
 
     const navLinks = [
@@ -127,26 +159,80 @@ const Navbar = () => {
                     </Link>
                     
                     {/* Search Bar - Desktop */}
-                    <div className="hidden lg:flex flex-1 max-w-md mx-10">
-                        <form onSubmit={handleSearch} className="relative w-full">
+                    <div className="hidden lg:flex flex-1 max-w-lg mx-10 relative" ref={searchRef}>
+                        <form onSubmit={handleSearch} className="relative w-full flex bg-gray-50 rounded-2xl border border-transparent focus-within:bg-white focus-within:border-indigo-100 focus-within:ring-4 focus-within:ring-indigo-500/5 transition-all">
                             <input
                                 type="text"
                                 placeholder="Search products..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-gray-50 border-transparent rounded-2xl py-2.5 pl-12 pr-10 text-sm focus:bg-white focus:border-indigo-100 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:text-gray-400 font-medium"
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setShowSuggestions(true);
+                                }}
+                                onFocus={() => setShowSuggestions(true)}
+                                className="w-full bg-transparent py-2.5 pl-12 pr-10 text-sm focus:outline-none focus:ring-0 font-medium placeholder:text-gray-400 rounded-2xl"
                             />
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             {searchTerm && (
                                 <button
                                     type="button"
-                                    onClick={() => setSearchTerm("")}
+                                    onClick={() => {
+                                        setSearchTerm("");
+                                        setSuggestions([]);
+                                    }}
                                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
                             )}
                         </form>
+ 
+                        {/* Search Suggestions Dropdown */}
+                        {showSuggestions && (searchTerm.trim().length > 1) && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                {suggestions.length > 0 ? (
+                                    <ul className="py-2">
+                                        {suggestions.map((prod) => (
+                                            <li key={prod.id || prod._id}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setShowSuggestions(false);
+                                                        navigate(`/product/${prod.id || prod._id}`);
+                                                    }}
+                                                    className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                                                >
+                                                    <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                        {prod.images?.[0] ? (
+                                                            <img src={prod.images[0]} alt={prod.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-gray-200"></div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-bold text-gray-900 truncate">{prod.name}</p>
+                                                        <p className="text-xs font-medium text-indigo-600">₹{prod.price?.toFixed(2)}</p>
+                                                    </div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                                        No products found for "{searchTerm}"
+                                    </div>
+                                )}
+                                <div className="border-t border-gray-100 p-2">
+                                    <button 
+                                        type="button"
+                                        onClick={handleSearch}
+                                        className="w-full text-center text-xs font-bold text-indigo-600 hover:text-indigo-700 py-2 bg-indigo-50 rounded-xl transition-colors"
+                                    >
+                                        View All Results
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Desktop Navigation */}

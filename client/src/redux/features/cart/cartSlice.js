@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import cartApi from "../../../services/CartService";
+import { logout } from "../auth/authSlice";
 
 // Async Thunks
 export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { rejectWithValue }) => {
     try {
         const res = await cartApi.getCart();
-        console.log("API Response :",res.data);
-        return res.data; // This is the cart object { items: [...] }
+         return res.data; // This is the cart object { items: [...] }
     } catch (error) {
         return rejectWithValue(error.message);
     }
@@ -47,6 +47,18 @@ export const clearUserCart = createAsyncThunk("cart/clearCart", async (_, { reje
         return rejectWithValue(error.message);
     }
 });
+
+
+export const mergeUserCart  = createAsyncThunk("cart/merge",async(localItems,{rejectWithValue,dispatch})=>{
+    try {
+        const res = await cartApi.mergeCart(localItems);
+      dispatch(clearCartLocal());
+        return res.data;
+    } catch (error) {
+        return rejectWithValue(error.message);
+        
+    }
+})
 
 const getCartFromStorage = () => {
     try {
@@ -177,7 +189,25 @@ const cartSlice = createSlice({
             .addCase(clearUserCart.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+            .addCase(mergeUserCart.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(mergeUserCart.fulfilled, (state,action) => {
+                state.loading = false;
+                state.items = action.payload.items;
+            })
+            .addCase(mergeUserCart.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(logout,(state)=>{
+                state.items = [];
+                state.loading=false;
+                state.error=null;
+                window.localStorage.clear('cartItems')
+            })
+            
     }
 });
 

@@ -9,6 +9,7 @@ import { loginUser, resendOtp, setVerificationFlow } from "../../redux/features/
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectAuthLoading } from "../../redux/features/auth/authSelectors";
 import Button from "../common/Button";
+import { fetchCart, mergeUserCart } from "../../redux/features/cart/cartSlice";
 
 const UNVERIFIED_MSG = "Please verify your account with OTP.";
 
@@ -31,7 +32,7 @@ const LoginForm = () => {
 
     const onSubmit = useCallback(
         async (data, e) => {
-            console.log("LOGIN SUBMITTED", data);
+             
             if (e) e.preventDefault();
             
             // Clear any previous server errors before submitting
@@ -43,6 +44,7 @@ const LoginForm = () => {
                     password: data.password?.trim(),
                 };
                 const actionResult = await dispatch(loginUser(trimmedData));
+
 
                 if (loginUser.rejected.match(actionResult)) {
                     const errorMsg = actionResult.payload;
@@ -72,6 +74,12 @@ const LoginForm = () => {
                             toast.error(errorMsg || "Login failed. Please try again.");
                         }
                     }
+                }
+                const localItems = JSON.parse(window.localStorage.getItem("cartItems")) || []
+                if(localItems.length>0){
+                    dispatch(mergeUserCart(localItems)).unwrap();
+                }else{
+                    dispatch(fetchCart())
                 }
         } catch (err) {
             console.error("Unhandled error in onSubmit:", err);

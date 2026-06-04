@@ -1,24 +1,25 @@
 import { selectUser } from "../../redux/features/auth/authSelectors";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { memo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../../components/layout/AuthLayout";
 import LoginForm from "../../components/auth/LoginForm";
 import Button from "../../components/common/Button";
+import { mergeUserCart } from "../../redux/features/cart/cartSlice";
 
 const Login = memo(() => {
     const navigate = useNavigate();
+    const location = useLocation();
     const user = useAppSelector(selectUser);
-
+   
     useEffect(() => {
         if (user) {
-            if (user.role === 'admin') {
-                navigate("/admin/dashboard", { replace: true });
-            } else {
-                navigate("/", { replace: true });
-            }
+            const searchParams = new URLSearchParams(location.search);
+            const redirectPath = searchParams.get("redirect") || "/";
+            navigate(redirectPath, { replace: true });
         }
-    }, [navigate, user]);
+        
+    }, [navigate, user, location.search]);
 
     return (
         <AuthLayout title="Login" subtitle="Welcome back! Sign in to your account">

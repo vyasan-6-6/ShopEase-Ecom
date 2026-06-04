@@ -17,6 +17,11 @@ const productApi = {
     getAllProducts: (params) => makeRequest(userClient, { url: "/products", method: "GET", params }),
     getProductById: (id) => makeRequest(userClient, { url: `/products/${id}`, method: "GET" }),
     getProductBySlug: (slug) => makeRequest(userClient, { url: `/products/slug/${slug}`, method: "GET" }),
+
+    // Reviews
+    getLatestReviews: () => makeRequest(userClient, { url: `/products/reviews/latest`, method: "GET" }),
+    getProductReviews: (productId) => makeRequest(userClient, { url: `/products/${productId}/reviews`, method: "GET" }),
+    addReview: (productId, data) => makeRequest(userClient, { url: `/products/${productId}/reviews`, method: "POST", data }),
 };
 
 export default productApi;

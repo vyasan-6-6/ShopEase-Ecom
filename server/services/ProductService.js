@@ -7,13 +7,12 @@ class ProductService {
         return product.save();//product.save() saves the document and returns the saved product.
     }
 
-    static async getProducts(query = {}, skip = 0, limit = 0) {
+    static async getProducts(query = {}, skip = 0, limit = 0, sortOption = { createdAt: -1 }) {
         const products = await Product.find(query)
             .populate("category", "name slug")
-            .sort({ createdAt: -1 })
+            .sort(sortOption)
             .skip(skip)
             .limit(limit);
-            
         const total = await Product.countDocuments(query);
         return { products, total };
     }
@@ -48,7 +47,7 @@ class ProductService {
     }
 
     static async deleteProduct(id) {
-        const product = await Product.findByIdAndDelete(id);//it returns the document that was deleted. If no document is found, it returns null.
+        const product = await Product.findByIdAndUpdate(id,{isDeleted:true,deletedAt:new Date()});//it returns the document that was deleted. If no document is found, it returns null.
         if (!product) {
             throw ErrorFactory.notFound("Product not found");
         }

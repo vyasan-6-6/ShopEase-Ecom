@@ -1,10 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import GuestRoute from "../components/GuestRoute";
+import ProtectedRoute from "../components/ProtectedRoute";
 import Home from "../pages/public/Home";
 import Shop from "../pages/public/Shop";
 import SingleProduct from "../pages/public/SingleProduct";
 import Cart from "../pages/public/Cart";
+import Checkout from "../pages/user/Checkout";
+import OrderConfirmation from "../pages/user/OrderConfirmation";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
@@ -20,6 +23,11 @@ const PublicRoutes = () => {
                 <Route path="product/:id" element={<SingleProduct />} />
                 <Route path="cart" element={<Cart />} />
                 <Route path="500" element={<ServerError />} />
+                
+                <Route element={<ProtectedRoute allowedRoles={["user", "admin"]} />}>
+                    <Route path="checkout" element={<Checkout />} />
+                    <Route path="order-confirmation/:id" element={<OrderConfirmation />} />
+                </Route>
                 
                 {/* Guest-only: logged-in users are redirected to dashboard */}
                 <Route element={<GuestRoute />}>

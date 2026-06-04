@@ -37,7 +37,7 @@ class ProductController extends BaseController {
         const query = {};//create empty filter object for mongodb
 
         if (!req.admin) {//if req is from normal users , only fetch active products
-            query.status = "active";
+            query.status = { $in: ['active','draft'] };//used to fetch only active and draft products ,$in is used to check if the status is either active or draft
         }
 
         // Optional category filtering
@@ -45,16 +45,36 @@ class ProductController extends BaseController {
             query.category = req.query.category;
         }
 
-        // Optional search filtering
+        // Optional search filtering (keyword search in name and description)
         if (req.query.search) {
-            query.name = { $regex: req.query.search, $options: "i" };
+            query.$or = [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { description: { $regex: req.query.search, $options: "i" } }
+            ];
+        }
+
+        // Price Filtering 
+        if (req.query.minPrice || req.query.maxPrice) {
+            query.price = {};
+            if (req.query.minPrice) query.price.$gte = Number(req.query.minPrice);
+            if (req.query.maxPrice) query.price.$lte = Number(req.query.maxPrice);
+        }
+
+        // Rating Filtering (minimum average rating)
+        if (req.query.rating) {
+            query.averageRating = { $gte: Number(req.query.rating) };
         }
 
         const page = parseInt(req.query.page) || 1;    //get page number from query parameter or default to 1
         const limit = parseInt(req.query.limit) || 10; //get limit from query parameter or default to 10
         const skip = (page - 1) * limit;           //calculate skip value
 
-        const { products, total } = await ProductService.getProducts(query, skip, limit);
+        // Sorting 
+        let sortOption = { createdAt: -1 };
+        if (req.query.sort === "price_asc") sortOption = { price: 1 };
+        if (req.query.sort === "price_desc") sortOption = { price: -1 };
+
+        const { products, total } = await ProductService.getProducts(query, skip, limit, sortOption);
         
         BaseController.sendSuccess(res, "Products fetched successfully", { 
             products,
@@ -70,12 +90,22 @@ class ProductController extends BaseController {
     // GET /api/admin/products/:id OR /api/user/products/:id
     static getById = BaseController.asyncHandler(async (req, res) => {
         const product = await ProductService.getProductById(req.params.id);
+        
+        if (!product || (!req.admin && !(product.status === "active" || product.status === "draft"))) {
+            return BaseController.sendError(res, "Product not found", 404);
+        }
+
         BaseController.sendSuccess(res, "Product fetched successfully", { product });
     });
 
     // GET /api/user/products/slug/:slug
     static getBySlug = BaseController.asyncHandler(async (req, res) => {
         const product = await ProductService.getProductBySlug(req.params.slug);
+        
+        if (!product || (!req.admin && !(product.status == "active" || product.status == "draft"))) {
+            return BaseController.sendError(res, "Product not found", 404);
+        }
+
         BaseController.sendSuccess(res, "Product fetched successfully", { product });
     });
 

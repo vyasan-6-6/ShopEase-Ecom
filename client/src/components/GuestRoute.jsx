@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { selectIsAuthenticated, selectUser } from "../redux/features/auth/authSelectors";
 import { selectAdmin, selectIsAdminAuthenticated } from "../redux/features/auth/adminAuthSelectors";
 import { useAppSelector } from "../redux/hooks";
@@ -13,6 +13,8 @@ const GuestRoute = () => {
     const admin = useAppSelector(selectAdmin);
     const isAdminAuthenticated = useAppSelector(selectIsAdminAuthenticated);
 
+    const location = useLocation();
+
     // If Admin is logged in and tries to access a guest route
     if (isAdminAuthenticated && admin) {
         return <Navigate to="/admin/dashboard" replace />;
@@ -20,7 +22,9 @@ const GuestRoute = () => {
 
     // If User is logged in and tries to access a guest route
     if (isAuthenticated && user) {
-        return <Navigate to="/" replace />;
+        const searchParams = new URLSearchParams(location.search);
+        const redirectPath = searchParams.get("redirect") || "/";
+        return <Navigate to={redirectPath} replace />;
     }
 
     // Not logged in → let them through

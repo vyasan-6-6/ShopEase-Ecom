@@ -123,6 +123,36 @@ const updateQuantityValidation = Joi.object({
     quantity: Joi.number().min(1).required().messages(customMessages),
 });
 
+const couponValidation = Joi.object({
+    code: Joi.string().min(3).max(20).uppercase().trim().required().messages(customMessages),
+    discountPercent: Joi.number().min(1).max(100).required().messages(customMessages),
+    expiryDate: Joi.date().iso().greater("now").required().messages({
+        ...customMessages,
+        "date.greater": "Expiry date must be in the future",
+        "date.format": "Expiry date must be a valid ISO date",
+    }),
+    minOrderAmount: Joi.number().min(0).optional().messages(customMessages),
+    isActive: Joi.boolean().optional(),
+});
+ const updateValidation = Joi.object({
+            code: Joi.string().min(3).max(20).uppercase().trim().optional(),
+            discountPercent: Joi.number().min(1).max(100).optional(),
+            expiryDate: Joi.date().iso().greater("now").optional(),
+            minOrderAmount: Joi.number().min(0).optional(),
+            isActive: Joi.boolean().optional(),
+        });
+        
+
+const validateCouponRequest = Joi.object({
+    code: Joi.string().uppercase().trim().required().messages(customMessages),
+    cartTotal: Joi.number().min(0).required().messages(customMessages),
+});
+
+const reviewValidation = Joi.object({
+    rating: Joi.number().min(1).max(5).required().messages(customMessages),
+    comment: Joi.string().min(5).max(1000).trim().required().messages(customMessages),
+});
+
 module.exports = {
     registerValidation,
     loginValidation,
@@ -134,5 +164,9 @@ module.exports = {
     categoryValidation,
     productValidation,
     addToCartValidation,
-    updateQuantityValidation
+    updateQuantityValidation,
+    couponValidation,
+    validateCouponRequest,
+    updateValidation,
+    reviewValidation
 };

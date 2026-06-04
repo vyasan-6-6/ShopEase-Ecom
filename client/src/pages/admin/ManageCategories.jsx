@@ -1,5 +1,6 @@
 import { useState, useEffect, memo } from "react";
 import { Plus, Pencil, Trash2, Tag, Search, Loader2 } from "lucide-react";
+import { useDebounce } from "../../hooks/useDebounce";
 import CategoryFormModal from "../../components/admin/CategoryFormModal";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -25,6 +26,7 @@ const ManageCategories = () => {
     const isSubmitting = useAppSelector(selectCategorySubmitting);
     
     const [searchQuery, setSearchQuery] = useState("");
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
     const [modalOpen, setModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
@@ -75,7 +77,7 @@ const ManageCategories = () => {
     };
 
     const filteredCategories = categories.filter((cat) =>
-        cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+        cat.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     );
 
     return (

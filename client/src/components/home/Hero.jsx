@@ -13,7 +13,7 @@ const Hero = () => {
                 <div className="flex-1 text-center lg:text-left space-y-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-full text-indigo-700 font-bold text-sm">
                         <Zap className="w-4 h-4 fill-indigo-600" />
-                        <span>Limited Time: Free Shipping on all orders over $99</span>
+                        <span>Limited Time: Free Shipping on all orders over ₹99</span>
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] tracking-tight">
@@ -30,14 +30,14 @@ const Hero = () => {
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
                         <Link
-                            to="/products"
+                            to="/shop"
                             className="w-full sm:w-auto px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all shadow-xl shadow-gray-200 hover:-translate-y-1 active:scale-95"
                         >
                             Shop Now
                             <ArrowRight className="w-5 h-5" />
                         </Link>
                         <Link
-                            to="/categories"
+                            to="/shop"
                             className="w-full sm:w-auto px-8 py-4 bg-white border border-gray-100 text-gray-900 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition-all shadow-sm hover:shadow-md active:scale-95"
                         >
                             <ShoppingBag className="w-5 h-5 text-indigo-600" />

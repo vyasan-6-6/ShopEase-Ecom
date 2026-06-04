@@ -1,6 +1,6 @@
 const express = require("express");
 const CartController = require("../controllers/CartController");
-const { authenticateAnyUser } = require("../middlewares/auth");
+const { authenticateAnyUser, authenticateUser } = require("../middlewares/auth");
 
 const router = express.Router();
 
@@ -12,5 +12,6 @@ router.post("/add", CartController.addToCart);
 router.put("/update", CartController.updateQuantity);
 router.delete("/remove/:productId", CartController.removeFromCart);
 router.delete("/clear", CartController.clearCart);
+router.post("/merge",authenticateUser, CartController.mergeCart);
 
 module.exports = router;

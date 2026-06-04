@@ -238,7 +238,9 @@ const seedProducts = async () => {
         await Product.deleteMany({});
         console.log("Cleared existing products.");
 
-        for (const prod of products) {
+        const productsWithDefaults = products.map(p => ({ ...p, isDeleted: false, deletedAt: null }));
+
+        for (const prod of productsWithDefaults) {
             try {
                 await Product.create(prod);
                 console.log(`Created product: ${prod.name}`);

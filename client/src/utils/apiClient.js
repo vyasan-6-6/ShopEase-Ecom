@@ -4,7 +4,7 @@ import { API_CONFIG, AUTH_CONFIG } from "../config/app";
 export const tokenService = {
     getAuthToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey),
     getAdminToken: () => localStorage.getItem(AUTH_CONFIG.adminKey),
-    getAnyToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey) || localStorage.getItem(AUTH_CONFIG.adminKey),
+    getAnyToken: () => localStorage.getItem(AUTH_CONFIG.tokenKey) || localStorage.getItem(AUTH_CONFIG.adminKey),//shop will be avaible to admin also
     getUser: () => {
         const userData = localStorage.getItem(AUTH_CONFIG.userKey);
         return userData ? JSON.parse(userData) : null;
@@ -54,10 +54,8 @@ const createApiClient = (getToken) => {
             console.log("INTERCEPTOR CAUGHT 401. URL:", error.config?.url, "PATH:", window.location.pathname, "isAuthApi:", isAuthApi, "isAuthPage:", isAuthPage);
             
             if (status === 401 && !isAuthApi && !isAuthPage) {
-                console.warn("Unauthorized access detected. Redirecting to login...", {
-                    url: error.config?.url,
-                    path: window.location.pathname
-                });
+                console.warn("Unauthorized access detected. Clearing session and redirecting...");
+                tokenService.clearAll(); // Clear localStorage to break the loop
                 window.location.href = "/auth/login";
             }
             // Handle forbidden
