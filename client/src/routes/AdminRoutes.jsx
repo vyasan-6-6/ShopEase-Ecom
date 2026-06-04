@@ -10,6 +10,7 @@ import ManageProducts from "../pages/admin/ManageProducts";
 import ManageCoupon from "../pages/admin/ManageCoupon";
 import AdminOrders from "../pages/admin/AdminOrders";
 import AdminReports from "../pages/admin/AdminReports";
+import BannerManagement from "../pages/admin/BannerManagement";
 import NotFound from "../pages/public/NotFound";
 
 const AdminRoutes = () => {
@@ -27,6 +28,7 @@ const AdminRoutes = () => {
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="coupons" element={<ManageCoupon />} />
                     <Route path="reports" element={<AdminReports />} />
+                    <Route path="banners" element={<BannerManagement />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Route>

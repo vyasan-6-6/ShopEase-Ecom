@@ -5,5 +5,6 @@ module.exports={
     CategoryService:require("./CategoryService"),
    ProductService:require("./ProductService"),
    CouponService:require("./CouponService"),
-   ChatbotService:require("./ChatbotService")
+   ChatbotService:require("./ChatbotService"),
+   BannerService:require("./BannerService")
 }
