@@ -12,6 +12,9 @@ import AdminRoutes from "./routes/AdminRoutes";
 import UserRoutes from "./routes/UserRoutes";
 import PublicRoutes from "./routes/PublicRoutes";
 
+import { ErrorBoundary } from "react-error-boundary";
+import GlobalErrorFallback from "./components/common/GlobalErrorFallback";
+
 function App() {
     const dispatch = useAppDispatch();
     const [isVerifyingAuth, setIsVerifyingAuth] = useState(true);
@@ -32,6 +35,7 @@ function App() {
 
             // Once finished checking, let the router boot up.
             setIsVerifyingAuth(false);
+           
         };
 
         verifyAuth();//we call this function to verify the authentication of the user and if the user is authenticated then it will redirect to the dashboard and if not then it will redirect to the login page 
@@ -51,19 +55,28 @@ function App() {
     return (
         <BrowserRouter>
             <ScrollToTop />
-            <Routes>
-                {/* 
-                  Descendant routing:
-                  Any path starting with /admin will be handled by AdminRoutes 
-                */}
-                <Route path="/admin/*" element={<AdminRoutes />} />
-                
-                {/* Any path starting with /user will be handled by UserRoutes */}
-                <Route path="/user/*" element={<UserRoutes />} />
-                
-                {/* Everything else (like /, /auth/login, etc.) goes to PublicRoutes */}
-                <Route path="/*" element={<PublicRoutes />} />
-            </Routes>
+            <ErrorBoundary 
+                FallbackComponent={GlobalErrorFallback}
+                onReset={() => {
+                    // This runs when the user clicks "Try Again"
+                    // We can reset state or simply reload the page as a brute-force reset
+                    window.location.reload();
+                }}
+            >
+                <Routes>
+                    {/* 
+                      Descendant routing:
+                      Any path starting with /admin will be handled by AdminRoutes 
+                    */}
+                    <Route path="/admin/*" element={<AdminRoutes />} />
+                    
+                    {/* Any path starting with /user will be handled by UserRoutes */}
+                    <Route path="/user/*" element={<UserRoutes />} />
+                    ``
+                    {/* Everything else (like /, /auth/login, etc.) goes to PublicRoutes */}
+                    <Route path="/*" element={<PublicRoutes />} />
+                </Routes>
+            </ErrorBoundary>
             <ToastContainer position="top-right" autoClose={1000} />
         </BrowserRouter>
     );

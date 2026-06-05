@@ -24,7 +24,6 @@ const Home = () => {
             
             {!user && !admin && <CTABanner />}
         </div>
-    );
-};
+    );};
 
 export default memo(Home);
