@@ -3,14 +3,23 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { getProfile } from "./redux/features/auth/authSlice";
 import { getAdminProfile } from "./redux/features/auth/adminAuthSlice";
 import { useAppDispatch } from "./redux/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { AUTH_CONFIG } from "./config/app";
 import ScrollToTop from "./components/common/ScrollToTop";
 
-// Extracted Route Modules
-import AdminRoutes from "./routes/AdminRoutes";
-import UserRoutes from "./routes/UserRoutes";
-import PublicRoutes from "./routes/PublicRoutes";
+// Lazy Loaded Route Modules
+const AdminRoutes = lazy(() => import("./routes/AdminRoutes"));
+const UserRoutes = lazy(() => import("./routes/UserRoutes"));
+const PublicRoutes = lazy(() => import("./routes/PublicRoutes"));
+
+const PageLoader = () => (
+    <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center space-y-4">
+            <span className="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+            <p className="text-gray-500 font-medium">Loading page...</p>
+        </div>
+    </div>
+);
 
 import { ErrorBoundary } from "react-error-boundary";
 import GlobalErrorFallback from "./components/common/GlobalErrorFallback";
@@ -63,19 +72,21 @@ function App() {
                     window.location.reload();
                 }}
             >
-                <Routes>
-                    {/* 
-                      Descendant routing:
-                      Any path starting with /admin will be handled by AdminRoutes 
-                    */}
-                    <Route path="/admin/*" element={<AdminRoutes />} />
-                    
-                    {/* Any path starting with /user will be handled by UserRoutes */}
-                    <Route path="/user/*" element={<UserRoutes />} />
-                    ``
-                    {/* Everything else (like /, /auth/login, etc.) goes to PublicRoutes */}
-                    <Route path="/*" element={<PublicRoutes />} />
-                </Routes>
+                <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                        {/* 
+                          Descendant routing:
+                          Any path starting with /admin will be handled by AdminRoutes 
+                        */}
+                        <Route path="/admin/*" element={<AdminRoutes />} />
+                        
+                        {/* Any path starting with /user will be handled by UserRoutes */}
+                        <Route path="/user/*" element={<UserRoutes />} />
+                        
+                        {/* Everything else (like /, /auth/login, etc.) goes to PublicRoutes */}
+                        <Route path="/*" element={<PublicRoutes />} />
+                    </Routes>
+                </Suspense>
             </ErrorBoundary>
             <ToastContainer position="top-right" autoClose={1000} />
         </BrowserRouter>
