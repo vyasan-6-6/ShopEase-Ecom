@@ -11,6 +11,7 @@ import ManageCoupon from "../pages/admin/ManageCoupon";
 import AdminOrders from "../pages/admin/AdminOrders";
 import AdminReports from "../pages/admin/AdminReports";
 import BannerManagement from "../pages/admin/BannerManagement";
+import ManageUsers from "../pages/admin/ManageUsers";
 import NotFound from "../pages/public/NotFound";
 
 const AdminRoutes = () => {
@@ -24,6 +25,7 @@ const AdminRoutes = () => {
                     <Route index element={<AdminOverview />} />
                     <Route path="profile" element={<AdminProfile />} />
                     <Route path="categories" element={<ManageCategories />} />
+                    <Route path="users" element={<ManageUsers />} />
                     <Route path="products" element={<ManageProducts />} />
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="coupons" element={<ManageCoupon />} />

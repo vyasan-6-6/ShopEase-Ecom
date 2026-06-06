@@ -62,6 +62,37 @@ class AdminService {
         return { admin };
     }
 
+    static async getAllUsers(query = {}) {
+        let filter = {};
+        if (query.search) {
+            filter = {
+                $or: [
+                    { name: { $regex: query.search, $options: 'i' } },
+                    { email: { $regex: query.search, $options: 'i' } }
+                ]
+            };
+        }
+        
+        const users = await User.find(filter)
+            .select('-password -resetPassword')
+            .sort({ createdAt: -1 });
+            
+        return { users };
+    }
+
+    static async toggleUserBan(userId) {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw ErrorFactory.notFound("User not found");
+        }
+
+        user.status = user.status === "banned" ? "active" : "banned";
+        await user.save();
+        
+        logger.info(`User ${userId} status changed to ${user.status}`);
+        return { user };
+    }
+
     static async getDashboardStats(days) {
         try {
             let dateFilter = {};

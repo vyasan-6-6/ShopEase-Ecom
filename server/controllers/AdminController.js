@@ -27,6 +27,19 @@ class AdminController extends BaseController {
         const statsData = await AdminService.getDashboardStats(days);
         BaseController.sendSuccess(res, 'Dashboard stats fetched successfully', statsData);
     })
+
+    static getAllUsers = BaseController.asyncHandler(async (req, res) => {
+        const result = await AdminService.getAllUsers(req.query);
+        BaseController.logAction('FETCH_ALL_USERS', req.admin);
+        BaseController.sendSuccess(res, 'Users fetched successfully', result);
+    })
+
+    static toggleUserBan = BaseController.asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const result = await AdminService.toggleUserBan(id);
+        BaseController.logAction('TOGGLE_USER_BAN', req.admin, { userId: id, newStatus: result.user.status });
+        BaseController.sendSuccess(res, `User status updated to ${result.user.status}`, result);
+    })
 }
 
 module.exports = AdminController;

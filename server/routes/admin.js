@@ -18,6 +18,10 @@ router.put("/order/:id/status", authenticateAdmin, OrderController.updateOrderSt
 router.get("/reports/sales", authenticateAdmin, OrderController.getSalesReport);
 router.get("/stats", authenticateAdmin, AdminController.getDashboardStats);
 
+// User Management
+router.get("/users", authenticateAdmin, AdminController.getAllUsers);
+router.put("/users/:id/ban", authenticateAdmin, AdminController.toggleUserBan);
+
 
 
 module.exports = router;

@@ -60,6 +60,21 @@ const adminApi = {
             method: 'GET',
             params: days ? { days } : {}
         });
+    },
+
+    getAllUsers: async (search = "") => {
+        return makeRequest(adminClient, {
+            url: "/admin/users",
+            method: 'GET',
+            params: search ? { search } : {}
+        });
+    },
+
+    toggleUserBan: async (userId) => {
+        return makeRequest(adminClient, {
+            url: `/admin/users/${userId}/ban`,
+            method: 'PUT'
+        });
     }
 }
 
