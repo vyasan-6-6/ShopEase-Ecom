@@ -3,6 +3,7 @@ const Cart = require("../models/Cart");
 const CouponService = require("./CouponService");
 const { ErrorFactory } = require("../utils/errors");
 const PaymentService = require("./payment");
+const { sendOrderStatusEmail } = require("../utils/nodemailer");
 
 class OrderService {
     static async createOrder(userId, shippingAddress, paymentMethod, couponCode) {
@@ -70,6 +71,8 @@ class OrderService {
         if (paymentMethod === 'COD') {
             await newOrder.save();
             await OrderService.decrementProductStock(newOrder);
+            await newOrder.populate("user", "name email");
+            sendOrderStatusEmail(newOrder.user.email, newOrder, "Placed").catch(err => console.error("Email error:", err));
             await Cart.findOneAndUpdate({ user: userId }, { items: [] });
             
             return {
@@ -111,6 +114,8 @@ class OrderService {
             order.razorpayPaymentId = razorpay_payment_id;
             order.razorpaySignature = razorpay_signature;
             await order.save();
+            await order.populate("user", "name email");
+            sendOrderStatusEmail(order.user.email, order, "Placed").catch(err => console.error("Email error:", err));
 
             await Cart.findOneAndUpdate({ user: userId }, { items: [] });
 
@@ -145,6 +150,8 @@ class OrderService {
         order.razorpaySignature = 'webhook-verified'; 
         
         await order.save();
+        await order.populate("user", "name email");
+        sendOrderStatusEmail(order.user.email, order, "Placed").catch(err => console.error("Email error:", err));
         await Cart.findOneAndUpdate({ user: order.user }, { items: [] });
 
         console.log(`Webhook Success: Order ${order._id} marked as Paid!`);
@@ -174,7 +181,11 @@ class OrderService {
         }
         
         await order.save();
-        await order.populate("items.product", "name images price");
+        await order.populate([
+            { path: "user", select: "name email" },
+            { path: "items.product", select: "name images price" }
+        ]);
+        sendOrderStatusEmail(order.user.email, order, "Cancelled").catch(err => console.error("Email error:", err));
         return order;
     }
 
@@ -196,7 +207,11 @@ class OrderService {
         }
         
         await order.save();
-        await order.populate("items.product", "name images price");
+        await order.populate([
+            { path: "user", select: "name email" },
+            { path: "items.product", select: "name images price" }
+        ]);
+        sendOrderStatusEmail(order.user.email, order, "Returned").catch(err => console.error("Email error:", err));
         return order;
     }
 
@@ -267,10 +282,20 @@ class OrderService {
         }
 
         await order.save();
-        return await order.populate([
+        await order.populate([
             { path: "user", select: "name email" },
             { path: "items.product", select: "name images price" }
         ]);
+
+        if (status === 'Delivered') {
+            sendOrderStatusEmail(order.user.email, order, "Delivered").catch(err => console.error("Email error:", err));
+        } else if (status === 'Cancelled') {
+            sendOrderStatusEmail(order.user.email, order, "Cancelled").catch(err => console.error("Email error:", err));
+        } else if (status === 'Returned') {
+            sendOrderStatusEmail(order.user.email, order, "Returned").catch(err => console.error("Email error:", err));
+        }
+
+        return order;
     }
 
     static async getSalesReport(startDate, endDate){
