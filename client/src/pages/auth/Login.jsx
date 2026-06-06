@@ -1,11 +1,10 @@
 import { selectUser } from "../../redux/features/auth/authSelectors";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import {   useAppSelector } from "../../redux/hooks";
 import { memo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../../components/layout/AuthLayout";
 import LoginForm from "../../components/auth/LoginForm";
-import Button from "../../components/common/Button";
-import { mergeUserCart } from "../../redux/features/cart/cartSlice";
+import Button from "../../components/common/Button"; 
 
 const Login = memo(() => {
     const navigate = useNavigate();

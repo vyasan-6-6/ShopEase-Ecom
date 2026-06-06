@@ -24,7 +24,7 @@ export const resendOtp = createAsyncThunk("auth/resendOtp", async (email, { reje
         await authAPI.resendOtp({ email });
         return true;
     } catch (error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue(error?.message);
     }
 });
 
@@ -34,6 +34,7 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (userCredentia
 
         return res.data.user;
     } catch (error) {
+        console.log("login error:", error);
         return rejectWithValue(error?.message);
     }
 });

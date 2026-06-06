@@ -14,11 +14,9 @@ const dispatch  = useAppDispatch();
 const navigate = useNavigate()
 const loading = useAppSelector(selectAdminLoading);
 const admin = useAppSelector(selectAdmin);
- const [serverErrors, setServerErrors] = useState({});
-    const {register,handleSubmit,formState:{errors}} = useForm();
+    const {register,handleSubmit,setError,formState:{errors}} = useForm();
 
 const onSubmit = async (data) => {
-    setServerErrors({});
 
     try {
         const actionResult = await dispatch(loginAdmin(data));
@@ -29,21 +27,15 @@ const onSubmit = async (data) => {
                 
                 const lowerMsg = (errorMsg || "").toLowerCase();
                  
-                const newErrors = {};
-
                 if (lowerMsg.includes("email") || lowerMsg.includes("admin") || lowerMsg.includes("not found")) {
-                    newErrors.email = errorMsg;
+                    setError("email", { type: "server", message: errorMsg });
                 }
                 
                 if (lowerMsg.includes("password") || lowerMsg.includes("credential")) {
-                    newErrors.password = errorMsg;
+                    setError("password", { type: "server", message: errorMsg });
                 }
 
-                if (Object.keys(newErrors).length > 0) {
-                    setServerErrors(newErrors);
-                } else {
-                    toast.error(errorMsg || "Login failed. Please try again.");
-                }
+                toast.error(errorMsg || "Login failed. Please try again.");
             }
         
     } catch (error) {
@@ -73,14 +65,14 @@ useEffect(()=>{
           type="email"
           placeholder="Enter your email"
           {...register("email",{required:"Email is required"})} 
-          error={errors.email?.message || serverErrors.email}
+          error={errors.email?.message}
         />
           <Input
           label="Password" 
           type="password"
           placeholder="Enter your password"
           {...register("password",{required:"Password is required"})}  
-          error={errors.password?.message || serverErrors.password}
+          error={errors.password?.message}
         />
         <div className="pt-2">
             <Button fullWidth type="submit" disabled={loading} loading={loading}>

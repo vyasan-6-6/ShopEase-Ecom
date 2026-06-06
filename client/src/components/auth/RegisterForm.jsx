@@ -25,20 +25,18 @@ const RegisterForm = () => {
     const {
         register,
         handleSubmit, 
+        setError,
         formState: { errors },
     } = useForm({
         resolver: yupResolver(registerSchema),
         mode: "onChange",
     });
     
-
-    const [serverErrors, setServerErrors] = useState({});
     const [otp, setOtp] = useState("");
     const [otpError, setOtpError] = useState("");
 
     const onSubmit = useCallback(
         async (data) => {
-            setServerErrors({});
             const trimmedData = {
                 firstName: data.firstName?.trim(),
                 lastName: data.lastName?.trim(),
@@ -58,25 +56,19 @@ const RegisterForm = () => {
                 const errorMsg = result.payload || "Registration failed";
                 const lowerMsg = errorMsg.toLowerCase();
                 
-                const newErrors = {};
-                
                 // Intelligently route backend errors to the appropriate input fields
                 if (lowerMsg.includes("email") || lowerMsg.includes("user") || lowerMsg.includes("exist")) {
-                    newErrors.email = errorMsg;
+                    setError("email", { type: "server", message: errorMsg });
                 } 
                 if (lowerMsg.includes("password")) {
-                    newErrors.password = errorMsg;
+                    setError("password", { type: "server", message: errorMsg });
                 }
                 if (lowerMsg.includes("name")) {
-                    newErrors.firstName = errorMsg;
-                    newErrors.lastName = errorMsg; 
+                    setError("firstName", { type: "server", message: errorMsg });
+                    setError("lastName", { type: "server", message: errorMsg });
                 }
 
-                if (Object.keys(newErrors).length > 0) {
-                    setServerErrors(newErrors);
-                } else {
-                    toast.error(errorMsg);
-                }
+                toast.error(errorMsg);
             }
         },
         [dispatch],
@@ -161,35 +153,35 @@ const RegisterForm = () => {
                     <Input
                         label={"FirstName"}
                         type="text"
-                        {...register("firstName", { onChange: () => { if (serverErrors.firstName) setServerErrors(prev => ({...prev, firstName: ""})) }})}
-                        error={errors.firstName?.message || serverErrors.firstName}
+                        {...register("firstName")}
+                        error={errors.firstName?.message}
                         placeholder="First Name"
                     />
                     <Input
                         label={"LastName"}
                         type="text"
-                        {...register("lastName", { onChange: () => { if (serverErrors.lastName) setServerErrors(prev => ({...prev, lastName: ""})) }})}
-                        error={errors.lastName?.message || serverErrors.lastName}
+                        {...register("lastName")}
+                        error={errors.lastName?.message}
                         placeholder="Last Name"
                     />
                     <Input
                         label={"Email"}
                         type="email"
-                        {...register("email", { onChange: () => { if (serverErrors.email) setServerErrors(prev => ({...prev, email: ""})) }})}
-                        error={errors.email?.message || serverErrors.email}
+                        {...register("email")}
+                        error={errors.email?.message}
                         placeholder="Email"
                     />
                     <Input
                         label={"Password"}
-                        {...register("password", { onChange: () => { if (serverErrors.password) setServerErrors(prev => ({...prev, password: ""})) }})}
-                        error={errors.password?.message || serverErrors.password}
+                        {...register("password")}
+                        error={errors.password?.message}
                         type="password"
                         placeholder="Password"
                     />
                     <Input
                         label={"Confirm Password"}
                         {...register("confirmPassword")}
-                        error={errors.confirmPassword?.message || serverErrors.password}
+                        error={errors.confirmPassword?.message}
                         type="password"
                         placeholder="Confirm Password"
                     />

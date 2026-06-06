@@ -23,6 +23,7 @@ class ResponseFormatter {
 
         const response = {
             ...formattedError,
+            message: formattedError.error.message, // Expose message at top level for frontend
             timestamp: new Date().toISOString(),
             requestId: res.locals.requestId || null,
         };

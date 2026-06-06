@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Input from "../common/Input";
@@ -19,11 +19,10 @@ const LoginForm = () => {
     const loading = useAppSelector(selectAuthLoading);
 
 
-    const [serverErrors, setServerErrors] = useState({});
-
     const {
         register,
         handleSubmit,
+        setError,
         formState: { errors },
     } = useForm({
         resolver: yupResolver(loginSchema),
@@ -32,12 +31,9 @@ const LoginForm = () => {
 
     const onSubmit = useCallback(
         async (data, e) => {
-             
+
             if (e) e.preventDefault();
-            
-            // Clear any previous server errors before submitting
-            setServerErrors({});
-            
+
             try {
                 const trimmedData = {
                     email: data.email?.trim(),
@@ -55,61 +51,45 @@ const LoginForm = () => {
                         navigate("/auth/register");
                     } else {
                         const lowerMsg = (errorMsg || "").toLowerCase();
-                        
-                        // Pass errors exactly where they belong natively 
-                        const newErrors = {};//usecase of newErrors is to store the errors in the form of key-value pairs so that we can display them in the form of error messages
-                        
+
                         if (lowerMsg.includes("email") || lowerMsg.includes("user") || lowerMsg.includes("not found")) {
-                            newErrors.email = errorMsg;
-                        }
-                        
-                        if (lowerMsg.includes("password") || lowerMsg.includes("credential")) {
-                            newErrors.password = errorMsg;
+                            setError("email", { type: "server", message: errorMsg });
                         }
 
-                        // If the backend sent a generic "Invalid email or password", both fields will be populated!
-                        if (Object.keys(newErrors).length > 0) {
-                            setServerErrors(newErrors);
-                        } else {
-                            toast.error(errorMsg || "Login failed. Please try again.");
+                        if (lowerMsg.includes("password") || lowerMsg.includes("credential")) {
+                            setError("password", { type: "server", message: errorMsg });
                         }
+
+                        toast.error(errorMsg || "Login failed. Please try again.");
                     }
                 }
                 const localItems = JSON.parse(window.localStorage.getItem("cartItems")) || []
-                if(localItems.length>0){
+                if (localItems.length > 0) {
                     dispatch(mergeUserCart(localItems)).unwrap();
-                }else{
+                } else {
                     dispatch(fetchCart())
                 }
-        } catch (err) {
-            console.error("Unhandled error in onSubmit:", err);
-        }
-    },
-    [dispatch, navigate]
-);
+            } catch (err) {
+                console.error("Unhandled error in onSubmit:", err);
+            }
+        },
+        [dispatch, navigate]
+    );
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input
                 label="Email"
                 type="email"
-                {...register("email", {
-                    onChange: () => {
-                        if (serverErrors.email) setServerErrors(prev => ({ ...prev, email: "" }));//onchange event is triggered when the value of the input field changes.so when the user starts typing the email, the error message will be cleared.
-                    }
-                })}
-                error={errors.email?.message || serverErrors.email}
+                {...register("email")}
+                error={errors.email?.message}
                 placeholder="Enter your email"
             />
             <Input
                 label="Password"
                 type="password"
-                {...register("password", {
-                    onChange: () => {
-                        if (serverErrors.password) setServerErrors(prev => ({ ...prev, password: "" }));
-                    }
-                })}
-                error={errors.password?.message || serverErrors.password}
+                {...register("password")}
+                error={errors.password?.message}
                 placeholder="Enter your password"
             />
 
