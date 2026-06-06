@@ -16,13 +16,8 @@ const OrderController = require('../controllers/OrderController');
 router.get("/orders", authenticateAdmin, OrderController.getAllOrders);
 router.put("/order/:id/status", authenticateAdmin, OrderController.updateOrderStatus);
 router.get("/reports/sales", authenticateAdmin, OrderController.getSalesReport);
+router.get("/stats", authenticateAdmin, AdminController.getDashboardStats);
 
-// router.get("/users/:id");
-// router.put("/users/:id");
-// router.post("/users/:id/ban");
-// router.post("/users/:id/unban");
-// router.post("/users/:id/force-logout");
-// router.patch("/users/:id/status");
-// router.get("/stats");
+
 
 module.exports = router;

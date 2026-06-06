@@ -52,6 +52,14 @@ const adminApi = {
             method: 'GET',
             params: { startDate, endDate }
         });
+    },
+
+    getDashboardStats: async (days = null) => {
+        return makeRequest(adminClient, {
+            url: "/admin/stats",
+            method: 'GET',
+            params: days ? { days } : {}
+        });
     }
 }
 

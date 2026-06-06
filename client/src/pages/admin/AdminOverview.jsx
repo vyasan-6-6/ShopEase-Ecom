@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react';
+import adminApi from '../../services/AdminService';
+import { toast } from 'react-toastify';
 
 import { 
     Users, 
     ShoppingBag, 
-    DollarSign, 
+    IndianRupee,
     Package, 
     TrendingUp, 
     ArrowUpRight, 
@@ -12,53 +15,125 @@ import {
 import { memo } from 'react';
 
 const AdminOverview = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [statsData, setStatsData] = useState({
+        totalRevenue: { value: "₹0.00", change: null },
+        totalOrders: { value: "0", change: null },
+        totalUsers: { value: "0", change: null },
+        totalProducts: { value: "0", change: null }
+    });
+    const [recentActivities, setRecentActivities] = useState([]);
+    const [daysFilter, setDaysFilter] = useState(null);
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setIsLoading(true);
+                const res = await adminApi.getDashboardStats(daysFilter);
+                if (res.success) {
+                    setStatsData(res.data.stats);
+                    setRecentActivities(res.data.recentActivities);
+                }
+            } catch (error) {
+                toast.error("Failed to load dashboard statistics");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, [daysFilter]);
+
+    const handleDownloadReport = async () => {
+        setIsDownloading(true);
+        try {
+            // Get date range (last 30 days)
+            const endDate = new Date().toISOString();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            
+            const res = await adminApi.getSalesReport(startDate.toISOString(), endDate);
+            
+            if (res.success && res.data) {
+                const { totalRevenue, totalOrders, mostSoldProducts } = res.data;
+                
+                // Construct CSV
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "=== ShopEase 30-Day Sales Summary ===\n\n";
+                csvContent += `Total Revenue,${totalRevenue}\n`;
+                csvContent += `Total Orders,${totalOrders}\n\n`;
+                csvContent += "--- Top 5 Best Selling Products ---\n";
+                csvContent += "Product Name,Quantity Sold,Revenue Generated\n";
+                
+                mostSoldProducts.forEach(prod => {
+                    const cleanName = prod.name.replace(/,/g, ''); // Remove commas to prevent CSV breakage
+                    csvContent += `${cleanName},${prod.totalQuantitySold},${prod.revenueGenerated}\n`;
+                });
+
+                // Trigger Download
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "shopease_30day_report.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                toast.success("Report downloaded successfully!");
+            }
+        } catch (error) {
+            toast.error("Failed to generate report");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     const stats = [
         {
             title: "Total Revenue",
-            value: "₹128,430.00",
-            change: "+12.5%",
-            isPositive: true,
-            icon: DollarSign,
+            value: statsData.totalRevenue?.value || "₹0.00",
+            change: statsData.totalRevenue?.change,
+            icon: IndianRupee,
             color: "text-emerald-500",
             bg: "bg-emerald-50"
         }, 
         {
             title: "Total Orders",
-            value: "1,240",
-            change: "+8.2%",
-            isPositive: true,
+            value: statsData.totalOrders?.value || "0",
+            change: statsData.totalOrders?.change,
             icon: ShoppingBag,
             color: "text-indigo-500",
             bg: "bg-indigo-50"
         },
         {
             title: "Active Users",
-            value: "8,201",
-            change: "+15.3%",
-            isPositive: true,
+            value: statsData.totalUsers?.value || "0",
+            change: statsData.totalUsers?.change,
             icon: Users,
             color: "text-blue-500",
             bg: "bg-blue-50"
         },
         {
             title: "Total Products",
-            value: "450",
-            change: "-2.4%",
-            isPositive: false,
+            value: statsData.totalProducts?.value || "0",
+            change: statsData.totalProducts?.change,
             icon: Package,
             color: "text-amber-500",
             bg: "bg-amber-50"
         }
     ];
 
-    // Dummy Data for Recent Activities
-    const recentActivities = [
-        { id: 1, user: "John Doe", action: "placed an order", time: "2 minutes ago", amount: "₹150.00", status: "Success" },
-        { id: 2, user: "Sarah Smith", action: "created a new account", time: "15 minutes ago", amount: null, status: "Success" },
-        { id: 3, user: "Mike Johnson", action: "updated product inventory", time: "1 hour ago", amount: null, status: "Update" },
-        { id: 4, user: "Emma Wilson", action: "requested a refund", time: "3 hours ago", amount: "₹45.00", status: "Pending" },
-        { id: 5, user: "Robert Brown", action: "purchased 'Pro Headphones'", time: "5 hours ago", amount: "₹299.00", status: "Success" }
-    ];
+    if (isLoading) {
+        return (
+            <div className="flex h-[80vh] items-center justify-center">
+                <div className="flex flex-col items-center space-y-4">
+                    <span className="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-gray-500 font-medium">Loading Overview...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -69,11 +144,23 @@ const AdminOverview = () => {
                     <p className="text-gray-500 mt-1 font-medium">Welcome back, Admin. Here's what's happening today.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 font-bold hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                    <button 
+                        onClick={() => setDaysFilter(daysFilter === 30 ? null : 30)}
+                        className={`px-4 py-2 border rounded-xl font-bold transition-all flex items-center gap-2 shadow-sm ${
+                            daysFilter === 30 
+                            ? 'bg-gray-100 border-gray-300 text-gray-900' 
+                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                        }`}
+                    >
                         <Clock className="w-4 h-4" /> Last 30 Days
                     </button>
-                    <button className="px-4 py-2 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-black/10 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4" /> Download Report
+                    <button 
+                        onClick={handleDownloadReport}
+                        disabled={isDownloading}
+                        className={`px-4 py-2 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-black/10 flex items-center gap-2 ${isDownloading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    >
+                        <TrendingUp className="w-4 h-4" /> 
+                        {isDownloading ? 'Generating...' : 'Download Report'}
                     </button>
                 </div>
             </div>
@@ -89,10 +176,12 @@ const AdminOverview = () => {
                             <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
-                            <div className={`flex items-center gap-1 text-sm font-bold ${stat.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                {stat.isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
-                                {stat.change}
-                            </div>
+                            {stat.change && (
+                                <span className={`text-sm font-bold flex items-center gap-1 ${stat.change.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                    {stat.change.isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                                    {stat.change.value}
+                                </span>
+                            )}
                         </div>
                         <div>
                             <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider">{stat.title}</p>
@@ -108,7 +197,9 @@ const AdminOverview = () => {
                 <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                     <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
                         <h2 className="text-xl font-black text-gray-900">Recent Activity</h2>
-                        <button className="text-indigo-600 text-sm font-bold hover:underline">View All</button>
+                        <button className="text-indigo-600 text-sm font-bold hover:underline">
+                            {/* View All */}
+                            </button>
                     </div>
                     <div className="p-0">
                         {recentActivities.map((activity, idx) => (
