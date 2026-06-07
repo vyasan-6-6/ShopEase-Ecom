@@ -141,6 +141,16 @@ useEffect(() => {
                     <Button disabled={cooldown > 0} variant="outline" fullWidth onClick={handleResent}>
                         {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend OTP"}
                     </Button>
+
+                    <Button 
+                        disabled={loading} 
+                        fullWidth 
+                        variant="text" 
+                        onClick={() => dispatch(resetForgotFlow())}
+                        className="text-gray-500 hover:text-gray-800"
+                    >
+                        Cancel & Return
+                    </Button>
                 </div>
             )}
             {step === "reset" && (
