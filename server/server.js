@@ -33,7 +33,8 @@ class Server {
 
             logger.info('Server initialized successfully');
         } catch (error) {
-            logger.error('Server initialization failed:',error);
+            console.error('Server initialization failed:', error);
+            logger.error('Server initialization failed:', error);
             process.exit(1);
         }
     }
