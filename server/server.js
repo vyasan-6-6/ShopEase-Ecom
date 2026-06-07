@@ -1,4 +1,14 @@
+console.log("SERVER.JS: Booting up...");
+process.on('uncaughtException', (err) => {
+    console.error("CRITICAL UNCAUGHT EXCEPTION:", err);
+    process.exit(1);
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error("CRITICAL UNHANDLED REJECTION:", reason);
+    process.exit(1);
+});
 require("dotenv").config();
+console.log("SERVER.JS: dotenv loaded.");
 const express = require("express");
 const config = require("./config/config");
 const http = require("http");
