@@ -509,7 +509,7 @@ const Navbar = () => {
                                 
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full flex items-center justify-center gap-3 px-4 py-3.5 text-base font-black text-white bg-red-600 rounded-2xl shadow-lg shadow-red-100 active:scale-95 transition-all mt-4"
+                                    className="w-full flex items-center justify-start gap-3 px-4 py-3 text-base font-black text-white bg-red-600 rounded-2xl shadow-lg shadow-red-100 active:scale-95 transition-all mt-4"
                                 >
                                     <LogOut className="w-5 h-5" />
                                     Logout
