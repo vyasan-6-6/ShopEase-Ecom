@@ -132,17 +132,8 @@ const RegisterForm = () => {
         }
     }, [cooldown]);
 
-    // Redirect to login/register after 10 minutes of inactivity on the OTP screen
-    useEffect(() => {
-        if (step === "otp") {
-            const timer = setTimeout(() => {
-                toast.error("OTP expired. Please try again.");
-                dispatch(logout());
-                navigate("/auth/register");
-            }, 600000); // 10 minutes in milliseconds
-            return () => clearTimeout(timer);
-        }
-    }, [step, dispatch, navigate]);
+    // Removed the frontend 10-minute auto-logout timer because it didn't reset
+    // when 'Resend OTP' was clicked. The backend already validates OTP expiration.
 
 
 
@@ -204,6 +195,16 @@ const RegisterForm = () => {
 
                     <Button disabled={cooldown > 0 || loading} fullWidth variant="outline" onClick={handleResent}>
                         {cooldown > 0 ? `Resend OTP in ${cooldown}s` : "Resend OTP"}
+                    </Button>
+
+                    <Button 
+                        disabled={loading} 
+                        fullWidth 
+                        variant="text" 
+                        onClick={() => dispatch(logout())}
+                        className="text-gray-500 hover:text-gray-800"
+                    >
+                        Cancel & Return
                     </Button>
                 </div>
             )}

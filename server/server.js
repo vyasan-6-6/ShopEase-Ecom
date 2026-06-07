@@ -13,8 +13,8 @@ const express = require("express");
 const config = require("./config/config");
 const http = require("http");
 const dbConnection = require("./config/db");
-const {setupMiddleware} = require('./middlewares/setup');
-const {setupRoutes} = require("./routes");
+const { setupMiddleware } = require('./middlewares/setup');
+const { setupRoutes } = require("./routes");
 const logger = require("./utils/logger");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 
@@ -25,18 +25,18 @@ class Server {
         this.port = config.PORT;
     }
 
-    async initialize(){
+    async initialize() {
         try {
             await dbConnection.connect();
 
             setupMiddleware(this.app);
-        
+
             setupRoutes(this.app);
 
-            
 
-           this.app.use(notFound);
-           this.app.use(errorHandler);
+
+            this.app.use(notFound);
+            this.app.use(errorHandler);
 
 
             //initialze socket
@@ -49,34 +49,34 @@ class Server {
         }
     }
 
-    async start(){
+    async start() {
         await this.initialize();
-        this.server.listen(this.port,()=>{
+        this.server.listen(this.port, () => {
             logger.info(`Server running in ${config.NODE_ENV} mode on port ${this.port}`);
             //seeders
         });
         this.setupGracefulShutdown();
     }
 
-  setupGracefulShutdown(){
-    const gracefulShutdown = async (signal)=>{
-        logger.info(`${signal} received. Starting graceful shutdown...`);
-        this.server.close(async ()=>{
-             logger.info('HTTP server closed');
+    setupGracefulShutdown() {
+        const gracefulShutdown = async (signal) => {
+            logger.info(`${signal} received. Starting graceful shutdown...`);
+            this.server.close(async () => {
+                logger.info('HTTP server closed');
 
-             await dbConnection.disconnect();
-             logger.info('Graceful shutdown completed');
+                await dbConnection.disconnect();
+                logger.info('Graceful shutdown completed');
 
-             process.exit(0);
-        })
+                process.exit(0);
+            })
+        }
+        process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+        process.on("SIGINT", () => gracefulShutdown("SIGINT"));
     }
-    process.on("SIGTERM",()=>gracefulShutdown("SIGTERM"));
-    process.on("SIGINT",()=>gracefulShutdown("SIGINT"));
-  }
-    
+
 }
 
 const appServer = new Server();
 appServer.start();
 
-module.exports=appServer.app;
+module.exports = appServer.app;

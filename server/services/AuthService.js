@@ -150,7 +150,7 @@ class AuthService {
         if (user.isVerified) {
             throw ErrorFactory.conflict("User already verified");
         }
-        if (user.otp?.lastSendAt && Date.now() - user.otp.lastSendAt < 60 * 1000) {
+        if (user.otp?.lastSendAt && Date.now() - user.otp.lastSendAt < 55 * 1000) {
             throw ErrorFactory.authentication("Please wait before requesting another OTP.");
         }
 
