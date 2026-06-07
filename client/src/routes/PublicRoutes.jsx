@@ -13,6 +13,10 @@ import Register from "../pages/auth/Register";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import NotFound from "../pages/public/NotFound";
 import ServerError from "../pages/public/ServerError";
+import Contact from "../pages/public/Contact";
+import FAQ from "../pages/public/FAQ";
+import Shipping from "../pages/public/Shipping";
+import Returns from "../pages/public/Returns";
 
 const PublicRoutes = () => {
     return (
@@ -22,6 +26,10 @@ const PublicRoutes = () => {
                 <Route path="shop" element={<Shop />} />
                 <Route path="product/:id" element={<SingleProduct />} />
                 <Route path="cart" element={<Cart />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="faq" element={<FAQ />} />
+                <Route path="shipping" element={<Shipping />} />
+                <Route path="returns" element={<Returns />} />
                 <Route path="500" element={<ServerError />} />
                 
                 <Route element={<ProtectedRoute allowedRoles={["user", "admin"]} />}>
