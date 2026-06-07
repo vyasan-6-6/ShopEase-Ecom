@@ -26,7 +26,7 @@ const setupMiddleware = (app) => {
         max: config.RATE_LIMIT.MAX_REQUESTS,
         message: {
             success: false,
-            message: "Too many requests from this IP, please try again later.",
+            message: "Please try again later, you have reached maximum limit for sending or logging.",
         },
         standardHeaders: true,
         legacyHeaders: false,
@@ -59,7 +59,7 @@ const createAuthLimiter =()=>{
         max:config.RATE_LIMIT.AUTH_MAX_REQUESTS,
          message: {
       success: false,
-      message: 'Too many authentication attempts, please try again later.'
+      message: 'Please try again later, you have reached maximum limit for sending or logging.'
     },
     standardHeaders:true,
     legacyHeaders:false
