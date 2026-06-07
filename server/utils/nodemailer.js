@@ -20,7 +20,7 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
     : "Thank you for joining ShopEase! Please use the following code to verify your account:";
 
   await transporter.sendMail({
-    from: `"ShopEase" <${process.env.SMTP_USER}>`,
+    from: `"ShopEase" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
     to: email,
     subject: subject,
     html: `
@@ -69,7 +69,7 @@ const sendOrderStatusEmail = async (email, order, status) => {
   }
 
   await transporter.sendMail({
-    from: `"ShopEase" <${process.env.SMTP_USER}>`,
+    from: `"ShopEase" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
     to: email,
     subject: subject,
     html: `
