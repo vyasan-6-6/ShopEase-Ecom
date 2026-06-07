@@ -39,6 +39,7 @@ class DatabaseConnection {
             });
 
         } catch (error) {
+            console.error("MongoDB Connection failed :", error);
             logger.error("MongoDb Connection failed :", error);
             process.exit(1);
         }
