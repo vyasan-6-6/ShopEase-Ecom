@@ -1,16 +1,16 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
- service: 'gmail',
+  service: 'gmail',
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMPT_PORT) || 465, // or 587 false
-  secure: process.env.SMPT_PORT===465 // true, 
-  , 
+  port: Number(process.env.SMTP_PORT) || 465, // or 587 false
+  secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for 587
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
-  },pool:true,
-  tls:{rejectUnauthorized:false}//for dev only
+  },
+  pool: true,
+  tls: { rejectUnauthorized: false } //for dev only
 });
 const sendOtpEmail = async (email, otp, type = "verification") => {
   const isReset = type === "reset";
@@ -21,7 +21,7 @@ const sendOtpEmail = async (email, otp, type = "verification") => {
     : "Thank you for joining ShopEase! Please use the following code to verify your account:";
 
   await transporter.sendMail({
-    from: `"ShopEase" <${process.env.EMAIL_USER}>`,
+    from: `"ShopEase" <${process.env.SMTP_USER}>`,
     to: email,
     subject: subject,
     html: `
@@ -70,7 +70,7 @@ const sendOrderStatusEmail = async (email, order, status) => {
   }
 
   await transporter.sendMail({
-    from: `"ShopEase" <${process.env.EMAIL_USER}>`,
+    from: `"ShopEase" <${process.env.SMTP_USER}>`,
     to: email,
     subject: subject,
     html: `
