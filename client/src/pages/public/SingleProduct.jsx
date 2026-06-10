@@ -330,10 +330,10 @@ const SingleProduct = () => {
                     </div>
                 </div>
 
-                {/* Side-by-Side Zoom Overlay (Flipkart Style) - Only visible on desktop */}
+                {/* Side-by-Side Zoom Overlay (Small Floating Box) - Only visible on desktop */}
                 {isZooming && mainImage && (
                     <div 
-                        className="hidden md:block absolute top-0 right-0 w-1/2 h-full bg-white z-50 border-l border-gray-100 shadow-inner pointer-events-none"
+                        className="hidden md:block absolute top-12 left-1/2 ml-8 w-[400px] h-[400px] bg-white z-50 border border-gray-200 shadow-2xl rounded-[2rem] pointer-events-none"
                         style={{
                             backgroundImage: `url(${mainImage})`,
                             backgroundPosition: backgroundPosition,
