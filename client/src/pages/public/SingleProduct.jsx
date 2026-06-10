@@ -198,13 +198,13 @@ const SingleProduct = () => {
                                     <img
                                         src={mainImage}
                                         alt={product.name}
-                                        className={`w-full h-full object-contain p-4 transition-opacity duration-300 ${isZooming ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
+                                        className={`w-full h-full object-contain p-4 transition-opacity duration-300 ${isZooming ? 'opacity-0' : 'opacity-100'}`}
                                     />
                                     
-                                    {/* In-Place Zoom Overlay (Approach 1) - Only visible on Mobile */}
+                                    {/* In-Place Zoom Overlay - Visible on all devices */}
                                     {isZooming && (
                                         <div 
-                                            className="absolute inset-0 z-10 pointer-events-none md:hidden"
+                                            className="absolute inset-0 z-10 pointer-events-none"
                                             style={{
                                                 backgroundImage: `url(${mainImage})`,
                                                 backgroundPosition: backgroundPosition,
@@ -330,18 +330,7 @@ const SingleProduct = () => {
                     </div>
                 </div>
 
-                {/* Side-by-Side Zoom Overlay (Small Floating Box) - Only visible on desktop */}
-                {isZooming && mainImage && (
-                    <div 
-                        className="hidden md:block absolute top-12 left-1/2 ml-8 w-[400px] h-[400px] bg-white z-50 border border-gray-200 shadow-2xl rounded-[2rem] pointer-events-none"
-                        style={{
-                            backgroundImage: `url(${mainImage})`,
-                            backgroundPosition: backgroundPosition,
-                            backgroundSize: '250%',
-                            backgroundRepeat: 'no-repeat'
-                        }}
-                    />
-                )}
+
             </div>
 
             {/* Reviews Section */}
