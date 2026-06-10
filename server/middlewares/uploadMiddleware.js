@@ -1,30 +1,30 @@
 const multer =require("multer");
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const path = require("path");
+const config = require("../config/config");
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "./uploads"); // We will save it locally in the server/uploads floor
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
-    },
-});
+cloudinary.config(config.CLOUDINARY);
 
-const fileFilter = (req, file, cb) => {
-    // Real-world e-commerce checks!
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    
-    if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error("Only .jpeg, .jpg, .png and .webp formats allowed!"), false);
+const storage = new CloudinaryStorage({
+    cloudinary:cloudinary,
+    params:{
+        folder: (req, file) => {
+            // Dynamically assign folders based on the fieldname defined in routes
+            if (file.fieldname === "avatar") return "shopease_avatars";
+            if (file.fieldname === "images") return "shopease_products";
+            if (file.fieldname === "image") return "shopease_banners";
+            return "shopease_general";
+        },
+        allowed_formats: ["jpg", "jpeg", "png", "webp"]
     }
-};
+
+})
+ 
+ 
 
 const upload = multer({
-    storage,
-    fileFilter,
+    storage, 
    limits: { fileSize: 1024 * 1024 * 5 } // 5MB limit
 });
 

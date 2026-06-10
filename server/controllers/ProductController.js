@@ -1,7 +1,6 @@
 const { ProductService } = require("../services");
 const BaseController = require("./BaseController");
 const { productValidation } = require("../utils/validation");
-const { uploadToCloudinary } = require("../utils/cloudinary");
 
 class ProductController extends BaseController {
     // POST /api/admin/products/upload-images
@@ -10,14 +9,8 @@ class ProductController extends BaseController {
             return BaseController.sendError(res, "No images provided", 400);
         }
 
-        const uploadedUrls = [];
-        for (const file of req.files) {
-            const result = await uploadToCloudinary(file.path, "shopease_products");
-            if (result && result.secure_url) {
-                uploadedUrls.push(result.secure_url);
-            }
-        }
-
+        const uploadedUrls = req.files.map(file=>file.path);
+        
         if (uploadedUrls.length === 0) {
             return BaseController.sendError(res, "Image upload failed", 500);
         }

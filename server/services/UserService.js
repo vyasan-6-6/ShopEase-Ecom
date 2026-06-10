@@ -1,5 +1,4 @@
-const User = require("../models/User");
-const { uploadToCloudinary } = require("../utils/cloudinary");
+const User = require("../models/User"); 
 const { ErrorFactory } = require("../utils/errors");
 
 class UserService {
@@ -65,17 +64,14 @@ class UserService {
             throw ErrorFactory.validation("No image file provided");
         }
 
-        const uploadResponse = await uploadToCloudinary(localFilePath);
-
-        if (!uploadResponse || !uploadResponse.secure_url) {
-            throw ErrorFactory.generic("Failed to upload image to cloud storage");
-        }
-
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { avatar: uploadResponse.secure_url },
+            { avatar: localFilePath },
             { returnDocument: "after", runValidators: true },
         );
+        if (!updatedUser) {
+            throw ErrorFactory.notFound("User not found");
+        }
         return {
             user: updatedUser,
         };

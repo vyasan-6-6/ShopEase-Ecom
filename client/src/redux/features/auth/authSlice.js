@@ -177,7 +177,7 @@ export const authSlice = createSlice({
 
         setVerificationFlow: (state, action) => {
             state.registerFlow.step = "otp";
-            state.registerFlow.email = action.payload; // Saves the email they typed into Login!
+            state.registerFlow.email = action.payload; 
             state.registerFlow.cooldown = 60;
         },
     },
