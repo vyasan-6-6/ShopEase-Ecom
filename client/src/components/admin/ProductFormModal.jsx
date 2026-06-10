@@ -22,6 +22,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
     const [previewUrls, setPreviewUrls] = useState([]); //stores both uploaded and newly selected images
     const [existingImages, setExistingImages] = useState([]); //storing uploaded images url
     const [isUploadingImages, setIsUploadingImages] = useState(false); //flag for uploading images
+    const [imageError, setImageError] = useState(""); //validation for images
 
     useEffect(() => {
         if (isOpen) {
@@ -51,6 +52,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                 setPreviewUrls([]);
             }
             setSelectedFiles([]);
+            setImageError("");
         }
     }, [isOpen, initialData, categories, reset]);
 
@@ -58,6 +60,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
 
+        setImageError("");
         setSelectedFiles((prev) => [...prev, ...files]);
 
         const newPreviews = files.map((file) => URL.createObjectURL(file));
@@ -78,6 +81,11 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
 
     const handleFormSubmit = async (data) => {
         let finalImages = [...existingImages];
+
+        if (finalImages.length === 0 && selectedFiles.length === 0) {
+            setImageError("Please upload at least one product image");
+            return;
+        }
 
         // If there are new files to upload to cloudinary
         if (selectedFiles.length > 0) {
@@ -234,7 +242,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                                                 type="file"
                                                 multiple
                                                 accept="image/*"
-                                                className="sr-only"
+                                                className="sr-only"//sr-only is used to hide the input but still allow it to be focused by screen readers and other assistive technologies
                                                 onChange={handleFileChange}
                                             />
                                         </label>
@@ -245,6 +253,11 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading })
                                     </p>
                                 </div>
                             </div>
+                            {imageError && (
+                                <p className="mt-2 text-sm text-red-500 font-medium">
+                                    {imageError}
+                                </p>
+                            )}
 
                             {/* Image Previews */}
                             {previewUrls.length > 0 && (
