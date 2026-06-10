@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { fetchProductById, clearSelectedProduct } from "../../redux/features/product/productSlice";
+import { fetchProductById, clearSelectedProduct, setSelectedProduct } from "../../redux/features/product/productSlice";
 import { selectSelectedProduct, selectProductLoading, selectProductError } from "../../redux/features/product/productSelectors";
 import { addItemToCart, addToCartLocal } from "../../redux/features/cart/cartSlice";
 import productApi from "../../services/ProductService";
@@ -24,6 +24,9 @@ const SingleProduct = () => {
     const error = useAppSelector(selectProductError);
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const isAdminAuthenticated = useAppSelector(selectIsAdminAuthenticated);
+    
+    // Only select the specific product from cache to avoid unnecessary re-renders
+    const cachedProduct = useAppSelector((state) => state.product.productCache[id]);
 
     const [quantity, setQuantity] = useState(1);
     const [mainImage, setMainImage] = useState("");
@@ -56,13 +59,17 @@ const SingleProduct = () => {
 
     useEffect(() => {
         if (id) {
-            dispatch(fetchProductById(id));
+            // Check cache first using the specific selector
+            if (cachedProduct) {
+                dispatch(setSelectedProduct(cachedProduct));
+            } else {
+                // If not in cache, fetch from API
+                dispatch(fetchProductById(id));
+            }
             fetchReviews(id);
         }
-        return () => {
-            dispatch(clearSelectedProduct());
-        };
-    }, [id, dispatch]);
+        // Removed the clearSelectedProduct on unmount so the UI doesn't stutter on navigation
+    }, [id, dispatch]); // Intentionally omitting cachedProduct to run only on ID change
 
     // Update mainImage when product loads
     useEffect(() => {

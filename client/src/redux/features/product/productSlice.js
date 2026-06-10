@@ -91,6 +91,7 @@ export const fetchProductById = createAsyncThunk(
 const initialState = {
     adminItems: [],
     publicItems: [],
+    productCache: {}, // Dictionary to cache products by ID
     selectedProduct: null, 
     pagination: null,
     isLoading: false,
@@ -107,6 +108,9 @@ const productSlice = createSlice({
         },
         clearSelectedProduct: (state) => {
             state.selectedProduct = null;
+        },
+        setSelectedProduct: (state, action) => {
+            state.selectedProduct = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -148,6 +152,9 @@ const productSlice = createSlice({
             .addCase(fetchProductById.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.selectedProduct = action.payload;
+                if (action.payload) {
+                    state.productCache[action.payload._id || action.payload.id] = action.payload;
+                }
             })
             .addCase(fetchProductById.rejected, (state, action) => {
                 state.isLoading = false;
@@ -218,5 +225,5 @@ const productSlice = createSlice({
     },
 });
 
-export const { clearProductError, clearSelectedProduct } = productSlice.actions;
+export const { clearProductError, clearSelectedProduct, setSelectedProduct } = productSlice.actions;
 export default productSlice.reducer;

@@ -26,7 +26,6 @@ import GlobalErrorFallback from "./components/common/GlobalErrorFallback";
 
 function App() {
     const dispatch = useAppDispatch();
-    const [isVerifyingAuth, setIsVerifyingAuth] = useState(true);
 
     useEffect(() => {
         const verifyAuth = async () => {
@@ -35,31 +34,17 @@ function App() {
             const adminToken = localStorage.getItem(AUTH_CONFIG.adminKey);
 
             // Fetch either (or both) profiles if tokens exist
+            // This runs in the background. The app renders instantly!
             if (token) {
-                await dispatch(getProfile());
+                dispatch(getProfile());
             }
             if (adminToken) {
-                await dispatch(getAdminProfile());
+                dispatch(getAdminProfile());
             }
-
-            // Once finished checking, let the router boot up.
-            setIsVerifyingAuth(false);
-           
         };
 
-        verifyAuth();//we call this function to verify the authentication of the user and if the user is authenticated then it will redirect to the dashboard and if not then it will redirect to the login page 
+        verifyAuth();
     }, [dispatch]);
-
-    if (isVerifyingAuth) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-gray-50">
-                <div className="flex flex-col items-center space-y-4">
-                    <span className="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-gray-500 font-medium">Verifying session...</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <BrowserRouter>
