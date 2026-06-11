@@ -21,6 +21,10 @@ const { notFound, errorHandler } = require("./middlewares/errorHandler");
 class Server {
     constructor() {
         this.app = express();
+        
+        // Trust the first proxy (required for express-rate-limit on Render/Heroku)
+        this.app.set('trust proxy', 1);
+        
         this.server = http.createServer(this.app);
         this.port = config.PORT;
     }
