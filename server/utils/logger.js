@@ -40,7 +40,7 @@ const logger = winston.createLogger({
     transports:[
         infoTransport,
         errorTranspot,
-        ...(process.env.NODE_ENV!== "production" ? [consoleTransport] : [])
+        consoleTransport
     ]
 });
 
