@@ -33,8 +33,10 @@ const ManageCoupon = () => {
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchCoupons());
-    }, [dispatch]);
+        if (!coupons || coupons.length === 0) {
+            dispatch(fetchCoupons());
+        }
+    }, [dispatch, coupons?.length]);
 
     // Create or Update
     const handleSubmit = async (formData) => {

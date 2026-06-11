@@ -17,8 +17,14 @@ const AdminOrders = () => {
         const params = {};
         if (debouncedSearchTerm) params.search = debouncedSearchTerm;
         if (statusFilter !== "All") params.status = statusFilter;
+        
+        // Skip fetching if default view and we already have orders
+        if (Object.keys(params).length === 0 && orders && orders.length > 0) {
+            return;
+        }
+
         dispatch(fetchAllOrders(params));
-    }, [dispatch, debouncedSearchTerm, statusFilter]);
+    }, [dispatch, debouncedSearchTerm, statusFilter, orders?.length]);
 
     const handleStatusFilterChange = (e) => {
         setStatusFilter(e.target.value);
@@ -56,7 +62,7 @@ const AdminOrders = () => {
         }
     };
 
-    const statusOptions = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Returned"];
+    const statusOptions = ["Processing", "Shipped", "Delivered", "Cancelled", "Returned"];
 
     return (
         <div className="space-y-6">

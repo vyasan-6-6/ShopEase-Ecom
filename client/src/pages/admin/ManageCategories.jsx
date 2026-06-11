@@ -31,9 +31,11 @@ const ManageCategories = () => {
     const [editingCategory, setEditingCategory] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
-    useEffect(()=>{
-        dispatch(fetchCategories());
-    },[dispatch]);
+    useEffect(() => {
+        if (!categories || categories.length === 0) {
+            dispatch(fetchCategories());
+        }
+    }, [dispatch, categories.length]);
     // Create or Update
     const handleSubmit = async (formData) => {
         try {

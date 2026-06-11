@@ -41,11 +41,13 @@ const ManageProducts = () => {
     const [viewingProduct, setViewingProduct] = useState(null);
 
     useEffect(() => {
-        dispatch(fetchAdminProducts());
-        if (!categories || categories?.length === 0){//we check for empty array to avoid fetching categories again and again if we already have categories in the state
+        if (!products || products.length === 0) {
+            dispatch(fetchAdminProducts());
+        }
+        if (!categories || categories?.length === 0){
             dispatch(fetchCategories());
         }
-    }, [dispatch]);
+    }, [dispatch, products.length, categories?.length]);
 
     // Create or Update
     const handleSubmit = async (formData) => {

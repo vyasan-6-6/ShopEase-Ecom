@@ -4,17 +4,21 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import adminApi from "../../services/AdminService";
 
+let globalCachedUsers = null;
+
 const ManageUsers = () => {
-    const [users, setUsers] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [users, setUsers] = useState(globalCachedUsers || []);
+    const [isLoading, setIsLoading] = useState(!globalCachedUsers);
     const [searchTerm, setSearchTerm] = useState("");
     const [isToggling, setIsToggling] = useState(null);
 
     const fetchUsers = async () => {
         try {
-            setIsLoading(true);
             const res = await adminApi.getAllUsers(searchTerm);
-            if (res.success) {
+            if (res.success) { 
+                if (!searchTerm) {
+                    globalCachedUsers = res.data.users || [];
+                }
                 setUsers(res.data.users || []);
             }
         } catch (error) {
@@ -26,7 +30,14 @@ const ManageUsers = () => {
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            fetchUsers();
+            if (searchTerm) {
+                fetchUsers();
+            } else if (globalCachedUsers) {
+                setUsers(globalCachedUsers);
+                setIsLoading(false);
+            } else {
+                fetchUsers();
+            }
         }, 500); // Debounce search
         return () => clearTimeout(timeoutId);
     }, [searchTerm]);

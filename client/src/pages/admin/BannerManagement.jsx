@@ -5,8 +5,10 @@ import { uploadBannerSchema, editBannerSchema } from "../../utils/bannerSchema";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
+let globalCachedBanners = null;
+
 const BannerManagement = () => {
-    const [banners, setBanners] = useState([]);
+    const [banners, setBanners] = useState(globalCachedBanners || []);
     const [loading, setLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [editingBannerId, setEditingBannerId] = useState(null);
@@ -24,7 +26,9 @@ const BannerManagement = () => {
     });
 
     useEffect(() => {
-        fetchBanners();
+        if (!globalCachedBanners) {
+            fetchBanners();
+        }
     }, []);
 
     const fetchBanners = async () => {
@@ -32,6 +36,7 @@ const BannerManagement = () => {
             setLoading(true);
             const res = await bannerApi.getAdminBanners();
             if (res.data?.banners) {
+                globalCachedBanners = res.data.banners;
                 setBanners(res.data.banners);
             }
         } catch (error) {
