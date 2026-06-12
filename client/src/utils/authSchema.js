@@ -39,6 +39,16 @@ export const registerSchema = yup.object().shape({
         .oneOf([yup.ref("password"), null], "Passwords must match"),
 });
 
+export const googleRegisterSchema = yup.object().shape({
+    password: yup
+        .string()
+        .required("Password is required")
+        .min(8, "Password must be at least 8 characters")
+        .matches(/[a-z]/, "At least one lowercase letter")
+        .matches(/[A-Z]/, "At least one uppercase letter")
+        .matches(/[0-9]/, "At least one number"),
+});
+
 export const forgotPasswordSchema = yup.object().shape({
     email: yup
         .string()

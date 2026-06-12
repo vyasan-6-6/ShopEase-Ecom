@@ -55,5 +55,9 @@ module.exports = {
     },
     OpenAI: {
         API_KEY: process.env.OPENAI_API_KEY,
+    },
+    GOOGLE: {
+        CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+        CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     }
 };

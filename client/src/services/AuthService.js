@@ -34,6 +34,30 @@ const authAPI = {
         return res;
     },
 
+    googleLogin: async (credential) => {
+        const res = await makeRequest(userClient, {
+            url: "/auth/google",
+            method: "POST",
+            data: { credential },
+        });
+        if (res?.data?.token) {
+            tokenService.setAuthToken(res?.data?.token);
+        }
+        return res;
+    },
+
+    googleRegister: async (credential, password) => {
+        const res = await makeRequest(userClient, {
+            url: "/auth/google/register",
+            method: "POST",
+            data: { credential, password },
+        });
+        if (res?.data?.token) {
+            tokenService.setAuthToken(res?.data?.token);
+        }
+        return res;
+    },
+
     getProfile: async () => {
          
         return makeRequest(userClient, {

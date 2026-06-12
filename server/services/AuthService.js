@@ -67,6 +67,7 @@ class AuthService {
 
     static async login(credentials) {
         const { email, password } = credentials;
+        console.log("login", credentials);
         const user = await User.findByEmail(email);
         if (!user) {
             throw ErrorFactory.authentication("Invalid email or password");
@@ -91,6 +92,82 @@ class AuthService {
             role: user.role,
         });
         logger.info(`User logged in: ${email}`);
+
+        return {
+            user: user,
+            token,
+        };
+    }
+
+    static async googleLogin(payload) {
+        const { email, name, picture } = payload;
+        
+        let user = await User.findByEmail(email);
+
+        if (user) {
+            if (user.status === "banned") {
+                throw ErrorFactory.authorization("Your account has been banned. Please contact administrator.");
+            }
+            
+            // Update missing profile info from Google if needed
+            if (!user.avatar && picture) {
+                user.avatar = picture;
+            }
+            // Mark verified if not already
+            if (!user.isVerified) {
+                user.isVerified = true;
+                user.otp = undefined;
+            }
+            
+            user.lastLogin = new Date();
+            await user.save();
+            
+            logger.info(`User logged in via Google: ${email}`);
+            
+            const token = generateUserToken({
+                id: user.id,
+                email: user.email,
+                role: user.role,
+            });
+
+            return {
+                user: user,
+                token,
+                isNewUser: false
+            };
+        } else {
+            return {
+                isNewUser: true,
+                email,
+                name,
+                picture
+            };
+        }
+    }
+
+    static async googleRegister(payload, password) {
+        const { email, name, picture } = payload;
+        
+        let user = await User.findByEmail(email);
+        if (user) {
+            throw ErrorFactory.conflict("User already exists");
+        }
+
+        user = await User.create({
+            name,
+            email,
+            password,
+            avatar: picture,
+            isVerified: true,
+            lastLogin: new Date()
+        });
+        logger.info(`New user registered via Google: ${email}`);
+
+        const token = generateUserToken({
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        });
 
         return {
             user: user,

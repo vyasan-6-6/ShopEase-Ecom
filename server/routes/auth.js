@@ -22,4 +22,6 @@ router.post("/reset-password", resetPasswordRules, validateRequest, AuthControll
 router.get("/getProfile", authenticateUser, checkUserStatus, AuthController.getProfile); 
 router.post("/change-password", changePasswordRules, validateRequest, authenticateUser, checkUserStatus, AuthController.changePassword);
 router.post("/logout", authenticateUser, checkUserStatus, AuthController.logout);
+router.post("/google", AuthController.googleAuth);
+router.post("/google/register", AuthController.googleRegister);
 module.exports = router;

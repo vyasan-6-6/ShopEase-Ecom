@@ -39,6 +39,25 @@ export const loginUser = createAsyncThunk("auth/loginUser", async (userCredentia
     }
 });
 
+export const googleLoginUser = createAsyncThunk("auth/googleLoginUser", async (credential, { rejectWithValue }) => {
+    try {
+        const res = await authAPI.googleLogin(credential);
+        return { isNewUser: res.data.isNewUser, credential, ...res.data };
+    } catch (error) {
+        console.log("google login error:", error);
+        return rejectWithValue(error?.message);
+    }
+});
+
+export const googleRegisterUser = createAsyncThunk("auth/googleRegisterUser", async ({ credential, password }, { rejectWithValue }) => {
+    try {
+        const res = await authAPI.googleRegister(credential, password);
+        return res.data.user;
+    } catch (error) {
+        return rejectWithValue(error?.message);
+    }
+});
+
 export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (email, { rejectWithValue }) => {
     try {
         await authAPI.forgotPassword(email);
@@ -236,6 +255,36 @@ export const authSlice = createSlice({
                 state.user = action.payload;
             })
             .addCase(loginUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            .addCase(googleLoginUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(googleLoginUser.fulfilled, (state, action) => {
+                state.loading = false;
+                if (!action.payload.isNewUser) {
+                    state.isAuthenticated = true;
+                    state.user = action.payload.user;
+                }
+            })
+            .addCase(googleLoginUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            .addCase(googleRegisterUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(googleRegisterUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isAuthenticated = true;
+                state.user = action.payload;
+            })
+            .addCase(googleRegisterUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
