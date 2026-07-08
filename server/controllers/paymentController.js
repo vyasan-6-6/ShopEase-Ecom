@@ -14,7 +14,7 @@ class PaymentController extends BaseController {
 
     static handleWebhook = BaseController.asyncHandler(async (req, res) => {
         const signature = req.headers['x-razorpay-signature']; 
-        const payload = req.body;
+        const payload = req.rawBody;
 
         const event = await PaymentService.verifyWebhook(payload, signature);
         

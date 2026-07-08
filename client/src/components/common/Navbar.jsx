@@ -422,11 +422,11 @@ const Navbar = () => {
             {/* Mobile Navigation */}
             <div
                 className={clsx(
-                    "md:hidden absolute w-full bg-white border-b border-gray-100 overflow-hidden transition-all duration-300",
-                    isOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
+                    "md:hidden absolute w-full bg-white border-b border-gray-100 transition-all duration-300",
+                    isOpen ? "max-h-[80vh] opacity-100 overflow-y-auto" : "max-h-0 opacity-0 overflow-hidden"
                 )}
             >
-                <div className="px-4 pt-4 pb-6 space-y-2 overflow-y-auto max-h-[90vh]">
+                <div className="px-4 pt-4 pb-6 space-y-2">
                     {/* Mobile Search */}
                     <div className="pb-4">
                         <form onSubmit={handleSearch} className="relative">

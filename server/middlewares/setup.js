@@ -37,7 +37,12 @@ const setupMiddleware = (app) => {
         app.use(limiter);
     }
 
-    app.use(express.json({limit:"10mb"}));//API's
+    app.use(express.json({
+        limit: "10mb",
+        verify: (req, res, buf) => {
+            req.rawBody = buf;
+        }
+    }));//API's
     app.use(express.urlencoded({extended:true}));//form data
 
     app.use(requestLogger);//custom logging middleware
