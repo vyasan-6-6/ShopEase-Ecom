@@ -14,10 +14,11 @@ const OrderConfirmation = () => {
     const loading = useAppSelector(selectOrderLoading);
 
     useEffect(() => {
-        if (!orders || orders.length === 0) {
+        const hasOrder = orders && orders.some(o => o._id === id);
+        if (!hasOrder) {
             dispatch(fetchMyOrders());
         }
-    }, [dispatch, orders]);
+    }, [dispatch, orders, id]);
 
     const order = useMemo(() => {
         return orders.find(o => o._id === id);
