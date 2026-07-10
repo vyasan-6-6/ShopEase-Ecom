@@ -26,34 +26,30 @@ Here is a visual tour of the platform. You can replace the placeholder paths bel
 <div align="center">
 
 ### 🏠 Home Page
-*(Featured Carousel, Categories, Top Deals, and DeepSeek Chatbot interface)*
-<!-- TODO: Add your home page screenshot in the path below -->
+*(Featured Carousel, Categories, Top Deals, and NVIDIA Nemotron Chatbot interface)*
 ![Home Page](images/home.png)
 
 ### 🛍️ Product Catalog & Search
 *(Dynamic filtering, search, pagination, and sorting)*
-<!-- TODO: Add your product page screenshot in the path below -->
-![Product Page](images/product.png)
+![Product Catalog](images/product.png)
 
-### 🛒 Shopping Cart & Checkout
-*(Item adjustments, real-time total, coupon validation, and wallet integration)*
-<!-- TODO: Add your cart screenshot in the path below -->
-![Cart and Checkout](images/cart.png)
+### 🛒 Shopping Cart & Checkout (2 Images)
+*(Item adjustments, real-time totals, and order checkout sequence)*
+![Shopping Cart](images/cart.png)
+![Checkout Page](images/checkout.png)
 
-### 💳 Razorpay Secure Payment Portal
-*(Seamless checkouts with Razorpay popup)*
-<!-- TODO: Add your checkout screenshot in the path below -->
-![Checkout Flow](images/checkout.png)
+### 💳 Razorpay Secure Payment Portal (1 Image)
+*(Seamless transaction popup integration)*
+![Razorpay Payment](images/razorpay.png)
 
 ### 📊 Admin Dashboard
-*(Sales analytics, inventory status, user metrics, and order progression)*
-<!-- TODO: Add your admin dashboard screenshot in the path below -->
+*(Sales metrics, category/product management tables)*
 ![Admin Dashboard](images/admin.png)
 
-### 📜 Order History & Wallet
-*(Past transactions, delivery statuses, invoice summary, and wallet balance updates)*
-<!-- TODO: Add your order history screenshot in the path below -->
+### 📜 Order History & Wallet (2 Images)
+*(Customer profile wallet balance additions, transactional ledger logs, and past order status trackers)*
 ![Order History](images/orders.png)
+![Wallet Page](images/wallet.png)
 
 </div>
 
@@ -81,7 +77,7 @@ Here is a visual tour of the platform. You can replace the placeholder paths bel
 
 ### 💳 Payments & Integrations
 *   **Payment Gateway:** Razorpay SDK Integration
-*   **AI Chatbot Assistant:** DeepSeek AI integration via OpenRouter API
+*   **AI Chatbot Assistant:** NVIDIA Nemotron-Nano model via OpenRouter API
 *   **Mail Service:** Nodemailer (Gmail SMTP setup)
 
 ### 📦 Cloud Storage
@@ -105,7 +101,7 @@ Here is a visual tour of the platform. You can replace the placeholder paths bel
     *   Integrated Digital Wallet to add funds and checkout directly.
     *   Integrated Razorpay payment portal for credit/debit card, UPI, and net banking.
 *   **AI Support Bot:**
-    *   AI Chatbot assistant powered by DeepSeek to answer product questions or help navigate.
+    *   AI Chatbot assistant powered by NVIDIA Nemotron-Nano via OpenRouter to answer product questions or help navigate.
 
 ### 🛡️ Admin Dashboard & CRUD Management
 *   **Insights:** Core analytics charts showing revenue, orders count, and inventory warnings.
@@ -144,7 +140,7 @@ graph TD
     Express -->|Image Uploads| Multer[Multer / Cloudinary]
     Express -->|Transactional Emails| Nodemailer[Nodemailer Mail Server]
     Express -->|Secure Payments| RazorpayAPI
-    Express -->|AI Assistant Chat| OpenRouter[DeepSeek / OpenRouter API]
+    Express -->|AI Assistant Chat| OpenRouter[NVIDIA Nemotron / OpenRouter API]
 ```
 
 ### Development Architecture Patterns
@@ -300,7 +296,7 @@ RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 
-# DeepSeek Chatbot API Integration
+# NVIDIA Nemotron Chatbot API Integration (via OpenRouter)
 OPENROUTER_API_KEY=your_openrouter_api_key
 ```
 
@@ -357,7 +353,7 @@ npm run build
 
 ## 📈 Learning Outcomes
 
-Through building **ShopSphere**, I gained hands-on expertise with:
+Through building **ShopEase**, I gained hands-on expertise with:
 *   Designing and implementing secure REST APIs following the MVC schema.
 *   Authenticating routes using JSON Web Tokens (JWT) and social OAuth integrations.
 *   Designing and scaling relational structures using MongoDB and Mongoose.
