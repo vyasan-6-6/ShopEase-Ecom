@@ -14,8 +14,8 @@ A premium, full-stack e-commerce platform that enables users to browse products,
 
 ## 🔗 Live Demo
 
-*   **Frontend Client:** [Deploy Link](https://shopease-frontend-vyasan.s3-website-us-east-1.amazonaws.com) *(Update with your production URL)*
-*   **Backend API Service:** [Backend Link](https://shopease-ecom-2dhd.onrender.com/api) *(Update with your production URL)*
+*   **Frontend Client:** [Deploy Link](http://shopease-frontend-vyasan.s3-website-us-east-1.amazonaws.com/)
+*   **Backend API Service:** [Backend Link](http://3.82.26.10:5000/api)
 
 ---
 
