@@ -1,4 +1,4 @@
-# 🌌 ShopSphere – Full Stack MERN E-Commerce Platform
+# 🌌 ShopEase – Full Stack MERN E-Commerce Platform
 
 [![React](https://img.shields.io/badge/Frontend-React%2019-blue?logo=react&style=flat-square)](https://react.dev)
 [![TailwindCSS](https://img.shields.io/badge/Styling-Tailwind%20v4-38bdf8?logo=tailwind-css&style=flat-square)](https://tailwindcss.com)
