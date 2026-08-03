@@ -19,7 +19,7 @@ const otpRateLimiter = createRedisRateLimiter({ windowInSeconds: 900, maxRequest
 router.post("/register", authRateLimiter, registerRules, validateRequest, AuthController.register);
 router.post("/login", authRateLimiter, loginRules, validateRequest, AuthController.login);
 router.post("/verify-otp", otpRateLimiter, AuthController.verifyOtp);
-router.post("/resend-otp", authRateLimiter, AuthController.resendOtp);
+router.post("/resend-otp", otpRateLimiter, AuthController.resendOtp);
 router.post("/forgot-password", authRateLimiter, forgotPasswordRules, validateRequest, AuthController.forgotPassword);
 router.post("/verify-reset-otp", otpRateLimiter, AuthController.verifyResetOtp);
 router.post("/reset-password", authRateLimiter, resetPasswordRules, validateRequest, AuthController.resetPassword);
