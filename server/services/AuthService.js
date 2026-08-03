@@ -351,6 +351,36 @@ class AuthService {
         logger.info(`Password changed for user:${user.email}`);
         return true;
     }
+
+    static async blacklistToken(token) {
+        if (!token) return false;
+        try {
+            const jwt = require("jsonwebtoken");
+            const { setCache } = require("../config/redis");
+            const decoded = jwt.decode(token);
+            if (!decoded || !decoded.exp) return false;
+
+            const remainingSeconds = decoded.exp - Math.floor(Date.now() / 1000);
+            if (remainingSeconds > 0) {
+                await setCache(`blacklist:token:${token}`, "true", remainingSeconds);
+            }
+            return true;
+        } catch (error) {
+            logger.warn(`Failed to blacklist token: ${error.message}`);
+            return false;
+        }
+    }
+
+    static async isTokenBlacklisted(token) {
+        if (!token) return false;
+        try {
+            const { getCache } = require("../config/redis");
+            const isBlacklisted = await getCache(`blacklist:token:${token}`);
+            return !!isBlacklisted;
+        } catch (error) {
+            return false;
+        }
+    }
 }
 
 module.exports = AuthService;

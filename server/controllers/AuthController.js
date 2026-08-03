@@ -121,6 +121,12 @@ class AuthController extends BaseController {
     });
 
     static logout = BaseController.asyncHandler(async (req, res) => {
+        const authHeader = req.headers.authorization || req.get("Authorization");
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            const token = authHeader.split(" ")[1];
+            await AuthService.blacklistToken(token);
+        }
+
         BaseController.logAction("USER_LOGOUT", req.user);
         BaseController.sendSuccess(res, "Logged out successfull");
     });

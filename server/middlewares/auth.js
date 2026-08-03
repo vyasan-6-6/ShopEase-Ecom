@@ -1,15 +1,20 @@
 const { ErrorFactory } = require("../utils/errors");
 const { verifyUserToken, verifyAdminToken } = require("../utils/jwt");
+const AuthService = require("../services/AuthService");
 
-
-const authenticateUser = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+const authenticateUser = async (req, res, next) => {
+  const authHeader = req.headers.authorization || req.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return next(ErrorFactory.authentication('Access token required'));
   }
   const token = authHeader.split(" ")[1];
 
   try {
+    const isBlacklisted = await AuthService.isTokenBlacklisted(token);
+    if (isBlacklisted) {
+      return next(ErrorFactory.authentication("Token has been revoked. Please log in again."));
+    }
+
     const decoded = verifyUserToken(token);
     req.user = {
       id: decoded.id,
@@ -18,18 +23,22 @@ const authenticateUser = (req, res, next) => {
     }
     next();
   } catch (error) {
-
     next(ErrorFactory.authentication("Invalid or expired token"));
   }
 }
 
-const authenticateAdmin = (req, res, next) => {
-  const authHeader = req.get('Authorization');
+const authenticateAdmin = async (req, res, next) => {
+  const authHeader = req.get('Authorization') || req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return next(ErrorFactory.authentication('Access token required'));
   }
   const token = authHeader.split(' ')[1];
   try {
+    const isBlacklisted = await AuthService.isTokenBlacklisted(token);
+    if (isBlacklisted) {
+      return next(ErrorFactory.authentication("Token has been revoked. Please log in again."));
+    }
+
     const decoded = verifyAdminToken(token);
     req.admin = {
       id: decoded.id,
@@ -71,12 +80,17 @@ const authenticateAdminOptional = (req, res, next) => {
   next();
 };
 
-const authenticateAnyUser = (req, res, next) => {
+const authenticateAnyUser = async (req, res, next) => {
   const authHeader = req.headers.authorization || req.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return next(ErrorFactory.authentication('Access token required'));
   }
   const token = authHeader.split(" ")[1];
+
+  const isBlacklisted = await AuthService.isTokenBlacklisted(token);
+  if (isBlacklisted) {
+    return next(ErrorFactory.authentication("Token has been revoked. Please log in again."));
+  }
 
   // Try user token first
   try {
