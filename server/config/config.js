@@ -59,5 +59,10 @@ module.exports = {
     GOOGLE: {
         CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    },
+    REDIS: {
+        HOST: process.env.REDIS_HOST || "127.0.0.1",
+        PORT: process.env.REDIS_PORT || 6379,
+        PASSWORD: process.env.REDIS_PASSWORD || null,
     }
 };
