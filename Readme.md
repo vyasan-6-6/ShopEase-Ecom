@@ -66,12 +66,14 @@ Here is a visual tour of the platform. You can replace the placeholder paths bel
 *   **HTTP Client:** Axios for API requests
 *   **UI Components:** Lucide React, Swiper.js, SweetAlert2, React Toastify
 
-### ⚙️ Backend
+### ⚙️ Backend & Infrastructure
 *   **Runtime:** Node.js
 *   **Framework:** Express.js (v5)
 *   **Database:** MongoDB & Mongoose ORM
+*   **In-Memory Cache & Rate Limiting:** Redis & ioredis (Product Caching, Sliding Window Rate Limiting, JWT Blacklisting)
+*   **Reverse Proxy & Web Server:** Nginx (Port forwarding, Gzip compression, WebSockets)
 *   **Authentication:** JSON Web Tokens (JWT) & Google OAuth
-*   **Security:** Helmet, CORS, Express Rate Limit
+*   **Security:** Helmet, CORS, Redis Rate Limiter
 *   **File Uploads:** Multer & Multer Cloudinary Storage
 *   **Logging:** Winston & Winston Daily Rotate File
 
@@ -116,7 +118,10 @@ Here is a visual tour of the platform. You can replace the placeholder paths bel
 ## 💡 Technical Highlights
 
 *   **Role-Based Access Control (RBAC):** Distinct route-protection middleware and distinct JWT secrets (`JWT_USER_SECRET` and `JWT_ADMIN_SECRET`) to separate Customer and Admin access levels.
-*   **Custom Rate Limiter:** Applied limiters on auth routes (`/api/auth`) to prevent brute force attacks.
+*   **Redis In-Memory Product Caching:** Product catalog endpoints (`GET /api/products`, `GET /api/products/:id`) utilize Redis caching with a 10-minute TTL and automatic pattern flushing (`products:*`) on admin updates.
+*   **Redis-based Rate Limiting:** Custom fixed-window rate limiter using Redis counters on sensitive `/api/auth` endpoints to prevent brute-force attacks and email spam.
+*   **JWT Logout Blacklisting:** True server-side token revocation on logout by storing blacklisted tokens in Redis with expiration matching the token's remaining lifespan.
+*   **Nginx Reverse Proxy & Port Forwarding:** Production-ready Nginx configuration handling HTTP/HTTPS proxying, Gzip compression, max body size uploads (20MB), and Socket.io WebSockets.
 *   **Robust Error Handling:** Global Express error-handling middleware coupled with React Error Boundaries on the client to avoid service interruption.
 *   **Database Aggregations:** MongoDB pipeline operations for admin analytics and inventory counts.
 *   **Production-Ready Logging:** Winston logger configurations maintaining logs separated into `/logs/error-%DATE%.log` and `/logs/combined-%DATE%.log` with daily automatic rotation.
