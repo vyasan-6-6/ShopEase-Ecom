@@ -32,6 +32,7 @@ const createApiClient = (getToken) => {
         baseURL: API_CONFIG.baseURL,
         timeout: API_CONFIG.timeout,
         headers: API_CONFIG.headers,
+        withCredentials: true,
     });
     client.interceptors.request.use(
         (config) => {

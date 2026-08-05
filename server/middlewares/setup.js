@@ -2,6 +2,7 @@ const express = require("express");
 const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
 const config = require("../config/config");
 const requestLogger = require("./requestLogger");
 
@@ -14,12 +15,13 @@ const setupMiddleware = (app) => {
 
     const corsOptions = {
         origin: config.CORS.ORIGIN,
-        credentials: config.CORS.CREDENTIALS,
+        credentials: true,
         allowedHeaders: config.CORS.ALLOWED_HEADERS,
         methods: config.CORS.METHODS,
         optionsSuccessStatus: 200
     };
     app.use(cors(corsOptions));
+    app.use(cookieParser());
 
     const limiter = rateLimit({
         windowMs: config.RATE_LIMIT.WINDOW_MS,

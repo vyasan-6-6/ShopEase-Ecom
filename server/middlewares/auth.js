@@ -2,12 +2,22 @@ const { ErrorFactory } = require("../utils/errors");
 const { verifyUserToken, verifyAdminToken } = require("../utils/jwt");
 const AuthService = require("../services/AuthService");
 
-const authenticateUser = async (req, res, next) => {
+const getTokenFromReq = (req, cookieName = "userToken") => {
+  if (req.cookies && req.cookies[cookieName]) {
+    return req.cookies[cookieName];
+  }
   const authHeader = req.headers.authorization || req.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.split(" ")[1];
+  }
+  return null;
+};
+
+const authenticateUser = async (req, res, next) => {
+  const token = getTokenFromReq(req, "userToken");
+  if (!token) {
     return next(ErrorFactory.authentication('Access token required'));
   }
-  const token = authHeader.split(" ")[1];
 
   try {
     const isBlacklisted = await AuthService.isTokenBlacklisted(token);
@@ -28,11 +38,10 @@ const authenticateUser = async (req, res, next) => {
 }
 
 const authenticateAdmin = async (req, res, next) => {
-  const authHeader = req.get('Authorization') || req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = getTokenFromReq(req, "adminToken") || getTokenFromReq(req, "userToken");
+  if (!token) {
     return next(ErrorFactory.authentication('Access token required'));
   }
-  const token = authHeader.split(' ')[1];
   try {
     const isBlacklisted = await AuthService.isTokenBlacklisted(token);
     if (isBlacklisted) {

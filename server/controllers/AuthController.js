@@ -13,10 +13,34 @@ const config = require("../config/config");
 const { ErrorFactory } = require("../utils/errors");
 const googleClient = new OAuth2Client(config.GOOGLE.CLIENT_ID);
 
+const setAuthCookie = (res, token, isAdmin = false) => {
+    if (!token) return;
+    const cookieName = isAdmin ? "adminToken" : "userToken";
+    const isProd = process.env.NODE_ENV === "production";
+    res.cookie(cookieName, token, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+        maxAge: 8 * 24 * 60 * 60 * 1000, // 8 days
+    });
+};
+
+const clearAuthCookies = (res) => {
+    const isProd = process.env.NODE_ENV === "production";
+    const options = {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+    };
+    res.clearCookie("userToken", options);
+    res.clearCookie("adminToken", options);
+};
+
 class AuthController extends BaseController {
     static register = BaseController.asyncHandler(async (req, res) => {
         const validatedData = BaseController.validateRequest(registerValidation, req.body);
         const result = await AuthService.register(validatedData);
+        if (result.token) setAuthCookie(res, result.token, result.user?.role === "admin");
         BaseController.logAction("USER_REGISTER", result.user);
         BaseController.sendSuccess(res, "User registered successfully. Welcome!", result, 201);
     });
@@ -24,6 +48,7 @@ class AuthController extends BaseController {
     static login = BaseController.asyncHandler(async (req, res) => {
         const validationData = BaseController.validateRequest(loginValidation, req.body);
         const result = await AuthService.login(validationData);
+        if (result.token) setAuthCookie(res, result.token, result.user?.role === "admin");
         BaseController.logAction("USER_LOGIN", result.user);
         BaseController.sendSuccess(res, "Login Successfull.", result);
     });
@@ -33,7 +58,6 @@ class AuthController extends BaseController {
         if (!credential) {
             throw ErrorFactory.badRequest("Google credential is required", 400);
         }
-
 
         const ticket = await googleClient.verifyIdToken({
             idToken: credential,
@@ -47,6 +71,7 @@ class AuthController extends BaseController {
             return BaseController.sendSuccess(res, "Please provide a password to complete registration.", result);
         }
 
+        if (result.token) setAuthCookie(res, result.token, result.user?.role === "admin");
         BaseController.logAction("USER_LOGIN_GOOGLE", result.user);
         BaseController.sendSuccess(res, "Login Successfull.", result);
     });
@@ -65,6 +90,7 @@ class AuthController extends BaseController {
         const payload = ticket.getPayload();
 
         const result = await AuthService.googleRegister(payload, password);
+        if (result.token) setAuthCookie(res, result.token, result.user?.role === "admin");
         BaseController.logAction("USER_REGISTER_GOOGLE", result.user);
         BaseController.sendSuccess(res, "Registration Successfull.", result);
     });
@@ -121,11 +147,12 @@ class AuthController extends BaseController {
     });
 
     static logout = BaseController.asyncHandler(async (req, res) => {
-        const authHeader = req.headers.authorization || req.get("Authorization");
-        if (authHeader && authHeader.startsWith("Bearer ")) {
-            const token = authHeader.split(" ")[1];
+        const token = req.cookies?.userToken || req.cookies?.adminToken || (req.headers.authorization?.startsWith("Bearer ") ? req.headers.authorization.split(" ")[1] : null);
+        if (token) {
             await AuthService.blacklistToken(token);
         }
+
+        clearAuthCookies(res);
 
         BaseController.logAction("USER_LOGOUT", req.user);
         BaseController.sendSuccess(res, "Logged out successfull");
