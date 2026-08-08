@@ -13,8 +13,23 @@ const setupMiddleware = (app) => {
         }),
     );
 
+    const allowedOrigins = [
+        config.CORS.ORIGIN,
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://localhost:5000",
+        "http://127.0.0.1:5000"
+    ];
+
     const corsOptions = {
-        origin: config.CORS.ORIGIN,
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin) || config.NODE_ENV !== "production") {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         credentials: true,
         allowedHeaders: config.CORS.ALLOWED_HEADERS,
         methods: config.CORS.METHODS,
