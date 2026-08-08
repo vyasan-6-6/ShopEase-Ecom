@@ -16,8 +16,8 @@ const authAPI = {
             data,
         });
 
-        if (res?.token) {
-            tokenService.setAuthToken(res.token);
+        if (res?.data?.token) {
+            tokenService.setAuthToken(res.data.token);
         }
         return res;
     },

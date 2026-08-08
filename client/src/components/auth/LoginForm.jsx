@@ -95,6 +95,7 @@ const LoginForm = () => {
 
                         toast.error(errorMsg || "Login failed. Please try again.");
                     }
+                    return;
                 }
                 const localItems = JSON.parse(window.localStorage.getItem("cartItems")) || []
                 if (localItems.length > 0) {
