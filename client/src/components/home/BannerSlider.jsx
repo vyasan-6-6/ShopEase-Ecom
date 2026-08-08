@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+
 import bannerApi from "../../services/BannerService";
 
 // Import Swiper React components and styles
@@ -50,16 +50,6 @@ const BannerSlider = () => {
                 >
                     {banners.map((banner) => (
                         <SwiperSlide key={banner.id}>
-                            {banner.link ? (
-                                <Link to={banner.link} className="block w-full h-full relative overflow-hidden">
-                                    <img
-                                        src={banner.imageUrl}
-                                        alt={banner.title}
-                                        className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-black/0" />
-                                </Link>
-                            ) : (
                                 <div className="w-full h-full relative overflow-hidden">
                                     <img
                                         src={banner.imageUrl}
@@ -68,7 +58,6 @@ const BannerSlider = () => {
                                     />
                                     <div className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-black/0" />
                                 </div>
-                            )}
                         </SwiperSlide>
                     ))}
                 </Swiper>
